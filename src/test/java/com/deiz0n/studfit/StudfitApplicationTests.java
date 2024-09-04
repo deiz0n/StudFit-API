@@ -1,10 +1,10 @@
-package com.deiz0n.studfitapi;
+package com.deiz0n.studfit;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class StudfitApiApplicationTests {
+class StudfitApplicationTests {
 
     @Test
     void contextLoads() {

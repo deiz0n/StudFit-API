@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.deiz0n</groupId>
-    <artifactId>studfit-api</artifactId>
+    <artifactId>studfit</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>studfit-api</name>
-    <description>studfit-api</description>
+    <name>studfit</name>
+    <description>studfit</description>
     <url/>
     <licenses>
         <license/>
