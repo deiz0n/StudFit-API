@@ -1,9 +1,6 @@
 package com.deiz0n.studfit.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Presencas {
+public class Presenca {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,4 +20,8 @@ public class Presencas {
     private LocalDate data;
     private Boolean presente;
 
+    @ManyToOne
+    private Aluno aluno;
+    @OneToOne
+    private Usuario usuario;
 }

@@ -22,4 +22,7 @@ public class Turno {
     @Column(name = "horario_final")
     private LocalTime horarioFinal;
 
+    @OneToOne
+    private Aluno aluno;
+
 }

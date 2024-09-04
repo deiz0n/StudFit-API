@@ -21,4 +21,7 @@ public class Usuario {
     private String email;
     private String senha;
 
+    @OneToOne
+    private Presenca presenca;
+
 }

@@ -5,17 +5,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Alunos {
+public class Aluno {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer colocacao;
     private String nome;
     private Double peso;
@@ -33,5 +35,10 @@ public class Alunos {
     private String status;
     @Column(name = "ausencias_consecutivas")
     private Integer ausenciasConsecutivas;
+
+    @OneToMany(mappedBy = "alunos")
+    private List<Presenca> presencas;
+    @OneToOne
+    private Turno turno;
 
 }
