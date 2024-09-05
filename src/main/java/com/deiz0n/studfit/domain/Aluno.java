@@ -17,7 +17,6 @@ public class Aluno {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer colocacao;
     private String nome;
     private Double peso;
@@ -36,7 +35,7 @@ public class Aluno {
     @Column(name = "ausencias_consecutivas")
     private Integer ausenciasConsecutivas;
 
-    @OneToMany(mappedBy = "alunos")
+    @OneToMany(mappedBy = "aluno")
     private List<Presenca> presencas;
     @OneToOne
     private Turno turno;
