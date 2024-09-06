@@ -34,6 +34,7 @@ public class Aluno {
     private String status;
     @Column(name = "ausencias_consecutivas")
     private Integer ausenciasConsecutivas;
+    private Boolean ativado;
 
     @OneToMany(mappedBy = "aluno")
     private List<Presenca> presencas;
