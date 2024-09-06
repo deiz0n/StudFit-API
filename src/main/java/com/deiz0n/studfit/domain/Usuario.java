@@ -20,6 +20,8 @@ public class Usuario {
     @Column(unique = true)
     private String email;
     private String senha;
+    @Column(name = "codigo_recuperacao")
+    private String codigoRecuperacao;
 
     @OneToOne
     private Presenca presenca;
