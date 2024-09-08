@@ -1,6 +1,6 @@
 package com.deiz0n.studfit.services;
 
-import com.deiz0n.studfit.domain.dtos.AlunoDTO;
+import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.repositories.AlunoRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +17,11 @@ public class AlunoService {
     }
 
     // Retorna todos os alunos que estão na lista de espera
-    public List<AlunoDTO> getListaDeEspera() {
+    public List<AlunoListaEsperaDTO> getListaDeEspera() {
         return alunoRepository.findAll()
                 .stream()
-                .map(aluno -> AlunoDTO.builder()
+                .map(aluno -> AlunoListaEsperaDTO.builder()
+                        .id(aluno.getId())
                         .nome(aluno.getNome())
                         .email(aluno.getEmail())
                         .colocacao(aluno.getColocacao())
