@@ -1,27 +1,29 @@
-package com.deiz0n.studfit.domain;
+package com.deiz0n.studfit.domain.entites;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Presenca {
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-    private LocalDate data;
-    private Boolean presente;
+    private String nome;
+    @Column(unique = true)
+    private String email;
+    private String senha;
+    @Column(name = "codigo_recuperacao")
+    private String codigoRecuperacao;
 
-    @ManyToOne
-    private Aluno aluno;
     @OneToOne
-    private Usuario usuario;
+    private Presenca presenca;
+
 }

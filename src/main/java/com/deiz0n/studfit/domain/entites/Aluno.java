@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.domain;
+package com.deiz0n.studfit.domain.entites;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
