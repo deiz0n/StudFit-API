@@ -20,12 +20,13 @@ public class AlunoService {
     public List<AlunoListaEsperaDTO> getListaDeEspera() {
         return alunoRepository.findAll()
                 .stream()
-                .map(aluno -> AlunoListaEsperaDTO.builder()
-                        .id(aluno.getId())
-                        .nome(aluno.getNome())
-                        .email(aluno.getEmail())
-                        .colocacao(aluno.getColocacao())
-                        .build()
+                .map(aluno -> new AlunoListaEsperaDTO(
+                            aluno.getId(),
+                            aluno.getNome(),
+                            aluno.getEmail(),
+                            aluno.getColocacao(),
+                            aluno.getAtivado()
+                        )
                 )
                 .filter(aluno -> !aluno.getAtivado())
                 .collect(Collectors.toList());
