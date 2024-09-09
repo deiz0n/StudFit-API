@@ -1,0 +1,1 @@
+ALTER TABLE aluno RENAME COLUMN "ativado" TO "lista_espera";

@@ -18,7 +18,7 @@ public class AlunoListaEsperaDTO {
     private String nome;
     private String email;
     private Integer colocacao;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Boolean ativado = false;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY, namespace = "lista_espera")
+    private Boolean listaEspera = false;
 
 }

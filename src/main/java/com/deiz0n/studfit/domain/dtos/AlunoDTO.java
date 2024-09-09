@@ -15,7 +15,6 @@ import java.util.UUID;
 public class AlunoDTO {
 
     private UUID id;
-    private Integer colocacao;
     private String nome;
     private Double peso;
     private Integer altura;
@@ -30,6 +29,7 @@ public class AlunoDTO {
     private String status;
     @JsonProperty(namespace = "ausencias_consecutivas")
     private Integer ausenciasConsecutivas;
-    private Boolean ativado;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY, namespace = "lista_espera")
+    private Boolean listaEspera;
 
 }
