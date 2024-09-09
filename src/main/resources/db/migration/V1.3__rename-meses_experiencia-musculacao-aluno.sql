@@ -1,0 +1,1 @@
+ALTER TABLE aluno RENAME COLUMN "meses_experiencias_musculacao" TO "meses_experiencia_musculacao"
