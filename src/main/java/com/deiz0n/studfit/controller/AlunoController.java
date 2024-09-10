@@ -1,13 +1,13 @@
 package com.deiz0n.studfit.controller;
 
+import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.domain.response.ResponseRequest;
 import com.deiz0n.studfit.services.AlunoService;
+import jakarta.validation.Valid;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import java.util.concurrent.TimeUnit;
@@ -23,28 +23,41 @@ public class AlunoController {
     }
 
     @GetMapping("lista-espera")
-    public ResponseEntity<ResponseRequest> getAlunosListaEspera(ServletWebRequest request) {
+    public ResponseEntity<ResponseRequest> getAlunosListaEspera(ServletWebRequest path) {
         var alunos = service.getListaDeEspera();
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
                 .body(ResponseRequest.builder()
                         .code(HttpStatus.OK.value())
                         .status(HttpStatus.OK)
-                        .path(request.getRequest().getRequestURI())
+                        .path(path.getRequest().getRequestURI())
                         .data(alunos)
                         .build());
     }
 
     @GetMapping("efetivados")
-    public ResponseEntity<ResponseRequest> getAlunosEfetivados(ServletWebRequest request) {
+    public ResponseEntity<ResponseRequest> getAlunosEfetivados(ServletWebRequest path) {
         var alunos = service.getEfetivados();
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
                 .body(ResponseRequest.builder()
                         .code(HttpStatus.OK.value())
                         .status(HttpStatus.OK)
-                        .path(request.getRequest().getRequestURI())
+                        .path(path.getRequest().getRequestURI())
                         .data(alunos)
+                        .build());
+    }
+
+    @PostMapping("/lista-espera/register")
+    public ResponseEntity<ResponseRequest> registerAlunoListaEspera(@RequestBody @Valid AlunoListaEsperaDTO request, ServletWebRequest path) {
+        var aluno = service.registerListaEspera(request);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
+                .body(ResponseRequest.builder()
+                        .code(HttpStatus.OK.value())
+                        .status(HttpStatus.OK)
+                        .path(path.getRequest().getRequestURI())
+                        .data(aluno)
                         .build());
     }
 }
