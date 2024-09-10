@@ -28,7 +28,6 @@ public class AlunoListaEsperaDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer colocacao;
     @JsonIgnore
-    @JsonProperty(namespace = "lista_espera")
     private Boolean listaEspera = true;
 
 }

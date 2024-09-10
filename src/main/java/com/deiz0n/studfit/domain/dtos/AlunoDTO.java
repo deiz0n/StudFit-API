@@ -1,5 +1,6 @@
 package com.deiz0n.studfit.domain.dtos;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +30,7 @@ public class AlunoDTO {
     private String status;
     @JsonProperty(namespace = "ausencias_consecutivas")
     private Integer ausenciasConsecutivas;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY, namespace = "lista_espera")
-    private Boolean listaEspera;
+    @JsonIgnore
+    private Boolean listaEspera = false;
 
 }
