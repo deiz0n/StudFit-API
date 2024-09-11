@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.ServletWebRequest;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -59,5 +60,11 @@ public class AlunoController {
                         .path(path.getRequest().getRequestURI())
                         .data(aluno)
                         .build());
+    }
+
+    @DeleteMapping("/lista-espera/delete/{id}")
+    public ResponseEntity<ResponseRequest> removeAlunoListaEspera(@PathVariable UUID id, ServletWebRequest path) {
+        var aluno = service.removeListaEspera(id);
+        return ResponseEntity.noContent().build();
     }
 }
