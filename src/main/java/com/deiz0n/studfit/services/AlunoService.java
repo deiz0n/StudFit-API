@@ -3,11 +3,14 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.domain.entites.Aluno;
+import com.deiz0n.studfit.domain.exceptions.AlunoNotFoundException;
 import com.deiz0n.studfit.repositories.AlunoRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,13 +44,55 @@ public class AlunoService {
 
     // Registra um aluno na lista de espera
     public AlunoListaEsperaDTO registerListaEspera(AlunoListaEsperaDTO alunoListaEspera) {
-        alunoListaEspera.setColocacao(getColocaoAtual());
+        alunoListaEspera.setColocacao(getColocacaoAtual());
         var aluno = mapper.map(alunoListaEspera, Aluno.class);
         alunoRepository.save(aluno);
         return alunoListaEspera;
     }
 
-    private Integer getColocaoAtual() {
-        return Math.toIntExact(alunoRepository.count() + 1);
+    public AlunoListaEsperaDTO removeListaEspera(UUID id) {
+        var aluno = getById(id);
+        alunoRepository.delete(aluno);
+
+        reorderListaEspera(aluno);
+
+        return new AlunoListaEsperaDTO(
+                aluno.getId(),
+                aluno.getNome(),
+                aluno.getEmail(),
+                aluno.getColocacao(),
+                aluno.getListaEspera()
+        );
+    }
+
+    private Integer getColocacaoAtual() {
+        return Math.toIntExact(alunoRepository.findAll()
+                .stream()
+                .filter(Aluno::getListaEspera)
+                .count() + 1
+        );
+    }
+
+    private void reorderListaEspera(Aluno aluno) {
+        List<Aluno> listOfAlunos = new ArrayList<>(alunoRepository.findAll());
+        var lastAluno = listOfAlunos.get(listOfAlunos.size()-1);
+        var currentColocacao = 0;
+
+        if (!aluno.equals(lastAluno)) {
+            for (Aluno x : listOfAlunos) {
+                currentColocacao = x.getColocacao();
+                if (aluno.getColocacao() < x.getColocacao()) {
+                    x.setColocacao(currentColocacao-1);
+                    alunoRepository.save(x);
+                }
+            }
+        }
+    }
+
+    private Aluno getById(UUID id) {
+        return alunoRepository.findById(id)
+                .orElseThrow(
+                        () -> new AlunoNotFoundException(String.format("Aluno com ID: %s não foi encontrado", id.toString()))
+                );
     }
 }
