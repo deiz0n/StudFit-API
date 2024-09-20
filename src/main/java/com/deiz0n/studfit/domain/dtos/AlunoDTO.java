@@ -23,12 +23,12 @@ public class AlunoDTO {
     private String telefone;
     private String cirurgias;
     private String patologias;
-    @JsonProperty(namespace = "meses_experiencia_musculacao")
+    @JsonProperty("meses_experiencia_musculacao")
     private Integer mesesExperienciaMusculacao;
-    @JsonProperty(namespace = "diagnostico_lesao_joelho")
+    @JsonProperty("diagnostico_lesao_joelho")
     private String diagnosticoLesaoJoelho;
     private String status;
-    @JsonProperty(namespace = "ausencias_consecutivas")
+    @JsonProperty("ausencias_consecutivas")
     private Integer ausenciasConsecutivas;
     @JsonIgnore
     private Boolean listaEspera = false;
