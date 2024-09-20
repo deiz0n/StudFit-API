@@ -82,4 +82,10 @@ public class AlunoController {
                         .build());
     }
 
+    @DeleteMapping("efetivados/delete/{id}")
+    public ResponseEntity removeAlunoEfetivado(@PathVariable UUID id) {
+        service.removeEfetivado(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
