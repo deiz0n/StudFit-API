@@ -1,5 +1,6 @@
 package com.deiz0n.studfit.controller;
 
+import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.domain.response.ResponseRequest;
 import com.deiz0n.studfit.services.AlunoService;
@@ -36,19 +37,6 @@ public class AlunoController {
                         .build());
     }
 
-    @GetMapping("efetivados")
-    public ResponseEntity<ResponseRequest> getAlunosEfetivados(ServletWebRequest path) {
-        var alunos = service.getEfetivados();
-        return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
-                .body(ResponseRequest.builder()
-                        .code(HttpStatus.OK.value())
-                        .status(HttpStatus.OK)
-                        .path(path.getRequest().getRequestURI())
-                        .data(alunos)
-                        .build());
-    }
-
     @PostMapping("/lista-espera/register")
     public ResponseEntity<ResponseRequest> registerAlunoListaEspera(@RequestBody @Valid AlunoListaEsperaDTO request, ServletWebRequest path) {
         var aluno = service.registerListaEspera(request);
@@ -67,4 +55,31 @@ public class AlunoController {
         var aluno = service.removeListaEspera(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("efetivados")
+    public ResponseEntity<ResponseRequest> getAlunosEfetivados(ServletWebRequest path) {
+        var alunos = service.getEfetivados();
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
+                .body(ResponseRequest.builder()
+                        .code(HttpStatus.OK.value())
+                        .status(HttpStatus.OK)
+                        .path(path.getRequest().getRequestURI())
+                        .data(alunos)
+                        .build());
+    }
+
+    @PostMapping("efetivados/{id}/efetivar")
+    public ResponseEntity<ResponseRequest> registerAlunoEfetivado(@PathVariable UUID id, @RequestBody AlunoDTO request, ServletWebRequest path) {
+        var aluno = service.registerEfetivado(id, request);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
+                .body(ResponseRequest.builder()
+                        .code(HttpStatus.OK.value())
+                        .status(HttpStatus.OK)
+                        .path(path.getRequest().getRequestURI())
+                        .data(aluno)
+                        .build());
+    }
+
 }
