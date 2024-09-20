@@ -51,7 +51,7 @@ public class AlunoController {
     }
 
     @DeleteMapping("/lista-espera/delete/{id}")
-    public ResponseEntity<ResponseRequest> removeAlunoListaEspera(@PathVariable UUID id, ServletWebRequest path) {
+    public ResponseEntity removeAlunoListaEspera(@PathVariable UUID id, ServletWebRequest path) {
         var aluno = service.removeListaEspera(id);
         return ResponseEntity.noContent().build();
     }
