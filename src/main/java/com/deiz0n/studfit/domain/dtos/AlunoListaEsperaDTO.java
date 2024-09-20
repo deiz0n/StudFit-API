@@ -1,6 +1,7 @@
 package com.deiz0n.studfit.domain.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Email;
@@ -18,6 +19,8 @@ import java.util.UUID;
 @Builder
 public class AlunoListaEsperaDTO {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
     @NotBlank(message = "O campo \"nome\" é obrigatório")
     private String nome;
