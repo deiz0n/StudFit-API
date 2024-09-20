@@ -79,6 +79,13 @@ public class AlunoService {
         alunoRepository.delete(aluno);
     }
 
+    public AlunoDTO updateEfetivado(UUID id, AlunoDTO alunoDTO) {
+        var aluno = getById(id);
+        BeanUtils.copyProperties(alunoDTO, aluno, "id");
+        alunoRepository.save(aluno);
+        return mapper.map(aluno, AlunoDTO.class);
+    }
+
     private Integer getColocacaoAtual() {
         return Math.toIntExact(alunoRepository.findAll()
                 .stream()
