@@ -6,6 +6,7 @@ import com.deiz0n.studfit.domain.entites.Aluno;
 import com.deiz0n.studfit.domain.exceptions.AlunoNotFoundException;
 import com.deiz0n.studfit.repositories.AlunoRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -48,6 +49,14 @@ public class AlunoService {
         var aluno = mapper.map(alunoListaEspera, Aluno.class);
         alunoRepository.save(aluno);
         return alunoListaEspera;
+    }
+
+    public AlunoDTO registerEfetivado(UUID id, AlunoDTO aluno) {
+        var alunoEfetivado = getById(id);
+        BeanUtils.copyProperties(aluno, alunoEfetivado, "id", "nome", "email");
+        alunoRepository.save(alunoEfetivado);
+
+        return mapper.map(alunoEfetivado, AlunoDTO.class);
     }
 
     public AlunoListaEsperaDTO removeListaEspera(UUID id) {
