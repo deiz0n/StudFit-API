@@ -74,6 +74,11 @@ public class AlunoService {
         );
     }
 
+    public void removeEfetivado(UUID id) {
+        var aluno = getById(id);
+        alunoRepository.delete(aluno);
+    }
+
     private Integer getColocacaoAtual() {
         return Math.toIntExact(alunoRepository.findAll()
                 .stream()
