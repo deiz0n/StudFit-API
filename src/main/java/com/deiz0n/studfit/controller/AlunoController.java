@@ -69,7 +69,7 @@ public class AlunoController {
                         .build());
     }
 
-    @PostMapping("efetivados/{id}/efetivar")
+    @PutMapping("efetivados/{id}/efetivar")
     public ResponseEntity<ResponseRequest> registerAlunoEfetivado(@PathVariable UUID id, @RequestBody AlunoDTO request, ServletWebRequest path) {
         var aluno = service.registerEfetivado(id, request);
         return ResponseEntity.ok()
