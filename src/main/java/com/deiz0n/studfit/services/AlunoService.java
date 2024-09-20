@@ -34,6 +34,24 @@ public class AlunoService {
                 .collect(Collectors.toList());
     }
 
+    // Registra um aluno na lista de espera
+    public AlunoListaEsperaDTO registerListaEspera(AlunoListaEsperaDTO alunoListaEspera) {
+        alunoListaEspera.setColocacao(getCurrentColocacao());
+        var aluno = mapper.map(alunoListaEspera, Aluno.class);
+        alunoRepository.save(aluno);
+        return alunoListaEspera;
+    }
+
+    // Remove um aluno da lista de espera
+    public AlunoListaEsperaDTO removeListaEspera(UUID id) {
+        var aluno = getById(id);
+        alunoRepository.delete(aluno);
+
+        reorderListaEspera(aluno);
+
+        return mapper.map(aluno, AlunoListaEsperaDTO.class);
+    }
+
     // Retorna todos os alunos já cadastrados na academia
     public List<AlunoDTO> getEfetivados() {
         return alunoRepository.findAll()
@@ -43,42 +61,25 @@ public class AlunoService {
                 .collect(Collectors.toList());
     }
 
-    // Registra um aluno na lista de espera
-    public AlunoListaEsperaDTO registerListaEspera(AlunoListaEsperaDTO alunoListaEspera) {
-        alunoListaEspera.setColocacao(getColocacaoAtual());
-        var aluno = mapper.map(alunoListaEspera, Aluno.class);
-        alunoRepository.save(aluno);
-        return alunoListaEspera;
-    }
-
+    // Realiza o cadastro completo do aluno na lista de espera
     public AlunoDTO registerEfetivado(UUID id, AlunoDTO aluno) {
         var alunoEfetivado = getById(id);
         BeanUtils.copyProperties(aluno, alunoEfetivado, "id", "nome", "email");
+
+        reorderListaEspera(alunoEfetivado);
+        alunoEfetivado.setColocacao(null);
         alunoRepository.save(alunoEfetivado);
 
         return mapper.map(alunoEfetivado, AlunoDTO.class);
     }
 
-    public AlunoListaEsperaDTO removeListaEspera(UUID id) {
-        var aluno = getById(id);
-        alunoRepository.delete(aluno);
-
-        reorderListaEspera(aluno);
-
-        return new AlunoListaEsperaDTO(
-                aluno.getId(),
-                aluno.getNome(),
-                aluno.getEmail(),
-                aluno.getColocacao(),
-                aluno.getListaEspera()
-        );
-    }
-
+    // Remove aluno cadastrado
     public void removeEfetivado(UUID id) {
         var aluno = getById(id);
         alunoRepository.delete(aluno);
     }
 
+    // Atualiza os dados do aluno cadastrado
     public AlunoDTO updateEfetivado(UUID id, AlunoDTO alunoDTO) {
         var aluno = getById(id);
         BeanUtils.copyProperties(alunoDTO, aluno, "id");
@@ -86,7 +87,14 @@ public class AlunoService {
         return mapper.map(aluno, AlunoDTO.class);
     }
 
-    private Integer getColocacaoAtual() {
+    private Aluno getById(UUID id) {
+        return alunoRepository.findById(id)
+                .orElseThrow(
+                        () -> new AlunoNotFoundException(String.format("Aluno com ID: %s não foi encontrado", id.toString()))
+                );
+    }
+
+    private Integer getCurrentColocacao() {
         return Math.toIntExact(alunoRepository.findAll()
                 .stream()
                 .filter(Aluno::getListaEspera)
@@ -94,6 +102,7 @@ public class AlunoService {
         );
     }
 
+    // Reorganiza a lista de espera
     private void reorderListaEspera(Aluno aluno) {
         List<Aluno> listOfAlunos = new ArrayList<>(alunoRepository.findAll());
         var lastAluno = listOfAlunos.get(listOfAlunos.size()-1);
@@ -110,10 +119,4 @@ public class AlunoService {
         }
     }
 
-    private Aluno getById(UUID id) {
-        return alunoRepository.findById(id)
-                .orElseThrow(
-                        () -> new AlunoNotFoundException(String.format("Aluno com ID: %s não foi encontrado", id.toString()))
-                );
-    }
 }
