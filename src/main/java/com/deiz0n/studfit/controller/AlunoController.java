@@ -70,7 +70,7 @@ public class AlunoController {
     }
 
     @PutMapping("efetivados/{id}/efetivar")
-    public ResponseEntity<ResponseRequest> registerAlunoEfetivado(@PathVariable UUID id, @RequestBody AlunoDTO request, ServletWebRequest path) {
+    public ResponseEntity<ResponseRequest> registerAlunoEfetivado(@PathVariable UUID id, @RequestBody @Valid AlunoDTO request, ServletWebRequest path) {
         var aluno = service.registerEfetivado(id, request);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
@@ -88,4 +88,16 @@ public class AlunoController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("efetivado/update/{id}")
+    public ResponseEntity<ResponseRequest> updateAlunoEfetivado(@PathVariable UUID id, @RequestBody @Valid AlunoDTO request, ServletWebRequest path) {
+        var aluno = service.updateEfetivado(id, request);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
+                .body(ResponseRequest.builder()
+                        .code(HttpStatus.OK.value())
+                        .status(HttpStatus.OK)
+                        .path(path.getRequest().getRequestURI())
+                        .data(aluno)
+                        .build());
+    }
 }
