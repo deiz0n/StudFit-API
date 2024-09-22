@@ -18,16 +18,12 @@ import java.util.UUID;
 public class AlunoDTO {
 
     private UUID id;
-    @NotBlank(message = "O campo \"nome\" é obrigatório")
     private String nome;
-    @NotBlank(message = "O campo \"peso\" é obrigatório")
     private Double peso;
-    @NotBlank(message = "O campo \"altura\" é obrigatório")
     private Integer altura;
-    @NotBlank(message = "O campo \"email\" é obrigatório")
     @Email(message = "Email inválido. Tente novamente")
     private String email;
-    @NotBlank(message = "O campo \"telefone\" é obrigatório")
+    @NotBlank(message = "O campo telefone é  obrigatório")
     private String telefone;
     private String cirurgias;
     private String patologias;
