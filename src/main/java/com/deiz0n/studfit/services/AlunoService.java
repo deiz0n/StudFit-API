@@ -62,8 +62,10 @@ public class AlunoService {
     }
 
     // Realiza o cadastro completo do aluno na lista de espera
-    public AlunoDTO registerEfetivado(UUID id, AlunoDTO aluno) {
-        var alunoEfetivado = getById(id);
+    public AlunoDTO registerEfetivado(AlunoDTO aluno) {
+        var alunoEfetivado = alunoRepository.getByColocacao(1).orElseThrow(
+                () -> new AlunoNotFoundException("Aluno não encontrado")
+        );
         BeanUtils.copyProperties(aluno, alunoEfetivado, "id", "nome", "email");
 
         reorderListaEspera(alunoEfetivado);

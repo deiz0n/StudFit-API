@@ -69,9 +69,9 @@ public class AlunoController {
                         .build());
     }
 
-    @PutMapping("efetivados/{id}/efetivar")
-    public ResponseEntity<ResponseRequest> registerAlunoEfetivado(@PathVariable UUID id, @RequestBody @Valid AlunoDTO request, ServletWebRequest path) {
-        var aluno = service.registerEfetivado(id, request);
+    @PatchMapping("efetivados/efetivar")
+    public ResponseEntity<ResponseRequest> registerAlunoEfetivado(@RequestBody @Valid AlunoDTO request, ServletWebRequest path) {
+        var aluno = service.registerEfetivado(request);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
                 .body(ResponseRequest.builder()
