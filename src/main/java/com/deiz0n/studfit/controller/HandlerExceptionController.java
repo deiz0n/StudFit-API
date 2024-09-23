@@ -1,5 +1,6 @@
 package com.deiz0n.studfit.controller;
 
+import com.deiz0n.studfit.domain.exceptions.ResourceAlreadyException;
 import com.deiz0n.studfit.domain.exceptions.ResourceNotFoundException;
 import com.deiz0n.studfit.domain.response.ResponseError;
 import org.springframework.http.HttpHeaders;
@@ -58,5 +59,18 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(ResourceAlreadyException.class)
+    public ResponseEntity<ResponseError> handleResourceNotFoundException(ResourceAlreadyException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.BAD_REQUEST.value())
+                                .title("Recurso existente")
+                                .status(HttpStatus.BAD_REQUEST)
+                                .description(exception.getMessage())
+                                .build()
+                );
+    }
 
 }
