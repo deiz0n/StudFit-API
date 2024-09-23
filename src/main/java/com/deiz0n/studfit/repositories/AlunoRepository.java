@@ -10,5 +10,6 @@ public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
 
     Optional<Aluno> getByColocacao(Integer colocacao);
     Optional<Aluno> getByEmail(String email);
+    Optional<Aluno> getByTelefone(String telefone);
 
 }
