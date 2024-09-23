@@ -4,6 +4,8 @@ import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.domain.entites.Aluno;
 import com.deiz0n.studfit.domain.exceptions.AlunoNotFoundException;
+import com.deiz0n.studfit.domain.exceptions.EmailAlreadyRegisteredException;
+import com.deiz0n.studfit.domain.exceptions.TelefoneAlreadyRegistered;
 import com.deiz0n.studfit.repositories.AlunoRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
@@ -36,6 +38,7 @@ public class AlunoService {
 
     // Registra um aluno na lista de espera
     public AlunoListaEsperaDTO registerListaEspera(AlunoListaEsperaDTO alunoListaEspera) {
+        isExisting(alunoListaEspera.getEmail());
         alunoListaEspera.setColocacao(getCurrentColocacao());
         var aluno = mapper.map(alunoListaEspera, Aluno.class);
         alunoRepository.save(aluno);
@@ -66,6 +69,7 @@ public class AlunoService {
         var alunoEfetivado = alunoRepository.getByColocacao(1).orElseThrow(
                 () -> new AlunoNotFoundException("Aluno não encontrado")
         );
+        isExisting(aluno, alunoEfetivado.getId());
         BeanUtils.copyProperties(aluno, alunoEfetivado, "id", "nome", "email");
 
         reorderListaEspera(alunoEfetivado);
@@ -83,6 +87,7 @@ public class AlunoService {
 
     // Atualiza os dados do aluno cadastrado
     public AlunoDTO updateEfetivado(UUID id, AlunoDTO alunoDTO) {
+        isExisting(alunoDTO, id);
         var aluno = getById(id);
         BeanUtils.copyProperties(alunoDTO, aluno, "id");
         alunoRepository.save(aluno);
@@ -94,6 +99,23 @@ public class AlunoService {
                 .orElseThrow(
                         () -> new AlunoNotFoundException(String.format("Aluno com ID: %s não foi encontrado", id.toString()))
                 );
+    }
+
+    // Verifica a existência de email ao cadastrar um aluno na lista de espera
+    private void isExisting(String email) {
+        if (alunoRepository.getByEmail(email).isPresent())
+            throw new EmailAlreadyRegisteredException("Email já cadastrado");
+    }
+
+    // Verifica a existência de email ou telefone ao efetivar ou atualizar dados de um aluno
+    private void isExisting(AlunoDTO aluno, UUID id) {
+        var alunoByEmail = alunoRepository.getByEmail(aluno.getEmail());
+        if (alunoByEmail.isPresent() && !alunoByEmail.get().getId().equals(id))
+            throw new EmailAlreadyRegisteredException("Email já cadastrado");
+
+        var alunoByTelefone = alunoRepository.getByTelefone(aluno.getTelefone());
+        if (alunoByTelefone.isPresent() && !alunoByTelefone.get().getId().equals(id))
+            throw new TelefoneAlreadyRegistered("Telefone já cadastradp");
     }
 
     private Integer getCurrentColocacao() {
