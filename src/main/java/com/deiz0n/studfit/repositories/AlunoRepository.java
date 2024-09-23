@@ -9,5 +9,6 @@ import java.util.UUID;
 public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
 
     Optional<Aluno> getByColocacao(Integer colocacao);
+    Optional<Aluno> getByEmail(String email);
 
 }

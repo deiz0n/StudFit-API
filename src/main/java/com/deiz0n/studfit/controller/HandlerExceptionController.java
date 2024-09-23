@@ -44,7 +44,7 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
                 );
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ResponseError> handleResourceNotFoundException(ResourceNotFoundException exception) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
