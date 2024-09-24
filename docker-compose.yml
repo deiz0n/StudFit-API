@@ -1,0 +1,29 @@
+version: "3.9"
+
+networks:
+  stud-fit-network:
+    driver: "bridge"
+
+services:
+  stud-fit-db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: 1234567
+      POSTGRES_DB: studfit
+    ports:
+      - "5435:5432"
+    networks:
+      - stud-fit-network
+
+  stud-fit-api:
+    build: .
+    image: stud-fit-api
+    command: ["/wait-for-it.sh", "-t", "10", "stud-fit-db:5435", "--", "java", "-jar", "studfit-api.jar"]
+    ports:
+      - "8080:8080"
+    environment:
+      HOST: stud-fit-db
+    networks:
+      - stud-fit-network
+    depends_on:
+      - stud-fit-db
