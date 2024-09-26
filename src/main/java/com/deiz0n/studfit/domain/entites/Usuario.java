@@ -22,6 +22,7 @@ public class Usuario {
     private String senha;
     @Column(name = "codigo_recuperacao")
     private String codigoRecuperacao;
+    private String cargo;
 
     @OneToOne
     private Presenca presenca;
