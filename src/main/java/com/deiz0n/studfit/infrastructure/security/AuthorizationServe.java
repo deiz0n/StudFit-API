@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.infrastructure;
+package com.deiz0n.studfit.infrastructure.security;
 
 import com.deiz0n.studfit.repositories.UsuarioRepository;
 import org.springframework.security.core.userdetails.UserDetails;
