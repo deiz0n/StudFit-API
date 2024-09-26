@@ -4,11 +4,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BCryptPasswordEncoder {
+public class BCryptPasswordEncoderConfig {
 
     @Bean
-    public BCryptPasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
+    public BCryptPasswordEncoderConfig encoder() {
+        return new BCryptPasswordEncoderConfig();
     }
 
 }
