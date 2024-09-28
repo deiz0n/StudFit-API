@@ -6,10 +6,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.context.request.ServletWebRequest;
 
 public interface UsuarioController {
 
     @PostMapping
-    public ResponseEntity<ResponseRequest> create(@RequestBody @Valid UsuarioDTO request);
+    public ResponseEntity<ResponseRequest> create(@RequestBody @Valid UsuarioDTO request, ServletWebRequest path);
 
 }
