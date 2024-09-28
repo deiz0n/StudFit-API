@@ -21,6 +21,18 @@ public class UsuarioControllerImpl implements UsuarioController {
     }
 
     @Override
+    public ResponseEntity<ResponseRequest> getUsuarios(ServletWebRequest path) {
+        var usuarios = service.getAll();
+        return ResponseEntity.ok()
+                .body(ResponseRequest.builder()
+                        .code(HttpStatus.CREATED.value())
+                        .status(HttpStatus.CREATED)
+                        .path(path.getRequest().getRequestURI())
+                        .data(usuarios)
+                        .build());
+    }
+
+    @Override
     public ResponseEntity<ResponseRequest> create(UsuarioDTO request, ServletWebRequest path) {
         var usuario = service.create(request);
         var uri = ServletUriComponentsBuilder

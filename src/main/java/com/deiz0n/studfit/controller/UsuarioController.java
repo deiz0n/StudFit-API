@@ -12,8 +12,8 @@ import org.springframework.web.context.request.ServletWebRequest;
 public interface UsuarioController {
 
     @GetMapping
-    public ResponseEntity<ResponseRequest> getUsuarios();
-    @PostMapping
+    public ResponseEntity<ResponseRequest> getUsuarios(ServletWebRequest path);
+    @PostMapping("/create")
     public ResponseEntity<ResponseRequest> create(@RequestBody @Valid UsuarioDTO request, ServletWebRequest path);
 
 }
