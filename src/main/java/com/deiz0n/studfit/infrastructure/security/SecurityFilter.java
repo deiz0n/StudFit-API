@@ -1,6 +1,5 @@
 package com.deiz0n.studfit.infrastructure.security;
 
-import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
