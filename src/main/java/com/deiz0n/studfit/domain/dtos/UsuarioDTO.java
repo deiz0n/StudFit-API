@@ -1,5 +1,6 @@
 package com.deiz0n.studfit.domain.dtos;
 
+import com.deiz0n.studfit.domain.enums.Cargo;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,6 @@ public class UsuarioDTO {
     @Email(message = "Email inválido. Tente novamente")
     private String email;
     @NotBlank(message = "O campo cargo é  obrigatório")
-    private String cargo;
+    private Cargo cargo;
 
 }
