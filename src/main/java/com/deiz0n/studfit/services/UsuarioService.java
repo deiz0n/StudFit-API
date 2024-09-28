@@ -7,6 +7,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class UsuarioService {
 
@@ -18,6 +21,13 @@ public class UsuarioService {
         this.repository = repository;
         this.mapper = mapper;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public List<UsuarioDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(usuario -> mapper.map(usuario, UsuarioDTO.class))
+                .collect(Collectors.toList());
     }
 
     public UsuarioDTO create(UsuarioDTO usuarioDTO) {
