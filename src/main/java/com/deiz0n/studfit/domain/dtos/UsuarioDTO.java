@@ -1,6 +1,7 @@
 package com.deiz0n.studfit.domain.dtos;
 
 import com.deiz0n.studfit.domain.enums.Cargo;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,8 @@ public class UsuarioDTO {
     private String nome;
     @Email(message = "Email inválido. Tente novamente")
     private String email;
-    @NotBlank(message = "O campo cargo é  obrigatório")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String senha;
     private Cargo cargo;
 
 }
