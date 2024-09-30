@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller;
+package com.deiz0n.studfit.controller.exceptions;
 
 import com.deiz0n.studfit.domain.exceptions.ResourceAlreadyException;
 import com.deiz0n.studfit.domain.exceptions.ResourceNotFoundException;

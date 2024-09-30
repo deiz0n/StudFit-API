@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller;
+package com.deiz0n.studfit.controller.usuario;
 
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
 import com.deiz0n.studfit.domain.response.ResponseRequest;
@@ -25,8 +25,8 @@ public class UsuarioControllerImpl implements UsuarioController {
         var usuarios = service.getAll();
         return ResponseEntity.ok()
                 .body(ResponseRequest.builder()
-                        .code(HttpStatus.CREATED.value())
-                        .status(HttpStatus.CREATED)
+                        .code(HttpStatus.OK.value())
+                        .status(HttpStatus.OK)
                         .path(path.getRequest().getRequestURI())
                         .data(usuarios)
                         .build());

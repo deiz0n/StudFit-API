@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller;
+package com.deiz0n.studfit.controller.aluno;
 
 import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;

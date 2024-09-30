@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller;
+package com.deiz0n.studfit.controller.usuario;
 
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
 import com.deiz0n.studfit.domain.response.ResponseRequest;
