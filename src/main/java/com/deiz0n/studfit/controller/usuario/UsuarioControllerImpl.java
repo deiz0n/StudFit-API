@@ -1,7 +1,7 @@
 package com.deiz0n.studfit.controller.usuario;
 
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
-import com.deiz0n.studfit.domain.response.ResponseRequest;
+import com.deiz0n.studfit.domain.response.Response;
 import com.deiz0n.studfit.services.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +21,10 @@ public class UsuarioControllerImpl implements UsuarioController {
     }
 
     @Override
-    public ResponseEntity<ResponseRequest> getUsuarios(ServletWebRequest path) {
+    public ResponseEntity<Response> getUsuarios(ServletWebRequest path) {
         var usuarios = service.getAll();
         return ResponseEntity.ok()
-                .body(ResponseRequest.builder()
+                .body(Response.builder()
                         .code(HttpStatus.OK.value())
                         .status(HttpStatus.OK)
                         .path(path.getRequest().getRequestURI())
@@ -33,7 +33,7 @@ public class UsuarioControllerImpl implements UsuarioController {
     }
 
     @Override
-    public ResponseEntity<ResponseRequest> create(UsuarioDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response> create(UsuarioDTO request, ServletWebRequest path) {
         var usuario = service.create(request);
         var uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -41,7 +41,7 @@ public class UsuarioControllerImpl implements UsuarioController {
                 .buildAndExpand(usuario.getId())
                 .toUri();
         return ResponseEntity.created(uri)
-                .body(ResponseRequest.builder()
+                .body(Response.builder()
                         .code(HttpStatus.CREATED.value())
                         .status(HttpStatus.CREATED)
                         .path(path.getRequest().getRequestURI())

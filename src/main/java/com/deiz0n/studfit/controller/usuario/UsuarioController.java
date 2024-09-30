@@ -1,7 +1,7 @@
 package com.deiz0n.studfit.controller.usuario;
 
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
-import com.deiz0n.studfit.domain.response.ResponseRequest;
+import com.deiz0n.studfit.domain.response.Response;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +12,8 @@ import org.springframework.web.context.request.ServletWebRequest;
 public interface UsuarioController {
 
     @GetMapping
-    public ResponseEntity<ResponseRequest> getUsuarios(ServletWebRequest path);
+    public ResponseEntity<Response> getUsuarios(ServletWebRequest path);
     @PostMapping("/create")
-    public ResponseEntity<ResponseRequest> create(@RequestBody @Valid UsuarioDTO request, ServletWebRequest path);
+    public ResponseEntity<Response> create(@RequestBody @Valid UsuarioDTO request, ServletWebRequest path);
 
 }
