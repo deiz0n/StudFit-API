@@ -1,5 +1,6 @@
 package com.deiz0n.studfit.controller.exceptions;
 
+import com.deiz0n.studfit.domain.enums.Cargo;
 import com.deiz0n.studfit.domain.exceptions.ResourceAlreadyException;
 import com.deiz0n.studfit.domain.exceptions.ResourceNotFoundException;
 import com.deiz0n.studfit.domain.response.ResponseError;
@@ -7,12 +8,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import java.util.Arrays;
 
 @RestControllerAdvice
 public class HandlerExceptionController extends ResponseEntityExceptionHandler {
@@ -43,6 +47,33 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
                                 .description("Rota inexistente")
                                 .build()
                 );
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        if (ex.getLocalizedMessage().contains("Cargo")) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(
+                            ResponseError.builder()
+                                    .code(HttpStatus.BAD_REQUEST.value())
+                                    .title("Cargo inexistente")
+                                    .status(HttpStatus.BAD_REQUEST)
+                                    .description(String.format("Os cargos existentes são: %s", Arrays.toString(Cargo.values())))
+                                    .build()
+                    );
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(
+                            ResponseError.builder()
+                                    .code(HttpStatus.BAD_REQUEST.value())
+                                    .title("JSON inválido")
+                                    .status(HttpStatus.BAD_REQUEST)
+                                    .description("Verifique o corpo da requisição")
+                                    .build()
+                    );
+        }
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
