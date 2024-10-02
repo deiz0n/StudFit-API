@@ -4,6 +4,7 @@ import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
 import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.domain.enums.Cargo;
 import com.deiz0n.studfit.domain.exceptions.CargoNotExistentException;
+import com.deiz0n.studfit.domain.exceptions.EmailAlreadyRegisteredException;
 import com.deiz0n.studfit.domain.exceptions.UsuarioNotFoundException;
 import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
 import org.modelmapper.ModelMapper;
@@ -36,6 +37,7 @@ public class UsuarioService {
     }
 
     public UsuarioDTO create(UsuarioDTO usuarioDTO) {
+        isExisting(usuarioDTO.getEmail());
         var usuario = mapper.map(usuarioDTO, Usuario.class);
 
         usuario.setSenha(passwordEncoder.encode(usuario.getPassword()));
@@ -71,6 +73,11 @@ public class UsuarioService {
         } catch (Exception e) {
             throw new CargoNotExistentException(String.format("Os cargos existentes são: %s", Arrays.toString(Cargo.values())));
         }
+    }
+
+    private void isExisting(String email) {
+        if (repository.findByEmail(email).isPresent())
+            throw new EmailAlreadyRegisteredException("Email já cadastrado");
     }
 
 }
