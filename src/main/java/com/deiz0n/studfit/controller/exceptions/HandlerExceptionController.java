@@ -1,6 +1,7 @@
 package com.deiz0n.studfit.controller.exceptions;
 
 import com.deiz0n.studfit.domain.enums.Cargo;
+import com.deiz0n.studfit.domain.exceptions.CargoNotExistentException;
 import com.deiz0n.studfit.domain.exceptions.ResourceAlreadyException;
 import com.deiz0n.studfit.domain.exceptions.ResourceNotFoundException;
 import com.deiz0n.studfit.domain.response.ResponseError;
@@ -51,7 +52,7 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        if (ex.getLocalizedMessage().contains("Cargo")) {
+        if (ex instanceof CargoNotExistentException) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(
@@ -70,7 +71,7 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
                                     .code(HttpStatus.BAD_REQUEST.value())
                                     .title("JSON inválido")
                                     .status(HttpStatus.BAD_REQUEST)
-                                    .description("Verifique o corpo da requisição")
+                                    .description(ex.getMessage())
                                     .build()
                     );
         }
@@ -104,4 +105,17 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(CargoNotExistentException.class)
+    public ResponseEntity<ResponseError> handleCargoNotExist(CargoNotExistentException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.BAD_REQUEST.value())
+                                .title("Cargo inexistente")
+                                .status(HttpStatus.BAD_REQUEST)
+                                .description(exception.getMessage())
+                                .build()
+                );
+    }
 }
