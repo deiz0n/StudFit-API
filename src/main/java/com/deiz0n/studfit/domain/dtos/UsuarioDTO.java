@@ -1,6 +1,6 @@
 package com.deiz0n.studfit.domain.dtos;
 
-import com.deiz0n.studfit.domain.enums.Cargo;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -24,6 +24,6 @@ public class UsuarioDTO {
     private String email;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
-    private Cargo cargo;
+    private String cargo;
 
 }
