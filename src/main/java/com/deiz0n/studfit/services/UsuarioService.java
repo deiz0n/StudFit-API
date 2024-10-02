@@ -2,12 +2,15 @@ package com.deiz0n.studfit.services;
 
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
 import com.deiz0n.studfit.domain.entites.Usuario;
+import com.deiz0n.studfit.domain.enums.Cargo;
+import com.deiz0n.studfit.domain.exceptions.CargoNotExistentException;
 import com.deiz0n.studfit.domain.exceptions.UsuarioNotFoundException;
 import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -34,15 +37,19 @@ public class UsuarioService {
 
     public UsuarioDTO create(UsuarioDTO usuarioDTO) {
         var usuario = mapper.map(usuarioDTO, Usuario.class);
+
         usuario.setSenha(passwordEncoder.encode(usuario.getPassword()));
+        usuario.setCargo(validateCargo(usuarioDTO.getCargo()));
+
         repository.save(usuario);
 
         return UsuarioDTO.builder()
                 .id(usuario.getId())
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
-                .cargo(usuario.getCargo())
+                .cargo(usuario.getCargo().name())
                 .build();
+
     }
 
     public void delete(UUID id) {
@@ -56,6 +63,14 @@ public class UsuarioService {
                 .orElseThrow(
                     () -> new UsuarioNotFoundException(String.format("Usuário com ID: %s não foi encontrado", id.toString()))
                 );
+    }
+
+    private Cargo validateCargo(String cargo) {
+        try {
+            return Cargo.valueOf(cargo.toUpperCase());
+        } catch (Exception e) {
+            throw new CargoNotExistentException(String.format("Os cargos existentes são: %s", Arrays.toString(Cargo.values())));
+        }
     }
 
 }
