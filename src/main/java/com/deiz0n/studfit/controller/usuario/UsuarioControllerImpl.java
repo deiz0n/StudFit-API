@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("api/v1.0/usuarios")
 public class UsuarioControllerImpl implements UsuarioController {
@@ -33,7 +35,7 @@ public class UsuarioControllerImpl implements UsuarioController {
     }
 
     @Override
-    public ResponseEntity<Response> create(UsuarioDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response> createUsuario(UsuarioDTO request, ServletWebRequest path) {
         var usuario = service.create(request);
         var uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -48,4 +50,12 @@ public class UsuarioControllerImpl implements UsuarioController {
                         .data(usuario)
                         .build());
     }
+
+    @Override
+    public ResponseEntity deleteUsuario(UUID id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
