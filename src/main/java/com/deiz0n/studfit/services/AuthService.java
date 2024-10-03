@@ -27,9 +27,7 @@ public class AuthService {
     public TokenDTO signIn(AuthDTO auth) {
         var user = new UsernamePasswordAuthenticationToken(auth.getEmail(), auth.getSenha());
         var authentication = manager.authenticate(user);
-        var tokenGeneration = TokenGenerationEvent.builder()
-                .usuario((UsuarioDTO) authentication.getPrincipal())
-                .build();
+        var tokenGeneration = new TokenGenerationEvent(this, (Usuario) authentication.getPrincipal());
 
         eventPublisher.publishEvent(tokenGeneration);
 
