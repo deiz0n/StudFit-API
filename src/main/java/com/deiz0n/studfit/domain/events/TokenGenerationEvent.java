@@ -1,8 +1,6 @@
 package com.deiz0n.studfit.domain.events;
 
-import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
 import com.deiz0n.studfit.domain.entites.Usuario;
-import lombok.Builder;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
