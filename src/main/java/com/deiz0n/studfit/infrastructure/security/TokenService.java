@@ -36,9 +36,7 @@ public class TokenService {
                     .withSubject(tokenGeneration.getUsuario().getEmail())
                     .withExpiresAt(expirationInstant())
                     .sign(algorithm);
-            var tokenGenerated = TokenGeneratedEvent.builder()
-                    .token(token)
-                    .build();
+            var tokenGenerated = new TokenGeneratedEvent(this, token);
 
             eventPublisher.publishEvent(tokenGenerated);
 
@@ -60,7 +58,7 @@ public class TokenService {
     }
 
     public Instant expirationInstant() {
-        return LocalDateTime.now().plusHours(8).toInstant(ZoneOffset.of("03-00"));
+        return LocalDateTime.now().plusHours(8).toInstant(ZoneOffset.of("-03:00"));
     }
 
 }
