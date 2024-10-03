@@ -4,7 +4,9 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.deiz0n.studfit.domain.events.TokenGenerationEvent;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -18,13 +20,14 @@ public class TokenService {
     @Value("${api.secret.key.jwt}")
     private String secret;
 
-    public void generateToken(String email) {
+    @EventListener
+    public void generateToken(TokenGenerationEvent tokenGeneration) {
         try {
             var algorithm = Algorithm.HMAC256(secret);
 
             var token = JWT.create()
                     .withIssuer(ISSUER)
-                    .withSubject(email)
+                    .withSubject(tokenGeneration.getUsuario().getEmail())
                     .withExpiresAt(expirationInstant())
                     .sign(algorithm);
 
