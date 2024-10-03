@@ -4,8 +4,10 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.deiz0n.studfit.domain.events.TokenGeneratedEvent;
 import com.deiz0n.studfit.domain.events.TokenGenerationEvent;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
@@ -19,17 +21,26 @@ public class TokenService {
     private static final String ISSUER = "stud-fit";
     @Value("${api.secret.key.jwt}")
     private String secret;
+    private ApplicationEventPublisher eventPublisher;
+
+    public TokenService(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
     @EventListener
     public void generateToken(TokenGenerationEvent tokenGeneration) {
         try {
             var algorithm = Algorithm.HMAC256(secret);
-
             var token = JWT.create()
                     .withIssuer(ISSUER)
                     .withSubject(tokenGeneration.getUsuario().getEmail())
                     .withExpiresAt(expirationInstant())
                     .sign(algorithm);
+            var tokenGenerated = TokenGeneratedEvent.builder()
+                    .token(token)
+                    .build();
+
+            eventPublisher.publishEvent(tokenGenerated);
 
         } catch (JWTCreationException e) {
             throw new RuntimeException("Erro ao criar Token", e);
