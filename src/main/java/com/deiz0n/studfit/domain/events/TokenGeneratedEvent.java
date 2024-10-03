@@ -5,7 +5,6 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 @Getter
-@Builder
 public class TokenGeneratedEvent extends ApplicationEvent {
 
     private String token;
