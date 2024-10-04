@@ -1,8 +1,8 @@
-package com.deiz0n.studfit.controller;
+package com.deiz0n.studfit.controller.aluno;
 
 import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
-import com.deiz0n.studfit.domain.response.ResponseRequest;
+import com.deiz0n.studfit.domain.response.Response;
 import com.deiz0n.studfit.services.AlunoService;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
@@ -25,11 +25,11 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<ResponseRequest> getAlunosListaEspera(ServletWebRequest path) {
+    public ResponseEntity<Response> getAlunosListaEspera(ServletWebRequest path) {
         var alunos = service.getListaDeEspera();
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
-                .body(ResponseRequest.builder()
+                .body(Response.builder()
                         .code(HttpStatus.OK.value())
                         .status(HttpStatus.OK)
                         .path(path.getRequest().getRequestURI())
@@ -38,11 +38,11 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<ResponseRequest> registerAlunoListaEspera(AlunoListaEsperaDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response> registerAlunoListaEspera(AlunoListaEsperaDTO request, ServletWebRequest path) {
         var aluno = service.registerListaEspera(request);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
-                .body(ResponseRequest.builder()
+                .body(Response.builder()
                         .code(HttpStatus.OK.value())
                         .status(HttpStatus.OK)
                         .path(path.getRequest().getRequestURI())
@@ -57,11 +57,11 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<ResponseRequest> getAlunosEfetivados(ServletWebRequest path) {
+    public ResponseEntity<Response> getAlunosEfetivados(ServletWebRequest path) {
         var alunos = service.getEfetivados();
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
-                .body(ResponseRequest.builder()
+                .body(Response.builder()
                         .code(HttpStatus.OK.value())
                         .status(HttpStatus.OK)
                         .path(path.getRequest().getRequestURI())
@@ -70,11 +70,11 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<ResponseRequest> registerAlunoEfetivado(AlunoDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response> registerAlunoEfetivado(AlunoDTO request, ServletWebRequest path) {
         var aluno = service.registerEfetivado(request);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
-                .body(ResponseRequest.builder()
+                .body(Response.builder()
                         .code(HttpStatus.OK.value())
                         .status(HttpStatus.OK)
                         .path(path.getRequest().getRequestURI())
@@ -89,11 +89,11 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<ResponseRequest> updateAlunoEfetivado(UUID id, AlunoDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response> updateAlunoEfetivado(UUID id, AlunoDTO request, ServletWebRequest path) {
         var aluno = service.updateEfetivado(id, request);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
-                .body(ResponseRequest.builder()
+                .body(Response.builder()
                         .code(HttpStatus.OK.value())
                         .status(HttpStatus.OK)
                         .path(path.getRequest().getRequestURI())

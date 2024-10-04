@@ -1,5 +1,7 @@
-package com.deiz0n.studfit.controller;
+package com.deiz0n.studfit.controller.exceptions;
 
+import com.deiz0n.studfit.domain.enums.Cargo;
+import com.deiz0n.studfit.domain.exceptions.CargoNotExistentException;
 import com.deiz0n.studfit.domain.exceptions.ResourceAlreadyException;
 import com.deiz0n.studfit.domain.exceptions.ResourceNotFoundException;
 import com.deiz0n.studfit.domain.response.ResponseError;
@@ -7,12 +9,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import java.util.Arrays;
 
 @RestControllerAdvice
 public class HandlerExceptionController extends ResponseEntityExceptionHandler {
@@ -45,6 +51,33 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
                 );
     }
 
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        if (ex instanceof CargoNotExistentException) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(
+                            ResponseError.builder()
+                                    .code(HttpStatus.BAD_REQUEST.value())
+                                    .title("Cargo inexistente")
+                                    .status(HttpStatus.BAD_REQUEST)
+                                    .description(String.format("Os cargos existentes são: %s", Arrays.toString(Cargo.values())))
+                                    .build()
+                    );
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(
+                            ResponseError.builder()
+                                    .code(HttpStatus.BAD_REQUEST.value())
+                                    .title("JSON inválido")
+                                    .status(HttpStatus.BAD_REQUEST)
+                                    .description(ex.getMessage())
+                                    .build()
+                    );
+        }
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ResponseError> handleResourceNotFoundException(ResourceNotFoundException exception) {
         return ResponseEntity
@@ -73,4 +106,22 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(CargoNotExistentException.class)
+    public ResponseEntity<ResponseError> handleCargoNotExist(CargoNotExistentException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.BAD_REQUEST.value())
+                                .title("Cargo inexistente")
+                                .status(HttpStatus.BAD_REQUEST)
+                                .description(exception.getMessage())
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity handleAuthenticationException() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
 }

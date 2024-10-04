@@ -6,7 +6,7 @@ import com.deiz0n.studfit.domain.entites.Aluno;
 import com.deiz0n.studfit.domain.exceptions.AlunoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.EmailAlreadyRegisteredException;
 import com.deiz0n.studfit.domain.exceptions.TelefoneAlreadyRegistered;
-import com.deiz0n.studfit.repositories.AlunoRepository;
+import com.deiz0n.studfit.infrastructure.repositories.AlunoRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
