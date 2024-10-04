@@ -12,7 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Turno {
+public class Horario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
