@@ -1,5 +1,6 @@
 package com.deiz0n.studfit.domain.entites;
 
+import com.deiz0n.studfit.domain.enums.Turno;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class Horario {
     private LocalTime horarioInicial;
     @Column(name = "horario_final")
     private LocalTime horarioFinal;
+    private Turno turno;
 
     @OneToOne
     private Aluno aluno;
