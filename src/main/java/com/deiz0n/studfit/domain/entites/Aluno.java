@@ -40,6 +40,6 @@ public class Aluno {
     @OneToMany(mappedBy = "aluno")
     private List<Presenca> presencas;
     @OneToOne
-    private Turno turno;
+    private Horario horario;
 
 }
