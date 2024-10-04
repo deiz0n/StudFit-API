@@ -42,6 +42,10 @@ public class Usuario implements UserDetails {
                     new SimpleGrantedAuthority("ROLE_INSTRUTOR"),
                     new SimpleGrantedAuthority("ROLE_ESTAGIARIO")
             );
+        } else if (cargo == Cargo.ADMINISTRADOR) {
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_ADMINISTRADOR")
+            );
         } else {
             return List.of(new SimpleGrantedAuthority("ROLE_ESTAGIARIO"));
         }
