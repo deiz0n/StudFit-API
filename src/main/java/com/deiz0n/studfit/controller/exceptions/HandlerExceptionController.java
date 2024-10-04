@@ -121,7 +121,7 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity handleAuthenticationException() {
+    public ResponseEntity<?> handleAuthenticationException() {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 }
