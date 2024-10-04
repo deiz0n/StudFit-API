@@ -30,6 +30,6 @@ public interface AlunoController {
     @DeleteMapping("efetivados/delete/{id}")
     ResponseEntity removeAlunoEfetivado(@PathVariable UUID id);
 
-    @PatchMapping("efetivado/update/{id}")
+    @PatchMapping("efetivados/update/{id}")
     ResponseEntity<Response> updateAlunoEfetivado(@PathVariable UUID id, @RequestBody @Valid AlunoDTO request, ServletWebRequest path);
 }
