@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -27,7 +28,7 @@ public class Horario {
     private LocalTime horarioFinal;
     private Turno turno;
 
-    @OneToOne
-    private Aluno aluno;
+    @OneToMany(mappedBy = "horario")
+    private List<Aluno> alunos;
 
 }
