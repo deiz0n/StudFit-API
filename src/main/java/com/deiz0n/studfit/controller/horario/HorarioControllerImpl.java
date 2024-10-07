@@ -12,7 +12,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping("/horarios")
+@RequestMapping("api/v1.0/horarios")
 public class HorarioControllerImpl  implements HorarioController{
 
     private HorarioService service;
