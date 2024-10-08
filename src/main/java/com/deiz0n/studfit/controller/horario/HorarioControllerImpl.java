@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -52,5 +53,11 @@ public class HorarioControllerImpl  implements HorarioController{
                 .path(path.getRequest().getRequestURI())
                 .data(horario)
                 .build());
+    }
+
+    @Override
+    public ResponseEntity deleteHorario(UUID id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
