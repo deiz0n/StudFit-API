@@ -22,7 +22,7 @@ public class HorarioDTO {
     @JsonProperty("horario_inicial")
     private LocalTime horarioInicial;
     @JsonFormat(pattern = "HH:mm")
-    @JsonProperty("horario_inicial")
+    @JsonProperty("horario_final")
     private LocalTime horarioFinal;
     private Turno turno;
 

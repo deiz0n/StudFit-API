@@ -20,10 +20,8 @@ public class Horario {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-    @JsonFormat(pattern = "HH:mm")
     @Column(name = "horario_inicial")
     private LocalTime horarioInicial;
-    @JsonFormat(pattern = "HH:mm")
     @Column(name = "horario_final")
     private LocalTime horarioFinal;
     private Turno turno;
