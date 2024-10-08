@@ -9,13 +9,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class HorarioDTO {
+public class HorarioDTO implements Comparable<HorarioDTO> {
 
     private UUID id;
     @JsonFormat(pattern = "HH:mm")
@@ -27,4 +28,12 @@ public class HorarioDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Turno turno;
 
+    @Override
+    public int compareTo(HorarioDTO horario) {
+        if (this.horarioInicial.isAfter(horario.getHorarioInicial()) && getHorarioFinal().isAfter(horario.getHorarioFinal()))
+            return 1;
+        if (horario.getHorarioInicial().isAfter(this.horarioInicial) && horario.getHorarioFinal().isAfter(this.getHorarioFinal()))
+            return -1;
+        return 0;
+    }
 }
