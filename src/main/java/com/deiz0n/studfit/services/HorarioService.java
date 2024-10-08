@@ -2,6 +2,7 @@ package com.deiz0n.studfit.services;
 
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
 import com.deiz0n.studfit.domain.entites.Horario;
+import com.deiz0n.studfit.domain.enums.Turno;
 import com.deiz0n.studfit.domain.exceptions.HorarioAlreadyRegistered;
 import com.deiz0n.studfit.domain.exceptions.HorarioNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.HorarioNotValidException;
@@ -33,8 +34,10 @@ public class HorarioService {
 
     public HorarioDTO create(HorarioDTO horarioDTO) {
         validateHorarios(horarioDTO);
+
         var horario = mapper.map(horarioDTO, Horario.class);
 
+        horario.setTurno(defineTurno(horarioDTO));
         repository.save(horario);
 
         return HorarioDTO.builder()
@@ -70,6 +73,16 @@ public class HorarioService {
         } catch (NullPointerException e) {
             throw new HorarioNotValidException("Os campos de horário são obrigatórios");
         }
+    }
+
+    // Define os turnos automaticamente com base nos horários informados
+    private Turno defineTurno(HorarioDTO horarioDTO) {
+        if (horarioDTO.getHorarioInicial().getHour() >= 6 && horarioDTO.getHorarioFinal().getHour() <= 12)
+            return Turno.MANHA;
+        if (horarioDTO.getHorarioInicial().getHour() >= 12 && horarioDTO.getHorarioFinal().getHour() <= 18)
+            return Turno.TARDE;
+        else
+            return Turno.NOITE;
     }
 
 }
