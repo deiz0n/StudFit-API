@@ -29,6 +29,7 @@ public class HorarioService {
         return repository.findAll()
                 .stream()
                 .map(horario -> mapper.map(horario, HorarioDTO.class))
+                .sorted()
                 .collect(Collectors.toList());
     }
 
@@ -84,5 +85,4 @@ public class HorarioService {
         else
             return Turno.NOITE;
     }
-
 }
