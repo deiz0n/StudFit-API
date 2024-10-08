@@ -24,6 +24,7 @@ public class HorarioDTO {
     @JsonFormat(pattern = "HH:mm")
     @JsonProperty("horario_final")
     private LocalTime horarioFinal;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Turno turno;
 
 }
