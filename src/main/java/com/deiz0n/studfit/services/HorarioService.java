@@ -3,12 +3,14 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
 import com.deiz0n.studfit.domain.entites.Horario;
 import com.deiz0n.studfit.domain.exceptions.HorarioAlreadyRegistered;
+import com.deiz0n.studfit.domain.exceptions.HorarioNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.HorarioNotValidException;
 import com.deiz0n.studfit.infrastructure.repositories.HorarioRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +45,19 @@ public class HorarioService {
                 .build();
     }
 
+    public void delete(UUID id) {
+        var horario = findByID(id);
+        repository.delete(horario);
+    }
+
+    private Horario findByID(UUID id) {
+        return repository.findById(id)
+                .map(horario -> mapper.map(horario, Horario.class))
+                .orElseThrow(
+                        () -> new HorarioNotFoundException(String.format("Horário com ID: %s não foi encontrado", id.toString()))
+                );
+    }
+
     private void validateHorarios(HorarioDTO horario) {
         try {
             if (repository.getHorario(horario.getHorarioInicial(), horario.getHorarioFinal()).isPresent())
@@ -56,4 +71,5 @@ public class HorarioService {
             throw new HorarioNotValidException("Os campos de horário são obrigatórios");
         }
     }
+
 }
