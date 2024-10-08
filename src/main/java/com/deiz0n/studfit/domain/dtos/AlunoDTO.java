@@ -23,7 +23,7 @@ public class AlunoDTO {
     private Integer altura;
     @Email(message = "Email inválido. Tente novamente")
     private String email;
-    @NotBlank(message = "O campo telefone é  obrigatório")
+    @NotBlank(message = "O campo telefone é obrigatório")
     private String telefone;
     private String cirurgias;
     private String patologias;
