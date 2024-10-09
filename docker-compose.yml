@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: 1234567
       POSTGRES_DB: studfit
     ports:
-      - "5435:5432"
+      - "5432:5432"
     networks:
       - stud-fit-network
 
