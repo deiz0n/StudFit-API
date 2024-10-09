@@ -16,7 +16,7 @@ services:
       - stud-fit-network
 
   stud-fit-api:
-    image: deiz0n/studfit-api:1.1
+    image: deiz0n/studfit-api:1.2
     command: ["/wait-for-it.sh", "-t", "10", "stud-fit-db:5435", "--", "java", "-jar", "studfit-api.jar"]
     ports:
       - "8080:8080"
