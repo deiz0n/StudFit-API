@@ -20,22 +20,14 @@ import static com.deiz0n.studfit.infrastructure.config.CorsConfig.getCorsConfigu
 @EnableWebSecurity
 public class SecurityConfig {
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
-                .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(request -> request
-                        .requestMatchers("api/v1.0/alunos/**").permitAll()
-                )
+                .cors(corsConfigurer -> corsConfigurer.configurationSource(getCorsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        return getCorsConfigurationSource();
-    }
 
 }
