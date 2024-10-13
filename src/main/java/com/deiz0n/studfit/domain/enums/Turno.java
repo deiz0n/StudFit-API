@@ -6,9 +6,6 @@ public enum Turno {
     TARDE("tarde"),
     NOITE("noite");
 
-    private String cargo;
-
     Turno(String cargo) {
-        this.cargo = cargo;
     }
 }
