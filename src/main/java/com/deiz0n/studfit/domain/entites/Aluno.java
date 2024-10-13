@@ -1,5 +1,6 @@
 package com.deiz0n.studfit.domain.entites;
 
+import com.deiz0n.studfit.domain.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,7 +32,7 @@ public class Aluno {
     private Integer mesesExperienciaMusculacao;
     @Column(name = "diagnostico_lesao_joelho")
     private String diagnosticoLesaoJoelho;
-    private String status;
+    private Status status;
     @Column(name = "ausencias_consecutivas")
     private Integer ausenciasConsecutivas;
     @Column(name = "lista_espera")

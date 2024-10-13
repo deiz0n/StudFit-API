@@ -1,5 +1,6 @@
 package com.deiz0n.studfit.domain.dtos;
 
+import com.deiz0n.studfit.domain.enums.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
@@ -31,7 +32,7 @@ public class AlunoDTO {
     private Integer mesesExperienciaMusculacao;
     @JsonProperty("diagnostico_lesao_joelho")
     private String diagnosticoLesaoJoelho;
-    private String status;
+    private Status status;
     @JsonProperty("ausencias_consecutivas")
     private Integer ausenciasConsecutivas;
     @JsonIgnore
