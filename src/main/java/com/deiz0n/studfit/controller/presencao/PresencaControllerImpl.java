@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("api/v1.0/presencas")
 public class PresencaControllerImpl implements PresencaController {
@@ -33,8 +35,8 @@ public class PresencaControllerImpl implements PresencaController {
     }
 
     @Override
-    public ResponseEntity<Response> createPresenca(PresencaDTO request, ServletWebRequest path) {
-        var presenca = service.create(request);
+    public ResponseEntity<Response> createPresenca(PresencaDTO request, ServletWebRequest path, LocalDate data) {
+        var presenca = service.create(request, data);
         var uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("id")
