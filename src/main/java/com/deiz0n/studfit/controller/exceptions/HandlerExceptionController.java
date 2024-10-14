@@ -1,10 +1,7 @@
 package com.deiz0n.studfit.controller.exceptions;
 
 import com.deiz0n.studfit.domain.enums.Cargo;
-import com.deiz0n.studfit.domain.exceptions.CargoNotExistentException;
-import com.deiz0n.studfit.domain.exceptions.HorarioNotValidException;
-import com.deiz0n.studfit.domain.exceptions.ResourceAlreadyException;
-import com.deiz0n.studfit.domain.exceptions.ResourceNotFoundException;
+import com.deiz0n.studfit.domain.exceptions.*;
 import com.deiz0n.studfit.domain.response.ResponseError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -117,6 +114,20 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
                         ResponseError.builder()
                                 .code(HttpStatus.BAD_REQUEST.value())
                                 .title("Horário inválido")
+                                .status(HttpStatus.BAD_REQUEST)
+                                .description(exception.getMessage())
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(AlunoNotEfetivadoException.class)
+    private ResponseEntity<ResponseError> handleAlunoNotEfetivadoException(AlunoNotEfetivadoException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.BAD_REQUEST.value())
+                                .title("Erro ao cadastrar presença")
                                 .status(HttpStatus.BAD_REQUEST)
                                 .description(exception.getMessage())
                                 .build()
