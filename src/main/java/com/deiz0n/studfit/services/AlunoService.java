@@ -3,12 +3,15 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.domain.entites.Aluno;
+import com.deiz0n.studfit.domain.events.AlunoRegisterAusenciasEvent;
 import com.deiz0n.studfit.domain.exceptions.AlunoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.EmailAlreadyRegisteredException;
 import com.deiz0n.studfit.domain.exceptions.TelefoneAlreadyRegistered;
 import com.deiz0n.studfit.infrastructure.repositories.AlunoRepository;
+import com.deiz0n.studfit.infrastructure.repositories.PresencaRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,10 +23,12 @@ import java.util.stream.Collectors;
 public class AlunoService {
 
     private AlunoRepository alunoRepository;
+    private PresencaRepository presencaRepository;
     private ModelMapper mapper;
 
-    public AlunoService(AlunoRepository alunoRepository, ModelMapper mapper) {
+    public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper) {
         this.alunoRepository = alunoRepository;
+        this.presencaRepository = presencaRepository;
         this.mapper = mapper;
     }
 
@@ -141,6 +146,18 @@ public class AlunoService {
                 }
             }
         }
+    }
+
+    // Registra as ausências dos alunos
+    @EventListener
+    private void setAusencias(AlunoRegisterAusenciasEvent registerAusencias) {
+        var aluno = getById(registerAusencias
+                .getPresenca()
+                .getAluno()
+                .getId()
+        );
+        var quantityAusencias = presencaRepository.getPresencas(aluno.getId()).size();
+        aluno.setAusenciasConsecutivas(quantityAusencias);
     }
 
 }
