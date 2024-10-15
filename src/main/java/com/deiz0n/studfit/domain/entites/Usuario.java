@@ -37,14 +37,15 @@ public class Usuario implements UserDetails {
     @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (cargo == Cargo.INSTRUTOR) {
+        if (cargo == Cargo.INSTRUTOR)
             return List.of(
                     new SimpleGrantedAuthority("ROLE_INSTRUTOR"),
                     new SimpleGrantedAuthority("ROLE_ESTAGIARIO")
             );
-        } else {
+        else if (cargo == Cargo.ADMINISTRADOR)
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMINISTRADOR"));
+        else
             return List.of(new SimpleGrantedAuthority("ROLE_ESTAGIARIO"));
-        }
     }
 
     @Override
