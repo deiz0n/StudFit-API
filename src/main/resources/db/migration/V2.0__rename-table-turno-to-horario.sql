@@ -1,0 +1,1 @@
+ALTER TABLE turno RENAME TO horario

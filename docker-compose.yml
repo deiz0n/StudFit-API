@@ -11,12 +11,12 @@ services:
       POSTGRES_PASSWORD: 1234567
       POSTGRES_DB: studfit
     ports:
-      - "5435:5432"
+      - "5432:5432"
     networks:
       - stud-fit-network
 
   stud-fit-api:
-    image: deiz0n/studfit-api:1.1
+    image: deiz0n/studfit-api:1.3
     command: ["/wait-for-it.sh", "-t", "10", "stud-fit-db:5435", "--", "java", "-jar", "studfit-api.jar"]
     ports:
       - "8080:8080"

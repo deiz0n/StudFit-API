@@ -1,9 +1,7 @@
 package com.deiz0n.studfit.controller.exceptions;
 
 import com.deiz0n.studfit.domain.enums.Cargo;
-import com.deiz0n.studfit.domain.exceptions.CargoNotExistentException;
-import com.deiz0n.studfit.domain.exceptions.ResourceAlreadyException;
-import com.deiz0n.studfit.domain.exceptions.ResourceNotFoundException;
+import com.deiz0n.studfit.domain.exceptions.*;
 import com.deiz0n.studfit.domain.response.ResponseError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -53,29 +51,17 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        if (ex instanceof CargoNotExistentException) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(
-                            ResponseError.builder()
-                                    .code(HttpStatus.BAD_REQUEST.value())
-                                    .title("Cargo inexistente")
-                                    .status(HttpStatus.BAD_REQUEST)
-                                    .description(String.format("Os cargos existentes são: %s", Arrays.toString(Cargo.values())))
-                                    .build()
-                    );
-        } else {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(
-                            ResponseError.builder()
-                                    .code(HttpStatus.BAD_REQUEST.value())
-                                    .title("JSON inválido")
-                                    .status(HttpStatus.BAD_REQUEST)
-                                    .description(ex.getMessage())
-                                    .build()
-                    );
-        }
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.BAD_REQUEST.value())
+                                .title("JSON inválido")
+                                .status(HttpStatus.BAD_REQUEST)
+                                .description(ex.getMessage())
+                                .build()
+                );
+
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -107,13 +93,41 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(CargoNotExistentException.class)
-    public ResponseEntity<ResponseError> handleCargoNotExist(CargoNotExistentException exception) {
+    public ResponseEntity<ResponseError> handleCargoNotExistException(CargoNotExistentException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(
                         ResponseError.builder()
                                 .code(HttpStatus.BAD_REQUEST.value())
                                 .title("Cargo inexistente")
+                                .status(HttpStatus.BAD_REQUEST)
+                                .description(exception.getMessage())
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(HorarioNotValidException.class)
+    private ResponseEntity<ResponseError> handleHorarioNotValidException(HorarioNotValidException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.BAD_REQUEST.value())
+                                .title("Horário inválido")
+                                .status(HttpStatus.BAD_REQUEST)
+                                .description(exception.getMessage())
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(AlunoNotEfetivadoException.class)
+    private ResponseEntity<ResponseError> handleAlunoNotEfetivadoException(AlunoNotEfetivadoException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.BAD_REQUEST.value())
+                                .title("Erro ao cadastrar presença")
                                 .status(HttpStatus.BAD_REQUEST)
                                 .description(exception.getMessage())
                                 .build()
