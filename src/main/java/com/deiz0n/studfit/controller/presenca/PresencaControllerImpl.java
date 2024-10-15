@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller.presencao;
+package com.deiz0n.studfit.controller.presenca;
 
 import com.deiz0n.studfit.domain.dtos.PresencaDTO;
 import com.deiz0n.studfit.domain.response.Response;
