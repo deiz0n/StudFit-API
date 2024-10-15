@@ -4,6 +4,7 @@ import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.PresencaDTO;
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
 import com.deiz0n.studfit.domain.entites.Presenca;
+import com.deiz0n.studfit.domain.events.AlunoRegisterAusenciasEvent;
 import com.deiz0n.studfit.domain.exceptions.AlunoNotEfetivadoException;
 import com.deiz0n.studfit.domain.exceptions.AlunoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.UsuarioNotFoundException;
@@ -11,6 +12,7 @@ import com.deiz0n.studfit.infrastructure.repositories.AlunoRepository;
 import com.deiz0n.studfit.infrastructure.repositories.PresencaRepository;
 import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,12 +27,14 @@ public class PresencaService {
     private AlunoRepository alunoRepository;
     private UsuarioRepository usuarioRepository;
     private ModelMapper mapper;
+    private ApplicationEventPublisher eventPublisher;
 
-    public PresencaService(PresencaRepository presencaRepository, AlunoRepository alunoRepository, UsuarioRepository usuarioRepository, ModelMapper mapper) {
+    public PresencaService(PresencaRepository presencaRepository, AlunoRepository alunoRepository, UsuarioRepository usuarioRepository, ModelMapper mapper, ApplicationEventPublisher eventPublisher) {
         this.presencaRepository = presencaRepository;
         this.alunoRepository = alunoRepository;
         this.usuarioRepository = usuarioRepository;
         this.mapper = mapper;
+        this.eventPublisher = eventPublisher;
     }
 
     public List<PresencaDTO> getAll() {
@@ -48,6 +52,9 @@ public class PresencaService {
 
         presenca.setData(data);
         presencaRepository.save(presenca);
+
+        var registerAusencias = new AlunoRegisterAusenciasEvent(this, presencaDTO);
+        eventPublisher.publishEvent(registerAusencias);
 
         return PresencaDTO.builder()
                 .id(presenca.getId())
