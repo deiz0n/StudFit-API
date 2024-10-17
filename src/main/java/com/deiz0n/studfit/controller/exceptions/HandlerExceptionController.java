@@ -1,6 +1,5 @@
 package com.deiz0n.studfit.controller.exceptions;
 
-import com.deiz0n.studfit.domain.enums.Cargo;
 import com.deiz0n.studfit.domain.exceptions.*;
 import com.deiz0n.studfit.domain.response.ResponseError;
 import org.springframework.http.HttpHeaders;
@@ -8,18 +7,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.util.Arrays;
-
-@RestControllerAdvice
-public class HandlerExceptionController extends ResponseEntityExceptionHandler {
+@ControllerAdvice
+public class HandlerExceptionController extends ResponseEntityExceptionHandler{
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -107,7 +108,7 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(HorarioNotValidException.class)
-    private ResponseEntity<ResponseError> handleHorarioNotValidException(HorarioNotValidException exception) {
+    public ResponseEntity<ResponseError> handleHorarioNotValidException(HorarioNotValidException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(
@@ -121,7 +122,7 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(AlunoNotEfetivadoException.class)
-    private ResponseEntity<ResponseError> handleAlunoNotEfetivadoException(AlunoNotEfetivadoException exception) {
+    public ResponseEntity<ResponseError> handleAlunoNotEfetivadoException(AlunoNotEfetivadoException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(
@@ -135,7 +136,55 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity handleAuthenticationException() {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    public ResponseEntity<?> handleAuthenticationException(AuthenticationException exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.UNAUTHORIZED.value())
+                                .title("Erro na autenticação")
+                                .status(HttpStatus.UNAUTHORIZED)
+                                .description(exception.getMessage() + " - " + exception.getClass())
+                                .build()
+                );
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ResponseError> handleAccessDeniedException() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.UNAUTHORIZED.value())
+                                .title("Acesso negado")
+                                .status(HttpStatus.UNAUTHORIZED)
+                                .description("O usuário não tem permissão para acessar este recurso")
+                                .build()
+                );
+    }
+
+    @ExceptionHandler({BadCredentialsException.class, InternalAuthenticationServiceException.class})
+    public ResponseEntity<ResponseError> handleBadCredentialsException() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.FORBIDDEN.value())
+                                .title("Credenciais inválidas")
+                                .status(HttpStatus.FORBIDDEN)
+                                .description("Usuário ou senha inválidos")
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(InsufficientAuthenticationException.class)
+    public ResponseEntity<ResponseError> handleInsufficientAuthenticationException() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.FORBIDDEN.value())
+                                .title("Token invdálido")
+                                .status(HttpStatus.FORBIDDEN)
+                                .description("Token inválido, nulo ou expirado")
+                                .build()
+                );
+    }
+
 }
