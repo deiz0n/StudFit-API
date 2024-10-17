@@ -16,9 +16,13 @@ import static com.deiz0n.studfit.infrastructure.config.CorsConfig.getCorsConfigu
 public class SecurityConfig {
 
     private SecurityFilter filter;
+    private CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private CustomAccessDeniedHandler accessDeniedHandler;
 
-    public SecurityConfig(SecurityFilter filter) {
+    public SecurityConfig(SecurityFilter filter, CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler) {
         this.filter = filter;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.accessDeniedHandler = accessDeniedHandler;
     }
 
     @Bean
@@ -28,16 +32,27 @@ public class SecurityConfig {
                 .cors(corsConfigurer -> corsConfigurer.configurationSource(getCorsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers( "api/v1.0/alunos/efetivados", "api/v1.0/alunos/lista-espera", "api/v1.0/auth/login").permitAll()
+                        .requestMatchers(
+                                "api/v1.0/alunos/efetivados",
+                                "api/v1.0/alunos/lista-espera",
+                                "api/v1.0/auth/login"
+                        ).permitAll()
+
+                        .requestMatchers("api/v1.0/usuarios/**").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.GET, "api/v1.0/usuarios").hasRole("ADMINISTRADOR")
+
+                        .requestMatchers("api/v1.0/presencas**").hasRole("ESTAGIARIO")
+                        .requestMatchers("api/v1.0/alunos**").hasRole("ESTAGIARIO")
 
                         .requestMatchers("api/v1.0/horarios**").hasRole("INSTRUTOR")
 
-                        .requestMatchers("api/v1.0/alunos**", "api/v1.0/presencas**").hasRole("ESTAGIARIO")
-
-                        .requestMatchers("api/v1.0/usuarios**").hasRole("ADMINISTRADOR")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(handlingConfigurer -> handlingConfigurer
+                        .accessDeniedHandler(accessDeniedHandler)
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                )
                 .build();
     }
 
