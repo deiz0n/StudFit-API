@@ -133,7 +133,13 @@ public class AlunoService {
 
     // Reorganiza a lista de espera
     private void reorderListaEspera(Aluno aluno) {
-        List<Aluno> listOfAlunos = new ArrayList<>(alunoRepository.findAll());
+        List<Aluno> listOfAlunos = new ArrayList<>(
+                alunoRepository.findAll()
+                .stream()
+                .filter(Aluno::getListaEspera)
+                .toList()
+        );
+
         var lastAluno = listOfAlunos.get(listOfAlunos.size()-1);
         var currentColocacao = 0;
 
