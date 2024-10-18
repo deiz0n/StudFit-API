@@ -166,41 +166,31 @@ public class AlunoService {
                 .getId()
         );
 
-        List<Presenca> presencasByAluno = presencaRepository.getPresencas(aluno.getId());
+        List<Presenca> ausenciasByAluno = presencaRepository.getPresencas(aluno.getId());
 
-        if (presencasByAluno.isEmpty() || !presencasByAluno.get(presencasByAluno.size()-1).getPresente()) {
+        if (ausenciasByAluno.isEmpty() || !ausenciasByAluno.get(ausenciasByAluno.size()-1).getPresente())
             quantityAusencias++;
-            aluno.setAusenciasConsecutivas(quantityAusencias);
-            alunoRepository.save(aluno);
-        } else {
-            for (int i = 0; i < presencasByAluno.size() - 1; i++) {
-                if (presencasByAluno.get(i).getPresente()) {
-                    if (presencasByAluno.get(i).getData().getDayOfWeek() == DayOfWeek.FRIDAY && presencasByAluno.get(i).getData().getDayOfWeek() == DayOfWeek.MONDAY) {
+        else {
+            for (int i = 0; i < ausenciasByAluno.size() - 1; i++) {
+                if (ausenciasByAluno.get(i).getPresente()) {
+                    // Verifica se é sexta e o próximo dia é segunda
+                    if (ausenciasByAluno.get(i).getData().getDayOfWeek() == DayOfWeek.FRIDAY && ausenciasByAluno.get(i + 1).getData().getDayOfWeek() == DayOfWeek.MONDAY)
                         quantityAusencias++;
-                        aluno.setAusenciasConsecutivas(quantityAusencias);
-                        alunoRepository.save(aluno);
-                    }
                     // Verifica se as ausências estão em sequência
-                    else if (presencasByAluno.get(i).getData().plusDays(presencasByAluno.get(i + 1).getData().getDayOfMonth()).equals(presencasByAluno.get(i + 1).getData())) {
+                    else if (ausenciasByAluno.get(i).getData().plusDays(1).equals(ausenciasByAluno.get(i + 1).getData()))
                         quantityAusencias++;
-                        aluno.setAusenciasConsecutivas(quantityAusencias);
-                        alunoRepository.save(aluno);
-                    }
                     // Verifica se é o último dia do mês
-                    else if (presencasByAluno.get(i).getData().getDayOfMonth() == presencasByAluno.get(i).getData().lengthOfMonth() && presencasByAluno.get(i + 1).getData().getDayOfMonth() == 1) {
+                    else if (ausenciasByAluno.get(i).getData().getDayOfMonth() == ausenciasByAluno.get(i).getData().lengthOfMonth() && ausenciasByAluno.get(i + 1).getData().getDayOfMonth() == 1)
                         quantityAusencias++;
-                        aluno.setAusenciasConsecutivas(quantityAusencias);
-                        alunoRepository.save(aluno);
-                    }
                 } else {
                     // Zera a quantidade de ausêcias caso a frequência seja quebrada
                     quantityAusencias = 0;
-                    aluno.setAusenciasConsecutivas(quantityAusencias);
-                    alunoRepository.save(aluno);
                     break;
                 }
             }
         }
+        aluno.setAusenciasConsecutivas(quantityAusencias);
+        alunoRepository.save(aluno);
         return quantityAusencias;
     }
 }
