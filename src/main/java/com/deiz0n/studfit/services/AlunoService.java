@@ -3,6 +3,7 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.domain.entites.Aluno;
+import com.deiz0n.studfit.domain.entites.Presenca;
 import com.deiz0n.studfit.domain.events.AlunoRegisterAusenciasEvent;
 import com.deiz0n.studfit.domain.exceptions.AlunoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.EmailAlreadyRegisteredException;
@@ -14,6 +15,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +27,7 @@ public class AlunoService {
     private AlunoRepository alunoRepository;
     private PresencaRepository presencaRepository;
     private ModelMapper mapper;
+    private Integer quantityAusencias = 0;
 
     public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper) {
         this.alunoRepository = alunoRepository;
@@ -156,14 +159,50 @@ public class AlunoService {
 
     // Registra as ausências dos alunos
     @EventListener
-    private void setAusencias(AlunoRegisterAusenciasEvent registerAusencias) {
+    private int setAusencias(AlunoRegisterAusenciasEvent registerAusencias) {
         var aluno = getById(registerAusencias
                 .getPresenca()
                 .getAluno()
                 .getId()
         );
-        var quantityAusencias = presencaRepository.getPresencas(aluno.getId()).size();
-        aluno.setAusenciasConsecutivas(quantityAusencias);
-    }
 
+        List<Presenca> presencasByAluno = presencaRepository.getPresencas(aluno.getId());
+
+        if (presencasByAluno.isEmpty() || !presencasByAluno.get(presencasByAluno.size()-1).getPresente()) {
+            quantityAusencias++;
+            aluno.setAusenciasConsecutivas(quantityAusencias);
+            alunoRepository.save(aluno);
+        } else {
+            for (int i = 0; i < presencasByAluno.size() - 1; i++) {
+                if (presencasByAluno.get(i).getPresente()) {
+                    if (presencasByAluno.get(i).getData().getDayOfWeek() == DayOfWeek.FRIDAY && presencasByAluno.get(i).getData().getDayOfWeek() == DayOfWeek.MONDAY) {
+                        quantityAusencias++;
+                        aluno.setAusenciasConsecutivas(quantityAusencias);
+                        alunoRepository.save(aluno);
+                    }
+                    // Verifica se as ausências estão em sequência
+                    else if (presencasByAluno.get(i).getData().plusDays(presencasByAluno.get(i + 1).getData().getDayOfMonth()).equals(presencasByAluno.get(i + 1).getData())) {
+                        quantityAusencias++;
+                        aluno.setAusenciasConsecutivas(quantityAusencias);
+                        alunoRepository.save(aluno);
+                    }
+                    // Verifica se é o último dia do mês
+                    else if (presencasByAluno.get(i).getData().getDayOfMonth() == presencasByAluno.get(i).getData().lengthOfMonth() && presencasByAluno.get(i + 1).getData().getDayOfMonth() == 1) {
+                        quantityAusencias++;
+                        aluno.setAusenciasConsecutivas(quantityAusencias);
+                        alunoRepository.save(aluno);
+                    }
+                } else {
+                    // Zera a quantidade de ausêcias caso a frequência seja quebrada
+                    quantityAusencias = 0;
+                    aluno.setAusenciasConsecutivas(quantityAusencias);
+                    alunoRepository.save(aluno);
+                    break;
+                }
+            }
+        }
+        return quantityAusencias;
+    }
 }
+
+
