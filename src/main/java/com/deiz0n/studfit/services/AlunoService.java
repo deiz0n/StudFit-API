@@ -4,7 +4,9 @@ import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.domain.entites.Aluno;
 import com.deiz0n.studfit.domain.entites.Presenca;
+import com.deiz0n.studfit.domain.enums.Status;
 import com.deiz0n.studfit.domain.events.AlunoRegisterAusenciasEvent;
+import com.deiz0n.studfit.domain.events.AlunoRegisterStatusEvent;
 import com.deiz0n.studfit.domain.exceptions.AlunoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.EmailAlreadyRegisteredException;
 import com.deiz0n.studfit.domain.exceptions.TelefoneAlreadyRegistered;
@@ -12,6 +14,7 @@ import com.deiz0n.studfit.infrastructure.repositories.AlunoRepository;
 import com.deiz0n.studfit.infrastructure.repositories.PresencaRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
@@ -27,12 +30,14 @@ public class AlunoService {
     private AlunoRepository alunoRepository;
     private PresencaRepository presencaRepository;
     private ModelMapper mapper;
+    private ApplicationEventPublisher eventPublisher;
     private Integer quantityAusencias = 0;
 
-    public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper) {
+    public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper, ApplicationEventPublisher eventPublisher) {
         this.alunoRepository = alunoRepository;
         this.presencaRepository = presencaRepository;
         this.mapper = mapper;
+        this.eventPublisher = eventPublisher;
     }
 
     // Retorna todos os alunos que estão na lista de espera
@@ -159,7 +164,7 @@ public class AlunoService {
 
     // Registra as ausências dos alunos
     @EventListener
-    private int setAusencias(AlunoRegisterAusenciasEvent registerAusencias) {
+    private void setAusencias(AlunoRegisterAusenciasEvent registerAusencias) {
         var aluno = getById(registerAusencias
                 .getPresenca()
                 .getAluno()
@@ -191,8 +196,18 @@ public class AlunoService {
         }
         aluno.setAusenciasConsecutivas(quantityAusencias);
         alunoRepository.save(aluno);
-        return quantityAusencias;
+
+        var registerStatus = new AlunoRegisterStatusEvent(this, aluno.getId());
+        eventPublisher.publishEvent(registerStatus);
+    }
+
+    @EventListener
+    private void setStatus(AlunoRegisterStatusEvent registerStatusEvent) {
+        var aluno = getById(registerStatusEvent.getId());
+        if (aluno.getAusenciasConsecutivas() >= 3)
+            aluno.setStatus(Status.EM_ALERTA);
+        else
+            aluno.setStatus(Status.REGULAR);
+        alunoRepository.save(aluno);
     }
 }
-
-
