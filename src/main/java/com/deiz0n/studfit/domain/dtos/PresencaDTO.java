@@ -17,6 +17,7 @@ import java.util.UUID;
 public class PresencaDTO {
 
     private UUID id;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate data;
     private Boolean presente;
