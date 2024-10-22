@@ -107,18 +107,22 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler{
                 );
     }
 
-    @ExceptionHandler(HorarioNotValidException.class)
-    public ResponseEntity<ResponseError> handleHorarioNotValidException(HorarioNotValidException exception) {
+    @ExceptionHandler(ResourceNotValidException.class)
+    public ResponseEntity<ResponseError> handleHorarioNotValidException(ResourceNotValidException exception) {
+        var response = ResponseError.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .status(HttpStatus.BAD_REQUEST)
+                .description(exception.getMessage())
+                .build();
+
+        if (exception instanceof HorarioNotValidException) {
+            response.setTitle("Horário inválido");
+        } else {
+            response.setTitle("Presença invália");
+        }
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(
-                        ResponseError.builder()
-                                .code(HttpStatus.BAD_REQUEST.value())
-                                .title("Horário inválido")
-                                .status(HttpStatus.BAD_REQUEST)
-                                .description(exception.getMessage())
-                                .build()
-                );
+                .body(response);
     }
 
     @ExceptionHandler(AlunoNotEfetivadoException.class)
