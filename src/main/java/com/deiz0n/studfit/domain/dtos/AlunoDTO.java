@@ -32,8 +32,9 @@ public class AlunoDTO {
     private Integer mesesExperienciaMusculacao;
     @JsonProperty("diagnostico_lesao_joelho")
     private String diagnosticoLesaoJoelho;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Status status;
-    @JsonProperty("ausencias_consecutivas")
+    @JsonProperty(value = "ausencias_consecutivas", access = JsonProperty.Access.READ_ONLY)
     private Integer ausenciasConsecutivas;
     @JsonIgnore
     private Boolean listaEspera = false;
