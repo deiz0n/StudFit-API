@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,5 +80,10 @@ public class PresencaService {
             throw new PresencaAlreadyRegistered("Presenca já realizada");
         if (presenca.getData().getDayOfWeek() == DayOfWeek.SATURDAY || presenca.getData().getDayOfWeek() == DayOfWeek.SUNDAY) // Verifica se a presença foi realizada em final de semana
             throw new PresencaNotValidException("Presença não pode ser realizada em sábados e domingos");
+        if (!presenca.getData().equals(LocalDate.now()))
+            if (!presenca.getData().isBefore(LocalDate.now()))
+                throw new PresencaNotValidException("Presença não pode ser realizada em datas anteriores");
+//            else
+//                throw new PresencaNotValidException("Presença não pode ser realizada em datas posteriores");
     }
 }
