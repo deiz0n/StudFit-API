@@ -5,6 +5,7 @@ import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.domain.entites.Aluno;
 import com.deiz0n.studfit.domain.entites.Presenca;
 import com.deiz0n.studfit.domain.enums.Status;
+import com.deiz0n.studfit.domain.events.AlunoDeletedByAusenciasEvent;
 import com.deiz0n.studfit.domain.events.AlunoRegisterAusenciasEvent;
 import com.deiz0n.studfit.domain.events.AlunoRegisterStatusEvent;
 import com.deiz0n.studfit.domain.exceptions.AlunoNotFoundException;
@@ -199,6 +200,9 @@ public class AlunoService {
 
         var registerStatus = new AlunoRegisterStatusEvent(this, aluno.getId());
         eventPublisher.publishEvent(registerStatus);
+
+        var deletedAluno = new AlunoDeletedByAusenciasEvent(this, mapper.map(aluno, AlunoDTO.class));
+        eventPublisher.publishEvent(deletedAluno);
     }
 
     @EventListener
@@ -209,5 +213,18 @@ public class AlunoService {
         else
             aluno.setStatus(Status.REGULAR);
         alunoRepository.save(aluno);
+    }
+
+    @EventListener
+    private void deleteByMaxAusencias(AlunoDeletedByAusenciasEvent deletedAlunoStatus) {
+        var aluno = deletedAlunoStatus.getAluno();
+        if (aluno.getAusenciasConsecutivas() == 5) {
+            var findAluno = getById(aluno.getId());
+            try {
+                alunoRepository.deleteById(findAluno.getId());
+            } catch (Exception e) {
+                throw new RuntimeException("Erro ao excluir aluno com máximo de ausências", e);
+            }
+        }
     }
 }
