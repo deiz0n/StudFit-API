@@ -38,6 +38,7 @@ public class HorarioService {
 
         var horario = mapper.map(horarioDTO, Horario.class);
 
+        horario.setVagasDisponiveis(15);
         horario.setTurno(defineTurno(horarioDTO));
         repository.save(horario);
 
