@@ -25,6 +25,8 @@ public class Horario {
     @Column(name = "horario_final")
     private LocalTime horarioFinal;
     private Turno turno;
+    @Column(name = "vagas_disponiveis")
+    private Integer vagasDisponiveis;
 
     @OneToMany(mappedBy = "horario")
     private List<Aluno> alunos;

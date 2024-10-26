@@ -2,6 +2,7 @@ package com.deiz0n.studfit.domain.dtos;
 
 import com.deiz0n.studfit.domain.enums.Turno;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +28,9 @@ public class HorarioDTO implements Comparable<HorarioDTO> {
     private LocalTime horarioFinal;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Turno turno;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty(value = "vagas_disponiveis", access = JsonProperty.Access.READ_ONLY)
+    private Integer vagasDisponiveis;
 
     @Override
     public int compareTo(HorarioDTO horario) {
