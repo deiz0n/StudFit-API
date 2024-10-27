@@ -3,6 +3,7 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
 import com.deiz0n.studfit.domain.entites.Horario;
 import com.deiz0n.studfit.domain.enums.Turno;
+import com.deiz0n.studfit.domain.exceptions.CargoNotExistentException;
 import com.deiz0n.studfit.domain.exceptions.HorarioAlreadyRegistered;
 import com.deiz0n.studfit.domain.exceptions.HorarioNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.HorarioNotValidException;
@@ -10,6 +11,7 @@ import com.deiz0n.studfit.infrastructure.repositories.HorarioRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,6 +35,13 @@ public class HorarioService {
                 .collect(Collectors.toList());
     }
 
+    public List<HorarioDTO> getByTurno(String turno) {
+        return repository.getByTurno(validateTurno(turno))
+                .stream()
+                .map(horario -> mapper.map(horario, HorarioDTO.class))
+                .collect(Collectors.toList());
+    }
+
     public HorarioDTO create(HorarioDTO horarioDTO) {
         validateHorarios(horarioDTO);
 
@@ -47,6 +56,7 @@ public class HorarioService {
                 .horarioInicial(horario.getHorarioInicial())
                 .horarioFinal(horario.getHorarioFinal())
                 .turno(horario.getTurno())
+                .vagasDisponiveis(horario.getVagasDisponiveis())
                 .build();
     }
 
@@ -78,12 +88,20 @@ public class HorarioService {
     }
 
     // Define os turnos automaticamente com base nos horários informados
-    private Turno defineTurno(HorarioDTO horarioDTO) {
+    private String defineTurno(HorarioDTO horarioDTO) {
         if (horarioDTO.getHorarioInicial().getHour() >= 6 && horarioDTO.getHorarioFinal().getHour() <= 12)
-            return Turno.MANHA;
+            return Turno.MANHA.toString();
         if (horarioDTO.getHorarioInicial().getHour() >= 12 && horarioDTO.getHorarioFinal().getHour() <= 18)
-            return Turno.TARDE;
+            return Turno.TARDE.toString();
         else
-            return Turno.NOITE;
+            return Turno.NOITE.toString();
+    }
+
+    private String validateTurno(String turno) {
+        try {
+            return Turno.valueOf(turno.toUpperCase()).toString();
+        } catch (Exception e) {
+            throw new CargoNotExistentException(String.format("Os turnos existentes são: %s", Arrays.toString(Turno.values())));
+        }
     }
 }
