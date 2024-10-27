@@ -93,18 +93,22 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler{
                 );
     }
 
-    @ExceptionHandler(CargoNotExistentException.class)
-    public ResponseEntity<ResponseError> handleCargoNotExistException(CargoNotExistentException exception) {
+    @ExceptionHandler(ResourceNotExistingException.class)
+    public ResponseEntity<ResponseError> handleCargoNotExistException(ResourceNotExistingException exception) {
+        var response =  ResponseError.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .status(HttpStatus.BAD_REQUEST)
+                .description(exception.getMessage())
+                .build();
+
+        if (exception instanceof CargoNotExistentException) {
+            response.setTitle("Cargo inexistente");
+        } else {
+            response.setTitle("Turno inexistente");
+        }
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(
-                        ResponseError.builder()
-                                .code(HttpStatus.BAD_REQUEST.value())
-                                .title("Cargo inexistente")
-                                .status(HttpStatus.BAD_REQUEST)
-                                .description(exception.getMessage())
-                                .build()
-                );
+                .body(response);
     }
 
     @ExceptionHandler(ResourceNotValidException.class)
