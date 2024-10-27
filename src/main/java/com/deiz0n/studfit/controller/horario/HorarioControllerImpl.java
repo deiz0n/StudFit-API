@@ -1,6 +1,7 @@
 package com.deiz0n.studfit.controller.horario;
 
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
+import com.deiz0n.studfit.domain.enums.Turno;
 import com.deiz0n.studfit.domain.response.Response;
 import com.deiz0n.studfit.services.HorarioService;
 import org.springframework.http.CacheControl;
@@ -27,6 +28,19 @@ public class HorarioControllerImpl  implements HorarioController{
     @Override
     public ResponseEntity<Response> getHorarios(ServletWebRequest path) {
         var horarios = service.getAll();
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
+                .body(Response.builder()
+                        .code(HttpStatus.OK.value())
+                        .status(HttpStatus.OK)
+                        .path(path.getRequest().getRequestURI())
+                        .data(horarios)
+                        .build());
+    }
+
+    @Override
+    public ResponseEntity<Response> getHorariosByTurno(String request, ServletWebRequest path) {
+        var horarios = service.getByTurno(request);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
                 .body(Response.builder()
