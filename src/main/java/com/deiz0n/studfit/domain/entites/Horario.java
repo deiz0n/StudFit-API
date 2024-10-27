@@ -24,7 +24,7 @@ public class Horario {
     private LocalTime horarioInicial;
     @Column(name = "horario_final")
     private LocalTime horarioFinal;
-    private Turno turno;
+    private String turno;
     @Column(name = "vagas_disponiveis")
     private Integer vagasDisponiveis;
 

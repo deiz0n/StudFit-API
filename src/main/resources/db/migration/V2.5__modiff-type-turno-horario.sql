@@ -1,0 +1,1 @@
+ALTER TABLE horario ALTER COLUMN turno TYPE varchar(125);
