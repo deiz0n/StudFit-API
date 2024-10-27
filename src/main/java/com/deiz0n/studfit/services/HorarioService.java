@@ -3,10 +3,7 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
 import com.deiz0n.studfit.domain.entites.Horario;
 import com.deiz0n.studfit.domain.enums.Turno;
-import com.deiz0n.studfit.domain.exceptions.CargoNotExistentException;
-import com.deiz0n.studfit.domain.exceptions.HorarioAlreadyRegistered;
-import com.deiz0n.studfit.domain.exceptions.HorarioNotFoundException;
-import com.deiz0n.studfit.domain.exceptions.HorarioNotValidException;
+import com.deiz0n.studfit.domain.exceptions.*;
 import com.deiz0n.studfit.infrastructure.repositories.HorarioRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -101,7 +98,7 @@ public class HorarioService {
         try {
             return Turno.valueOf(turno.toUpperCase()).toString();
         } catch (Exception e) {
-            throw new CargoNotExistentException(String.format("Os turnos existentes são: %s", Arrays.toString(Turno.values())));
+            throw new ResourceNotExistingException(String.format("Os turnos existentes são: %s", Arrays.toString(Turno.values())));
         }
     }
 }
