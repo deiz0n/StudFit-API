@@ -9,6 +9,7 @@ import com.deiz0n.studfit.domain.enums.Status;
 import com.deiz0n.studfit.domain.events.AlunoDeletedByAusenciasEvent;
 import com.deiz0n.studfit.domain.events.AlunoRegisterAusenciasEvent;
 import com.deiz0n.studfit.domain.events.AlunoRegisterStatusEvent;
+import com.deiz0n.studfit.domain.events.HorarioRegisterVagasDisponiveisEvent;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioINotAvailableException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotFoundException;
@@ -96,11 +97,10 @@ public class AlunoService {
         reorderListaEspera(alunoEfetivado);
         alunoEfetivado.setColocacao(null);
 
-        alunoRepository.save(alunoEfetivado);
+        var vagasDisponiveisEvent = new HorarioRegisterVagasDisponiveisEvent(this, aluno.getHorario().getId());
+        eventPublisher.publishEvent(vagasDisponiveisEvent);
 
-//        var vagasDisponiveisEvent = new HorarioRegisterVagasDisponiveisEvent(this, alunoEfetivado);
-//        System.out.println(alunoEfetivado.getHorario());
-//        eventPublisher.publishEvent(vagasDisponiveisEvent);
+        alunoRepository.save(alunoEfetivado);
 
         return mapper.map(alunoEfetivado, AlunoDTO.class);
     }
