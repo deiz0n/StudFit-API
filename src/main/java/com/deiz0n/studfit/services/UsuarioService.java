@@ -5,6 +5,7 @@ import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.domain.enums.Cargo;
 import com.deiz0n.studfit.domain.exceptions.CargoNotExistentException;
 import com.deiz0n.studfit.domain.exceptions.EmailAlreadyRegisteredException;
+import com.deiz0n.studfit.domain.exceptions.ResourceNotExistingException;
 import com.deiz0n.studfit.domain.exceptions.UsuarioNotFoundException;
 import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
 import org.modelmapper.ModelMapper;
@@ -71,7 +72,7 @@ public class UsuarioService {
         try {
             return Cargo.valueOf(cargo.toUpperCase());
         } catch (Exception e) {
-            throw new CargoNotExistentException(String.format("Os cargos existentes são: %s", Arrays.toString(Cargo.values())));
+            throw new ResourceNotExistingException(String.format("Os cargos existentes são: %s", Arrays.toString(Cargo.values())));
         }
     }
 

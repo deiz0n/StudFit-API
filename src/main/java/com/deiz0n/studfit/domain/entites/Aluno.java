@@ -38,7 +38,7 @@ public class Aluno {
     @Column(name = "lista_espera")
     private Boolean listaEspera;
 
-    @OneToMany(mappedBy = "aluno")
+    @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL)
     private List<Presenca> presencas;
     @ManyToOne
     private Horario horario;
