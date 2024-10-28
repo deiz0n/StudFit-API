@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.domain.exceptions;
+package com.deiz0n.studfit.domain.exceptions.resource;
 
 public class ResourceNotExistingException extends RuntimeException {
 

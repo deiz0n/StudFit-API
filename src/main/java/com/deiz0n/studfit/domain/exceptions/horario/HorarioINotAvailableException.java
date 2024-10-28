@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.domain.exceptions;
+package com.deiz0n.studfit.domain.exceptions.horario;
 
 public class HorarioINotAvailableException extends RuntimeException {
 

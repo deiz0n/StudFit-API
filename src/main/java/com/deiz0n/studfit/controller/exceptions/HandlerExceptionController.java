@@ -1,6 +1,12 @@
 package com.deiz0n.studfit.controller.exceptions;
 
-import com.deiz0n.studfit.domain.exceptions.*;
+import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotEfetivadoException;
+import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotValidException;
+import com.deiz0n.studfit.domain.exceptions.resource.ResourceAlreadyException;
+import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotExistingException;
+import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotFoundException;
+import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotValidException;
+import com.deiz0n.studfit.domain.exceptions.usuario.CargoNotExistentException;
 import com.deiz0n.studfit.domain.response.ResponseError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

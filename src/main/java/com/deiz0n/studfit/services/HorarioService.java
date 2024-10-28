@@ -3,11 +3,12 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
 import com.deiz0n.studfit.domain.entites.Horario;
 import com.deiz0n.studfit.domain.enums.Turno;
-import com.deiz0n.studfit.domain.events.HorarioRegisterVagasDisponiveisEvent;
-import com.deiz0n.studfit.domain.exceptions.*;
+import com.deiz0n.studfit.domain.exceptions.horario.HorarioAlreadyRegistered;
+import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotFoundException;
+import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotValidException;
+import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotExistingException;
 import com.deiz0n.studfit.infrastructure.repositories.HorarioRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
