@@ -1,18 +1,18 @@
 package com.deiz0n.studfit.domain.events;
 
-import com.deiz0n.studfit.domain.dtos.HorarioDTO;
 import com.deiz0n.studfit.domain.entites.Aluno;
-import com.deiz0n.studfit.domain.entites.Horario;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
+
+import java.util.UUID;
 
 @Getter
 public class HorarioRegisterVagasDisponiveisEvent extends ApplicationEvent {
 
-    private Aluno aluno;
+    private UUID id;
 
-    public HorarioRegisterVagasDisponiveisEvent(Object source, Aluno aluno) {
+    public HorarioRegisterVagasDisponiveisEvent(Object source, UUID id) {
         super(source);
-        this.aluno = aluno;
+        this.id = id;
     }
 }
