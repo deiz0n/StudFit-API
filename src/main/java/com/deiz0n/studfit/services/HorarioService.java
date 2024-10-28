@@ -3,9 +3,11 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
 import com.deiz0n.studfit.domain.entites.Horario;
 import com.deiz0n.studfit.domain.enums.Turno;
+import com.deiz0n.studfit.domain.events.HorarioRegisterVagasDisponiveisEvent;
 import com.deiz0n.studfit.domain.exceptions.*;
 import com.deiz0n.studfit.infrastructure.repositories.HorarioRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -44,7 +46,6 @@ public class HorarioService {
 
         var horario = mapper.map(horarioDTO, Horario.class);
 
-        horario.setVagasDisponiveis(15);
         horario.setTurno(defineTurno(horarioDTO));
         repository.save(horario);
 
@@ -61,6 +62,16 @@ public class HorarioService {
         var horario = findByID(id);
         repository.delete(horario);
     }
+
+//    @EventListener
+//    private void setVagasDisponiveis(HorarioRegisterVagasDisponiveisEvent vagasDisponiveisEvent) {
+//        var horario = repository.getByAlunos(List.of(vagasDisponiveisEvent.getAluno()));
+//        var vagasDisponiveis = horario.getVagasDisponiveis();
+//        var quantityAlunos = horario.getAlunos().size();
+//
+//        horario.setVagasDisponiveis(vagasDisponiveis - quantityAlunos);
+//        repository.save(horario);
+//    }
 
     private Horario findByID(UUID id) {
         return repository.findById(id)

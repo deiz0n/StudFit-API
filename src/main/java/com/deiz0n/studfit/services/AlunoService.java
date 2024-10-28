@@ -2,16 +2,18 @@ package com.deiz0n.studfit.services;
 
 import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
+import com.deiz0n.studfit.domain.dtos.HorarioDTO;
 import com.deiz0n.studfit.domain.entites.Aluno;
+import com.deiz0n.studfit.domain.entites.Horario;
 import com.deiz0n.studfit.domain.entites.Presenca;
 import com.deiz0n.studfit.domain.enums.Status;
 import com.deiz0n.studfit.domain.events.AlunoDeletedByAusenciasEvent;
 import com.deiz0n.studfit.domain.events.AlunoRegisterAusenciasEvent;
 import com.deiz0n.studfit.domain.events.AlunoRegisterStatusEvent;
-import com.deiz0n.studfit.domain.exceptions.AlunoNotFoundException;
-import com.deiz0n.studfit.domain.exceptions.EmailAlreadyRegisteredException;
-import com.deiz0n.studfit.domain.exceptions.TelefoneAlreadyRegistered;
+import com.deiz0n.studfit.domain.events.HorarioRegisterVagasDisponiveisEvent;
+import com.deiz0n.studfit.domain.exceptions.*;
 import com.deiz0n.studfit.infrastructure.repositories.AlunoRepository;
+import com.deiz0n.studfit.infrastructure.repositories.HorarioRepository;
 import com.deiz0n.studfit.infrastructure.repositories.PresencaRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
@@ -32,13 +34,15 @@ public class AlunoService {
     private PresencaRepository presencaRepository;
     private ModelMapper mapper;
     private ApplicationEventPublisher eventPublisher;
+    private HorarioRepository horarioRepository;
     private Integer quantityAusencias = 0;
 
-    public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper, ApplicationEventPublisher eventPublisher) {
+    public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper, ApplicationEventPublisher eventPublisher, HorarioRepository horarioRepository) {
         this.alunoRepository = alunoRepository;
         this.presencaRepository = presencaRepository;
         this.mapper = mapper;
         this.eventPublisher = eventPublisher;
+        this.horarioRepository = horarioRepository;
     }
 
     // Retorna todos os alunos que estão na lista de espera
@@ -84,11 +88,17 @@ public class AlunoService {
                 () -> new AlunoNotFoundException("Aluno não encontrado")
         );
         isExisting(aluno, alunoEfetivado.getId());
+        isAvailable(aluno.getHorario());
         BeanUtils.copyProperties(aluno, alunoEfetivado, "id", "nome", "email");
 
         reorderListaEspera(alunoEfetivado);
         alunoEfetivado.setColocacao(null);
+
         alunoRepository.save(alunoEfetivado);
+
+//        var vagasDisponiveisEvent = new HorarioRegisterVagasDisponiveisEvent(this, alunoEfetivado);
+//        System.out.println(alunoEfetivado.getHorario());
+//        eventPublisher.publishEvent(vagasDisponiveisEvent);
 
         return mapper.map(alunoEfetivado, AlunoDTO.class);
     }
@@ -161,6 +171,17 @@ public class AlunoService {
                 }
             }
         }
+    }
+
+    // Verifica se o horário informado está disponível
+    private void isAvailable(HorarioDTO horario) {
+        var getHorarioById = horarioRepository.findById(horario.getId())
+                .orElseThrow(
+                        () -> new HorarioNotFoundException(String.format("O horário com id: %s não foi encontrado", horario.getId().toString()))
+                );
+
+        if (getHorarioById.getVagasDisponiveis() == 0)
+            throw new HorarioINotAvailableException("O horário informado atingiu o número máximo de alunos");
     }
 
     // Registra as ausências dos alunos
