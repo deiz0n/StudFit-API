@@ -201,4 +201,17 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler{
                 );
     }
 
+    @ExceptionHandler(HorarioNotValidException.class)
+    public ResponseEntity<ResponseError> handleHorarioNotValidException(HorarioNotValidException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.BAD_REQUEST.value())
+                                .title("Horário indisponível")
+                                .status(HttpStatus.BAD_REQUEST)
+                                .description(exception.getMessage())
+                                .build()
+                );
+    }
 }
