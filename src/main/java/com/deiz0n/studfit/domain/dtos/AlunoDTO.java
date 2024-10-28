@@ -39,4 +39,6 @@ public class AlunoDTO {
     @JsonIgnore
     private Boolean listaEspera = false;
 
+    private HorarioDTO horario;
+
 }
