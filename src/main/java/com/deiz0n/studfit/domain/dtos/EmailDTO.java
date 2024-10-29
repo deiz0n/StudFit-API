@@ -2,10 +2,9 @@ package com.deiz0n.studfit.domain.dtos;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -18,5 +17,7 @@ public class EmailDTO {
     private String destinatario;
     private String titulo;
     private String conteudo;
+    @Singular("variavel")
+    private Map<String, Object> variaveis;
 
 }
