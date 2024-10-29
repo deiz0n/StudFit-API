@@ -2,8 +2,7 @@ package com.deiz0n.studfit.services;
 
 import com.deiz0n.studfit.domain.dtos.EmailDTO;
 import com.deiz0n.studfit.domain.events.EmailRecoveryPasswordEvent;
-import com.deiz0n.studfit.domain.events.UsuarioRecoveryPassswordEvent;
-import com.deiz0n.studfit.infrastructure.config.AlgorithmGenerateNumber;
+import com.deiz0n.studfit.domain.exceptions.usuario.SendEmailException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +38,7 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao enviar o email", e);
+            throw new SendEmailException("Erro ao enviar o email");
         }
     }
 
