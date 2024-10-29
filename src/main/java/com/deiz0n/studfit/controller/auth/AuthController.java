@@ -1,6 +1,7 @@
 package com.deiz0n.studfit.controller.auth;
 
 import com.deiz0n.studfit.domain.dtos.AuthDTO;
+import com.deiz0n.studfit.domain.dtos.RecoveryPasswordDTO;
 import com.deiz0n.studfit.domain.response.Response;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -12,5 +13,6 @@ public interface AuthController {
 
     @PostMapping("/login")
     ResponseEntity<Response> singIn(@RequestBody @Valid AuthDTO request, ServletWebRequest path);
-
+    @PostMapping("/recovery-password")
+    ResponseEntity<Response> recoveryPassword(@RequestBody @Valid RecoveryPasswordDTO request, ServletWebRequest path);
 }
