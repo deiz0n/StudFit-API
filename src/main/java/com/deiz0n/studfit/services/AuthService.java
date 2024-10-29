@@ -41,10 +41,6 @@ public class AuthService {
     }
 
     public void recovery(RecoveryPasswordDTO recoveryPassword) {
-        var usuario = usuarioRepository.findByEmail(recoveryPassword.getEmail());
-        if (usuario.isEmpty())
-            throw new UsuarioNotFoundException("Usuário não encontrado");
-
         var recoveryPasswordEvent = new UsuarioRecoveryPassswordEvent(this, recoveryPassword.getEmail());
         eventPublisher.publishEvent(recoveryPasswordEvent);
     }
