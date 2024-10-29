@@ -7,6 +7,7 @@ import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotExistingExceptio
 import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotValidException;
 import com.deiz0n.studfit.domain.exceptions.usuario.CargoNotExistentException;
+import com.deiz0n.studfit.domain.exceptions.usuario.SenhaNotCoincideException;
 import com.deiz0n.studfit.domain.response.ResponseError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -209,6 +210,20 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler{
                         ResponseError.builder()
                                 .code(HttpStatus.BAD_REQUEST.value())
                                 .title("Horário indisponível")
+                                .status(HttpStatus.BAD_REQUEST)
+                                .description(exception.getMessage())
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(SenhaNotCoincideException.class)
+    public ResponseEntity<ResponseError> handleSenhaNotCoincideException(SenhaNotCoincideException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.BAD_REQUEST.value())
+                                .title("Senha inválida")
                                 .status(HttpStatus.BAD_REQUEST)
                                 .description(exception.getMessage())
                                 .build()
