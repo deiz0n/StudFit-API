@@ -48,7 +48,7 @@ public class EmailService {
 
             return FreeMarkerTemplateUtils.processTemplateIntoString(template, message.getVariaveis());
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao renderizar template do email", e);
+            throw new SendEmailException("Erro ao renderizar template do email");
         }
     }
 

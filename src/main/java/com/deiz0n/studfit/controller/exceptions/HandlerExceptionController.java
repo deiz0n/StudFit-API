@@ -7,6 +7,7 @@ import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotExistingExceptio
 import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotValidException;
 import com.deiz0n.studfit.domain.exceptions.usuario.CargoNotExistentException;
+import com.deiz0n.studfit.domain.exceptions.usuario.SendEmailException;
 import com.deiz0n.studfit.domain.exceptions.usuario.SenhaNotCoincideException;
 import com.deiz0n.studfit.domain.response.ResponseError;
 import org.springframework.http.HttpHeaders;
@@ -225,6 +226,20 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler{
                                 .code(HttpStatus.BAD_REQUEST.value())
                                 .title("Senha inválida")
                                 .status(HttpStatus.BAD_REQUEST)
+                                .description(exception.getMessage())
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(SendEmailException.class)
+    public ResponseEntity<ResponseError> handleSendEmaiException(SendEmailException exception) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                                .title("Erro ao enviar email")
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .description(exception.getMessage())
                                 .build()
                 );
