@@ -2,6 +2,7 @@ package com.deiz0n.studfit.controller.auth;
 
 import com.deiz0n.studfit.domain.dtos.AuthDTO;
 import com.deiz0n.studfit.domain.dtos.RecoveryPasswordDTO;
+import com.deiz0n.studfit.domain.dtos.ResetPasswordDTO;
 import com.deiz0n.studfit.domain.response.Response;
 import com.deiz0n.studfit.services.AuthService;
 import org.springframework.http.HttpStatus;
@@ -43,4 +44,18 @@ public class AuthControllerImpl implements AuthController {
                         .data("Email enviado")
                         .build());
     }
+
+    @Override
+    public ResponseEntity<Response> setPassword(String codigo, ResetPasswordDTO request, ServletWebRequest path) {
+        service.reset(codigo, request);
+        return ResponseEntity.ok()
+                .body(Response.builder()
+                        .code(HttpStatus.OK.value())
+                        .status(HttpStatus.OK)
+                        .path(path.getRequest().getRequestURI())
+                        .data("Senha alterada com sucesso")
+                        .build());
+    }
+
+
 }
