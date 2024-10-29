@@ -35,7 +35,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "api/v1.0/alunos/efetivados",
                                 "api/v1.0/alunos/lista-espera",
-                                "api/v1.0/auth/login"
+                                "api/v1.0/auth/login",
+                                "api/v1.0/auth/recovery-password"
                         ).permitAll()
 
                         .requestMatchers("api/v1.0/usuarios/**").hasRole("ADMINISTRADOR")
