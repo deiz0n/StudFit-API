@@ -5,8 +5,11 @@ import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.domain.enums.Cargo;
 import com.deiz0n.studfit.domain.events.EmailRecoveryPasswordEvent;
 import com.deiz0n.studfit.domain.events.UsuarioRecoveryPassswordEvent;
+import com.deiz0n.studfit.domain.events.UsuarioResetPasswordEvent;
+import com.deiz0n.studfit.domain.exceptions.usuario.CodigoDeRecuperacaoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.usuario.EmailAlreadyRegisteredException;
 import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotExistingException;
+import com.deiz0n.studfit.domain.exceptions.usuario.SenhaNotCoincideException;
 import com.deiz0n.studfit.domain.exceptions.usuario.UsuarioNotFoundException;
 import com.deiz0n.studfit.infrastructure.config.AlgorithmGenerateNumber;
 import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
@@ -99,6 +102,22 @@ public class UsuarioService {
         eventPublisher.publishEvent(emailRecoveryPasswordEvent);
 
         usuario.setCodigoRecuperacao(codigo);
+        repository.save(usuario);
+    }
+
+    @EventListener
+    private void resetPassword(UsuarioResetPasswordEvent resetPasswordEvent) {
+        var newSenha = resetPasswordEvent.getResetPassword();
+        var usuario = repository.findByCodigoRecuperacao(resetPasswordEvent.getCodigo())
+                .orElseThrow(
+                        () -> new CodigoDeRecuperacaoNotFoundException("Código de recuperação não encontrado")
+                );
+
+        if (!newSenha.getSenha().equals(newSenha.getConfirmarSenha()))
+            throw new SenhaNotCoincideException("As senhas não coincidem");
+
+        usuario.setSenha(passwordEncoder.encode(newSenha.getConfirmarSenha()));
+        usuario.setCodigoRecuperacao(null);
         repository.save(usuario);
     }
 
