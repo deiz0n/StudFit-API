@@ -1,7 +1,6 @@
 package com.deiz0n.studfit.infrastructure.repositories;
 
 import com.deiz0n.studfit.domain.entites.Horario;
-import com.deiz0n.studfit.domain.enums.Turno;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

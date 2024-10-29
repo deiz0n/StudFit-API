@@ -1,6 +1,6 @@
-package com.deiz0n.studfit.domain.exceptions;
+package com.deiz0n.studfit.domain.exceptions.usuario;
 
-import org.springframework.http.converter.HttpMessageNotReadableException;
+import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotExistingException;
 
 public class CargoNotExistentException extends ResourceNotExistingException {
 

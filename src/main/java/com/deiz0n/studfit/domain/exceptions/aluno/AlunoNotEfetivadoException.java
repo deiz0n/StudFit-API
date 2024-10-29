@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.domain.exceptions;
+package com.deiz0n.studfit.domain.exceptions.aluno;
 
 public class AlunoNotEfetivadoException extends RuntimeException{
 

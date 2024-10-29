@@ -1,4 +1,6 @@
-package com.deiz0n.studfit.domain.exceptions;
+package com.deiz0n.studfit.domain.exceptions.horario;
+
+import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotValidException;
 
 public class HorarioNotValidException extends ResourceNotValidException {
 
