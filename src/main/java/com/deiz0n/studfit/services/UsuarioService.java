@@ -3,11 +3,16 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
 import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.domain.enums.Cargo;
+import com.deiz0n.studfit.domain.events.EmailRecoveryPasswordEvent;
+import com.deiz0n.studfit.domain.events.UsuarioRecoveryPassswordEvent;
 import com.deiz0n.studfit.domain.exceptions.usuario.EmailAlreadyRegisteredException;
 import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotExistingException;
 import com.deiz0n.studfit.domain.exceptions.usuario.UsuarioNotFoundException;
+import com.deiz0n.studfit.infrastructure.config.AlgorithmGenerateNumber;
 import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +27,13 @@ public class UsuarioService {
     private UsuarioRepository repository;
     private ModelMapper mapper;
     private BCryptPasswordEncoder passwordEncoder;
+    private ApplicationEventPublisher eventPublisher;
 
-    public UsuarioService(UsuarioRepository repository, ModelMapper mapper, BCryptPasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository repository, ModelMapper mapper, BCryptPasswordEncoder passwordEncoder, ApplicationEventPublisher eventPublisher) {
         this.repository = repository;
         this.mapper = mapper;
         this.passwordEncoder = passwordEncoder;
+        this.eventPublisher = eventPublisher;
     }
 
     public List<UsuarioDTO> getAll() {
@@ -78,6 +85,21 @@ public class UsuarioService {
     private void isExisting(String email) {
         if (repository.findByEmail(email).isPresent())
             throw new EmailAlreadyRegisteredException("Email já cadastrado");
+    }
+
+    @EventListener
+    private void setCodigoRecuperacao(UsuarioRecoveryPassswordEvent recoveryPassswordEvent) {
+        var usuario = repository.findByEmail(recoveryPassswordEvent.getEmail())
+                .orElseThrow(
+                        () -> new UsuarioNotFoundException("Usuário não encontrado")
+                );
+
+        var codigo = AlgorithmGenerateNumber.generateCode();
+        var emailRecoveryPasswordEvent = new EmailRecoveryPasswordEvent(this, usuario.getEmail(), codigo);
+        eventPublisher.publishEvent(emailRecoveryPasswordEvent);
+
+        usuario.setCodigoRecuperacao(codigo);
+        repository.save(usuario);
     }
 
 }
