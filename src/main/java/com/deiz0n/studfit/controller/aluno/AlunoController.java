@@ -12,6 +12,8 @@ import java.util.UUID;
 
 public interface AlunoController {
 
+    @GetMapping("/{id}")
+    ResponseEntity<Response> getAluno(@PathVariable UUID id, ServletWebRequest path);
     @GetMapping("lista-espera")
     ResponseEntity<Response> getAlunosListaEspera(ServletWebRequest path);
 

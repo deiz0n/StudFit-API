@@ -25,6 +25,18 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
+    public ResponseEntity<Response> getAluno(UUID id, ServletWebRequest path) {
+        var aluno = service.getAlunoById(id);
+        return ResponseEntity.ok()
+                .body(Response.builder()
+                        .code(HttpStatus.OK.value())
+                        .status(HttpStatus.OK)
+                        .path(path.getRequest().getRequestURI())
+                        .data(aluno)
+                        .build());
+    }
+
+    @Override
     public ResponseEntity<Response> getAlunosListaEspera(ServletWebRequest path) {
         var alunos = service.getListaDeEspera();
         return ResponseEntity.ok()
