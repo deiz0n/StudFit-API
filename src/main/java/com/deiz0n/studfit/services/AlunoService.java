@@ -127,6 +127,10 @@ public class AlunoService {
                 );
     }
 
+    public AlunoDTO getAlunoById(UUID id) {
+        return mapper.map(getById(id), AlunoDTO.class);
+    }
+
     // Verifica a existência de email ao cadastrar um aluno na lista de espera
     private void isExisting(String email) {
         if (alunoRepository.getByEmail(email).isPresent())
