@@ -37,6 +37,8 @@ public class Aluno {
     private Integer ausenciasConsecutivas;
     @Column(name = "lista_espera")
     private Boolean listaEspera;
+    @Column(name = "consumo_alcool")
+    private Boolean consumoAlcool;
 
     @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL)
     private List<Presenca> presencas;
