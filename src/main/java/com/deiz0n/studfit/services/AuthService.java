@@ -2,10 +2,7 @@ package com.deiz0n.studfit.services;
 
 import com.deiz0n.studfit.domain.dtos.*;
 import com.deiz0n.studfit.domain.entites.Usuario;
-import com.deiz0n.studfit.domain.events.TokenGeneratedEvent;
-import com.deiz0n.studfit.domain.events.TokenGenerationEvent;
-import com.deiz0n.studfit.domain.events.UsuarioRecoveryPassswordEvent;
-import com.deiz0n.studfit.domain.events.UsuarioResetPasswordEvent;
+import com.deiz0n.studfit.domain.events.*;
 import com.deiz0n.studfit.domain.exceptions.usuario.UsuarioNotFoundException;
 import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
 import org.springframework.context.ApplicationEventPublisher;
@@ -46,6 +43,11 @@ public class AuthService {
     public void reset(String codigo, ResetPasswordDTO resetPasswordDTO) {
         var resetPasswordEvent = new UsuarioResetPasswordEvent(this, codigo, resetPasswordDTO);
         eventPublisher.publishEvent(resetPasswordEvent);
+    }
+
+    public void validateToken(TokenDTO tokenDTO) {
+        var validateTokenEvent = new AuthValidateTokenEvent(this, tokenDTO.getToken());
+        eventPublisher.publishEvent(validateTokenEvent);
     }
 
     @EventListener
