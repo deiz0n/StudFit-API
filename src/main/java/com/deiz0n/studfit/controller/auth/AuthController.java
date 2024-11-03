@@ -3,6 +3,7 @@ package com.deiz0n.studfit.controller.auth;
 import com.deiz0n.studfit.domain.dtos.AuthDTO;
 import com.deiz0n.studfit.domain.dtos.RecoveryPasswordDTO;
 import com.deiz0n.studfit.domain.dtos.ResetPasswordDTO;
+import com.deiz0n.studfit.domain.dtos.TokenDTO;
 import com.deiz0n.studfit.domain.response.Response;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -19,5 +20,7 @@ public interface AuthController {
     ResponseEntity<Response> recoveryPassword(@RequestBody @Valid RecoveryPasswordDTO request, ServletWebRequest path);
     @PostMapping("/recovery-password/")
     ResponseEntity<Response> setPassword(@RequestParam String codigo, @RequestBody @Valid ResetPasswordDTO request, ServletWebRequest path);
+    @PostMapping("/validate-token")
+    ResponseEntity<Response> validateToken(@RequestBody TokenDTO request, ServletWebRequest path);
 
 }

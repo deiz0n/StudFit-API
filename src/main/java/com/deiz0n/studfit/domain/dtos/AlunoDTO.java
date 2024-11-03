@@ -38,6 +38,12 @@ public class AlunoDTO {
     private Integer ausenciasConsecutivas;
     @JsonIgnore
     private Boolean listaEspera = false;
+    @JsonProperty("consumo_alcool")
+    private Boolean consumoAlcool = false;
+    @JsonProperty("consumo_cigarro")
+    private Boolean consumoCigarro = false;
+    @JsonProperty("pratica_exercicio_fisico")
+    private Boolean praticaExercicioFisico;
 
     private HorarioDTO horario;
 

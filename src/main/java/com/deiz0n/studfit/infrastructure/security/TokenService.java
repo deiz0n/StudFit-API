@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.deiz0n.studfit.domain.events.AuthValidateTokenEvent;
 import com.deiz0n.studfit.domain.events.TokenGeneratedEvent;
 import com.deiz0n.studfit.domain.events.TokenGenerationEvent;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,15 +47,16 @@ public class TokenService {
     }
 
     public String validateToken(String token) {
-        try {
             var algorithm = Algorithm.HMAC256(secret);
             return JWT.require(algorithm)
                     .build()
                     .verify(token)
                     .getSubject();
-        } catch (JWTVerificationException e) {
-            return "";
-        }
+    }
+
+    @EventListener
+    private void validateTokenRequest(AuthValidateTokenEvent tokenEvent) {
+        validateToken(tokenEvent.getToken());
     }
 
     public Instant expirationInstant() {

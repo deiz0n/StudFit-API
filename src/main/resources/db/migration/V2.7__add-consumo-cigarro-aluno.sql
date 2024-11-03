@@ -1,0 +1,1 @@
+ALTER TABLE aluno ADD COLUMN consumo_cigarro boolean;

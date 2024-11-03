@@ -3,6 +3,7 @@ package com.deiz0n.studfit.controller.auth;
 import com.deiz0n.studfit.domain.dtos.AuthDTO;
 import com.deiz0n.studfit.domain.dtos.RecoveryPasswordDTO;
 import com.deiz0n.studfit.domain.dtos.ResetPasswordDTO;
+import com.deiz0n.studfit.domain.dtos.TokenDTO;
 import com.deiz0n.studfit.domain.response.Response;
 import com.deiz0n.studfit.services.AuthService;
 import org.springframework.http.HttpStatus;
@@ -54,6 +55,18 @@ public class AuthControllerImpl implements AuthController {
                         .status(HttpStatus.OK)
                         .path(path.getRequest().getRequestURI())
                         .data("Senha alterada com sucesso")
+                        .build());
+    }
+
+    @Override
+    public ResponseEntity<Response> validateToken(TokenDTO request, ServletWebRequest path) {
+        service.validateToken(request);
+        return ResponseEntity.ok()
+                .body(Response.builder()
+                        .code(HttpStatus.OK.value())
+                        .status(HttpStatus.OK)
+                        .path(path.getRequest().getRequestURI())
+                        .data("Token validado com sucesso")
                         .build());
     }
 
