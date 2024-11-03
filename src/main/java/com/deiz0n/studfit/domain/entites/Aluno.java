@@ -41,6 +41,8 @@ public class Aluno {
     private Boolean consumoAlcool;
     @Column(name = "consumo_cigarro")
     private Boolean consumoCigarro;
+    @Column(name = "pratica_exercicio_fisico")
+    private Boolean praticaExercicioFisico;
 
     @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL)
     private List<Presenca> presencas;

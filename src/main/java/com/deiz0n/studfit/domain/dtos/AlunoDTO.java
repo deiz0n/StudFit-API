@@ -42,6 +42,8 @@ public class AlunoDTO {
     private Boolean consumoAlcool = false;
     @JsonProperty("consumo_cigarro")
     private Boolean consumoCigarro = false;
+    @JsonProperty("pratica_exercicio_fisico")
+    private Boolean praticaExercicioFisico;
 
     private HorarioDTO horario;
 
