@@ -1,7 +1,7 @@
 package com.deiz0n.studfit.services;
 
 import com.deiz0n.studfit.domain.dtos.EmailDTO;
-import com.deiz0n.studfit.domain.events.EmailRecoveryPasswordEvent;
+import com.deiz0n.studfit.domain.events.SentEmailRecoveryPasswordEvent;
 import com.deiz0n.studfit.domain.exceptions.usuario.SendEmailException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -53,11 +53,11 @@ public class EmailService {
     }
 
     @EventListener
-    private void sendRecoveryPassword(EmailRecoveryPasswordEvent emailRecoveryPasswordEvent) {
+    private void sendRecoveryPassword(SentEmailRecoveryPasswordEvent sentEmailRecoveryPasswordEvent) {
         var email = EmailDTO.builder()
-                .destinatario(emailRecoveryPasswordEvent.getDestinatario())
+                .destinatario(sentEmailRecoveryPasswordEvent.getDestinatario())
                 .titulo("Solicitação para alteração de senha")
-                .variavel("codigo", emailRecoveryPasswordEvent.getCodigo())
+                .variavel("codigo", sentEmailRecoveryPasswordEvent.getCodigo())
                 .conteudo("recovery-password.html")
                 .build();
 
