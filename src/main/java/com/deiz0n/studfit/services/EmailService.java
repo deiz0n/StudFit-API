@@ -2,6 +2,7 @@ package com.deiz0n.studfit.services;
 
 import com.deiz0n.studfit.domain.dtos.EmailDTO;
 import com.deiz0n.studfit.domain.events.SentEmailRecoveryPasswordEvent;
+import com.deiz0n.studfit.domain.events.SentEmailUpdatedPasswordEvent;
 import com.deiz0n.studfit.domain.exceptions.usuario.SendEmailException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -59,6 +60,17 @@ public class EmailService {
                 .titulo("Solicitação para alteração de senha")
                 .variavel("codigo", sentEmailRecoveryPasswordEvent.getCodigo())
                 .conteudo("recovery-password.html")
+                .build();
+
+        sendMail(email);
+    }
+
+    @EventListener
+    private void sendConfirmUpdatedPassword(SentEmailUpdatedPasswordEvent updatedPassword) {
+        var email = EmailDTO.builder()
+                .destinatario(updatedPassword.getDestinatario())
+                .titulo("Sua senha foi alterada com sucesso")
+                .conteudo("updated-password-success.html")
                 .build();
 
         sendMail(email);
