@@ -1,6 +1,7 @@
 package com.deiz0n.studfit.services;
 
 import com.deiz0n.studfit.domain.dtos.EmailDTO;
+import com.deiz0n.studfit.domain.events.SentEmailDeletedAlunoEfetivadoEvent;
 import com.deiz0n.studfit.domain.events.SentEmailRecoveryPasswordEvent;
 import com.deiz0n.studfit.domain.events.SentEmailUpdatedPasswordEvent;
 import com.deiz0n.studfit.domain.exceptions.usuario.SendEmailException;
@@ -71,6 +72,18 @@ public class EmailService {
                 .destinatario(updatedPassword.getDestinatario())
                 .titulo("Sua senha foi alterada com sucesso")
                 .conteudo("updated-password-success.html")
+                .build();
+
+        sendMail(email);
+    }
+
+    @EventListener
+    private void sentDeletedAlunoEfetivado(SentEmailDeletedAlunoEfetivadoEvent deletedAlunoEfetivado) {
+        var email = EmailDTO.builder()
+                .destinatario(deletedAlunoEfetivado.getDestinatario())
+                .titulo("Remoção por excesso de faltas")
+                .variavel("nome_aluno", deletedAlunoEfetivado.getNome())
+                .conteudo("removed-by-absences.html")
                 .build();
 
         sendMail(email);
