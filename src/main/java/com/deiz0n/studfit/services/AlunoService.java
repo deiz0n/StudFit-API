@@ -6,10 +6,7 @@ import com.deiz0n.studfit.domain.dtos.HorarioDTO;
 import com.deiz0n.studfit.domain.entites.Aluno;
 import com.deiz0n.studfit.domain.entites.Presenca;
 import com.deiz0n.studfit.domain.enums.Status;
-import com.deiz0n.studfit.domain.events.AlunoDeletedByAusenciasEvent;
-import com.deiz0n.studfit.domain.events.AlunoRegisterAusenciasEvent;
-import com.deiz0n.studfit.domain.events.AlunoRegisterStatusEvent;
-import com.deiz0n.studfit.domain.events.HorarioRegisterVagasDisponiveisEvent;
+import com.deiz0n.studfit.domain.events.*;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioINotAvailableException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotFoundException;
@@ -247,11 +244,11 @@ public class AlunoService {
         var aluno = deletedAlunoStatus.getAluno();
         if (aluno.getAusenciasConsecutivas() == 5) {
             var findAluno = getById(aluno.getId());
-            try {
-                alunoRepository.deleteById(findAluno.getId());
-            } catch (Exception e) {
-                throw new RuntimeException("Erro ao excluir aluno com máximo de ausências", e);
-            }
+
+            var deletedAluno = new SentEmailDeletedAlunoEfetivadoEvent(this, aluno.getEmail(), aluno.getNome());
+            eventPublisher.publishEvent(deletedAluno);
+
+            alunoRepository.deleteById(findAluno.getId());
         }
     }
 }
