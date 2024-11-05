@@ -78,7 +78,7 @@ public class EmailService {
     }
 
     @EventListener
-    private void sentDeletedAlunoEfetivado(SentEmailDeletedAlunoEfetivadoEvent deletedAlunoEfetivado) {
+    private void sendDeletedAlunoEfetivado(SentEmailDeletedAlunoEfetivadoEvent deletedAlunoEfetivado) {
         var email = EmailDTO.builder()
                 .destinatario(deletedAlunoEfetivado.getDestinatario())
                 .titulo("Remoção por excesso de faltas")
