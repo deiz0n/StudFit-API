@@ -3,6 +3,7 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
+import com.deiz0n.studfit.domain.dtos.PresencaDTO;
 import com.deiz0n.studfit.domain.entites.Aluno;
 import com.deiz0n.studfit.domain.entites.Presenca;
 import com.deiz0n.studfit.domain.enums.Status;
@@ -22,6 +23,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,7 +37,6 @@ public class AlunoService {
     private ModelMapper mapper;
     private ApplicationEventPublisher eventPublisher;
     private HorarioRepository horarioRepository;
-    private Integer quantityAusencias = 0;
 
     public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper, ApplicationEventPublisher eventPublisher, HorarioRepository horarioRepository) {
         this.alunoRepository = alunoRepository;
@@ -196,6 +197,8 @@ public class AlunoService {
                 .getId()
         );
 
+        int quantityAusencias = aluno.getAusenciasConsecutivas();
+
         List<Presenca> ausenciasByAluno = presencaRepository.getPresencas(aluno.getId());
 
         if (ausenciasByAluno.isEmpty() || !ausenciasByAluno.get(ausenciasByAluno.size()-1).getPresente())
@@ -213,12 +216,12 @@ public class AlunoService {
                     else if (ausenciasByAluno.get(i).getData().getDayOfMonth() == ausenciasByAluno.get(i).getData().lengthOfMonth() && ausenciasByAluno.get(i + 1).getData().getDayOfMonth() == 1)
                         quantityAusencias++;
                 } else {
-                    // Zera a quantidade de ausêcias caso a frequência seja quebrada
                     quantityAusencias = 0;
                     break;
                 }
             }
         }
+
         aluno.setAusenciasConsecutivas(quantityAusencias);
         alunoRepository.save(aluno);
 
