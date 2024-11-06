@@ -13,8 +13,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
-import java.util.Arrays;
-
 @Service
 public class EmailService {
 
@@ -114,6 +112,18 @@ public class EmailService {
                 .titulo("Efetivação de cadastro")
                 .variavel("nome_aluno", alunoEfetivado.getNomeAluno())
                 .conteudo("aluno-efetivado.html")
+                .build();
+
+        sendMail(email);
+    }
+
+    @EventListener
+    private void sendAlunoEfetivadoToUsuarios(SentAlunoEfetivadoToUsuarios alunoEfetivadoToUsuarios) {
+        var email = EmailDTO.builder()
+                .destinatario(alunoEfetivadoToUsuarios.getDestinatario())
+                .titulo("Efetivação de cadastro")
+                .variavel("nome_aluno", alunoEfetivadoToUsuarios.getNomeAluno())
+                .conteudo("aluno-efetivado-to-usuarios.html")
                 .build();
 
         sendMail(email);
