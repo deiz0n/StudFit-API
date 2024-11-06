@@ -2,10 +2,7 @@ package com.deiz0n.studfit.services;
 
 import com.deiz0n.studfit.domain.dtos.EmailDTO;
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
-import com.deiz0n.studfit.domain.events.SentAlunoDeletedToUsuariosEvent;
-import com.deiz0n.studfit.domain.events.SentEmailDeletedAlunoEfetivadoEvent;
-import com.deiz0n.studfit.domain.events.SentEmailRecoveryPasswordEvent;
-import com.deiz0n.studfit.domain.events.SentEmailUpdatedPasswordEvent;
+import com.deiz0n.studfit.domain.events.*;
 import com.deiz0n.studfit.domain.exceptions.usuario.SendEmailException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -105,6 +102,18 @@ public class EmailService {
                 .titulo("Exclusão de cadastro")
                 .variavel("nome_aluno", deletedToUsuarios.getNomeAluno())
                 .conteudo("aluno-removed.html")
+                .build();
+
+        sendMail(email);
+    }
+
+    @EventListener
+    private void sendAlunoEfetivado(SentEmailAlunoEfetivadoEvent alunoEfetivado) {
+        var email = EmailDTO.builder()
+                .destinatario(alunoEfetivado.getDestinatario())
+                .titulo("Efetivação de cadastro")
+                .variavel("nome_aluno", alunoEfetivado.getNomeAluno())
+                .conteudo("aluno-efetivado.html")
                 .build();
 
         sendMail(email);
