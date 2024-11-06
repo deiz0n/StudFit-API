@@ -99,7 +99,7 @@ public class UsuarioService {
                 );
 
         var codigo = AlgorithmGenerateNumber.generateCode();
-        var emailRecoveryPasswordEvent = new SentEmailRecoveryPasswordEvent(this, usuario.getEmail(), codigo);
+        var emailRecoveryPasswordEvent = new SentEmailRecoveryPasswordEvent(this, new String[]{usuario.getEmail()}, codigo);
         eventPublisher.publishEvent(emailRecoveryPasswordEvent);
 
         usuario.setCodigoRecuperacao(codigo);
@@ -121,7 +121,7 @@ public class UsuarioService {
         usuario.setCodigoRecuperacao(null);
         repository.save(usuario);
 
-        var updatedPassword = new SentEmailUpdatedPasswordEvent(this, usuario.getEmail());
+        var updatedPassword = new SentEmailUpdatedPasswordEvent(this, new String[]{usuario.getEmail()});
         eventPublisher.publishEvent(updatedPassword);
     }
 
