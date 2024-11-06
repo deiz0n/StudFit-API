@@ -97,6 +97,9 @@ public class AlunoService {
         var vagasDisponiveisEvent = new HorarioRegisterVagasDisponiveisEvent(this, aluno.getHorario().getId());
         eventPublisher.publishEvent(vagasDisponiveisEvent);
 
+        var sentAlunoEfetivado = new SentEmailAlunoEfetivadoEvent(this, new String[]{alunoEfetivado.getEmail()}, alunoEfetivado.getNome());
+        eventPublisher.publishEvent(sentAlunoEfetivado);
+
         alunoRepository.save(alunoEfetivado);
 
         return mapper.map(alunoEfetivado, AlunoDTO.class);
