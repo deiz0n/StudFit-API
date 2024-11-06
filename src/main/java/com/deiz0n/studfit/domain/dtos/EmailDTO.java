@@ -14,7 +14,7 @@ public class EmailDTO {
 
     @Email(message = "Email inválido. Tente novamente")
     @NotBlank(message = "O campo email é obrigatório")
-    private String destinatario;
+    private String[] destinatario;
     private String titulo;
     private String conteudo;
     @Singular("variavel")
