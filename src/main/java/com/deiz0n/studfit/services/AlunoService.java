@@ -1,9 +1,6 @@
 package com.deiz0n.studfit.services;
 
-import com.deiz0n.studfit.domain.dtos.AlunoDTO;
-import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
-import com.deiz0n.studfit.domain.dtos.HorarioDTO;
-import com.deiz0n.studfit.domain.dtos.PresencaDTO;
+import com.deiz0n.studfit.domain.dtos.*;
 import com.deiz0n.studfit.domain.entites.Aluno;
 import com.deiz0n.studfit.domain.entites.Presenca;
 import com.deiz0n.studfit.domain.enums.Status;
@@ -16,6 +13,7 @@ import com.deiz0n.studfit.domain.exceptions.usuario.TelefoneAlreadyRegistered;
 import com.deiz0n.studfit.infrastructure.repositories.AlunoRepository;
 import com.deiz0n.studfit.infrastructure.repositories.HorarioRepository;
 import com.deiz0n.studfit.infrastructure.repositories.PresencaRepository;
+import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,7 +21,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -37,13 +34,15 @@ public class AlunoService {
     private ModelMapper mapper;
     private ApplicationEventPublisher eventPublisher;
     private HorarioRepository horarioRepository;
+    private UsuarioRepository usuarioRepository;
 
-    public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper, ApplicationEventPublisher eventPublisher, HorarioRepository horarioRepository) {
+    public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper, ApplicationEventPublisher eventPublisher, HorarioRepository horarioRepository, UsuarioRepository usuarioRepository) {
         this.alunoRepository = alunoRepository;
         this.presencaRepository = presencaRepository;
         this.mapper = mapper;
         this.eventPublisher = eventPublisher;
         this.horarioRepository = horarioRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     // Retorna todos os alunos que estão na lista de espera
@@ -248,8 +247,16 @@ public class AlunoService {
         if (aluno.getAusenciasConsecutivas() == 5) {
             var findAluno = getById(aluno.getId());
 
-            var deletedAluno = new SentEmailDeletedAlunoEfetivadoEvent(this, aluno.getEmail(), aluno.getNome());
+            var deletedAluno = new SentEmailDeletedAlunoEfetivadoEvent(this, new String[]{aluno.getEmail()}, aluno.getNome());
             eventPublisher.publishEvent(deletedAluno);
+
+            var listOfUsuario = usuarioRepository.findAll()
+                    .stream()
+                    .map(usuario -> mapper.map(usuario, UsuarioDTO.class))
+                    .toList();
+
+            var deletedToUsuarios = new SentAlunoDeletedToUsuariosEvent(this, listOfUsuario, aluno.getNome());
+            eventPublisher.publishEvent(deletedToUsuarios);
 
             alunoRepository.deleteById(findAluno.getId());
         }
