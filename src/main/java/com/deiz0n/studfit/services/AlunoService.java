@@ -3,6 +3,7 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.*;
 import com.deiz0n.studfit.domain.entites.Aluno;
 import com.deiz0n.studfit.domain.entites.Presenca;
+import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.domain.enums.Status;
 import com.deiz0n.studfit.domain.events.*;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotFoundException;
@@ -99,6 +100,14 @@ public class AlunoService {
 
         var sentAlunoEfetivado = new SentEmailAlunoEfetivadoEvent(this, new String[]{alunoEfetivado.getEmail()}, alunoEfetivado.getNome());
         eventPublisher.publishEvent(sentAlunoEfetivado);
+
+        var listOfDestinatarios = usuarioRepository.findAll()
+                .stream()
+                .map(Usuario::getEmail)
+                .toArray(String[]::new);
+
+        var sentAlunoEfetivadoToUsuarios = new SentAlunoEfetivadoToUsuarios(this, listOfDestinatarios, alunoEfetivado.getNome());
+        eventPublisher.publishEvent(sentAlunoEfetivadoToUsuarios);
 
         alunoRepository.save(alunoEfetivado);
 
