@@ -85,7 +85,7 @@ public class PresencaService {
         if (presenca.getData().getDayOfWeek() == DayOfWeek.SATURDAY || presenca.getData().getDayOfWeek() == DayOfWeek.SUNDAY) // Verifica se a presença foi realizada em final de semana
             throw new PresencaNotValidException("Presença não pode ser realizada em sábados e domingos");
         if (!presenca.getData().equals(LocalDate.now()))
-            if (!presenca.getData().isBefore(LocalDate.now()))
+            if (presenca.getData().isBefore(LocalDate.now()))
                 throw new PresencaNotValidException("Presença não pode ser realizada em datas anteriores");
 //            else
 //                throw new PresencaNotValidException("Presença não pode ser realizada em datas posteriores");

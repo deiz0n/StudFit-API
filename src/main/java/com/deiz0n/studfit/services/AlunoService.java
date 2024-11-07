@@ -1,15 +1,11 @@
 package com.deiz0n.studfit.services;
 
-import com.deiz0n.studfit.domain.dtos.AlunoDTO;
-import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
-import com.deiz0n.studfit.domain.dtos.HorarioDTO;
+import com.deiz0n.studfit.domain.dtos.*;
 import com.deiz0n.studfit.domain.entites.Aluno;
 import com.deiz0n.studfit.domain.entites.Presenca;
+import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.domain.enums.Status;
-import com.deiz0n.studfit.domain.events.AlunoDeletedByAusenciasEvent;
-import com.deiz0n.studfit.domain.events.AlunoRegisterAusenciasEvent;
-import com.deiz0n.studfit.domain.events.AlunoRegisterStatusEvent;
-import com.deiz0n.studfit.domain.events.HorarioRegisterVagasDisponiveisEvent;
+import com.deiz0n.studfit.domain.events.*;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioINotAvailableException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotFoundException;
@@ -18,6 +14,7 @@ import com.deiz0n.studfit.domain.exceptions.usuario.TelefoneAlreadyRegistered;
 import com.deiz0n.studfit.infrastructure.repositories.AlunoRepository;
 import com.deiz0n.studfit.infrastructure.repositories.HorarioRepository;
 import com.deiz0n.studfit.infrastructure.repositories.PresencaRepository;
+import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -38,14 +35,15 @@ public class AlunoService {
     private ModelMapper mapper;
     private ApplicationEventPublisher eventPublisher;
     private HorarioRepository horarioRepository;
-    private Integer quantityAusencias = 0;
+    private UsuarioRepository usuarioRepository;
 
-    public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper, ApplicationEventPublisher eventPublisher, HorarioRepository horarioRepository) {
+    public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper, ApplicationEventPublisher eventPublisher, HorarioRepository horarioRepository, UsuarioRepository usuarioRepository) {
         this.alunoRepository = alunoRepository;
         this.presencaRepository = presencaRepository;
         this.mapper = mapper;
         this.eventPublisher = eventPublisher;
         this.horarioRepository = horarioRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     // Retorna todos os alunos que estão na lista de espera
@@ -99,6 +97,17 @@ public class AlunoService {
 
         var vagasDisponiveisEvent = new HorarioRegisterVagasDisponiveisEvent(this, aluno.getHorario().getId());
         eventPublisher.publishEvent(vagasDisponiveisEvent);
+
+        var sentAlunoEfetivado = new SentEmailAlunoEfetivadoEvent(this, new String[]{alunoEfetivado.getEmail()}, alunoEfetivado.getNome());
+        eventPublisher.publishEvent(sentAlunoEfetivado);
+
+        var listOfDestinatarios = usuarioRepository.findAll()
+                .stream()
+                .map(Usuario::getEmail)
+                .toArray(String[]::new);
+
+        var sentAlunoEfetivadoToUsuarios = new SentAlunoEfetivadoToUsuarios(this, listOfDestinatarios, alunoEfetivado.getNome());
+        eventPublisher.publishEvent(sentAlunoEfetivadoToUsuarios);
 
         alunoRepository.save(alunoEfetivado);
 
@@ -199,6 +208,8 @@ public class AlunoService {
                 .getId()
         );
 
+        int quantityAusencias = aluno.getAusenciasConsecutivas();
+
         List<Presenca> ausenciasByAluno = presencaRepository.getPresencas(aluno.getId());
 
         if (ausenciasByAluno.isEmpty() || !ausenciasByAluno.get(ausenciasByAluno.size()-1).getPresente())
@@ -216,12 +227,12 @@ public class AlunoService {
                     else if (ausenciasByAluno.get(i).getData().getDayOfMonth() == ausenciasByAluno.get(i).getData().lengthOfMonth() && ausenciasByAluno.get(i + 1).getData().getDayOfMonth() == 1)
                         quantityAusencias++;
                 } else {
-                    // Zera a quantidade de ausêcias caso a frequência seja quebrada
                     quantityAusencias = 0;
                     break;
                 }
             }
         }
+
         aluno.setAusenciasConsecutivas(quantityAusencias);
         alunoRepository.save(aluno);
 
@@ -247,11 +258,19 @@ public class AlunoService {
         var aluno = deletedAlunoStatus.getAluno();
         if (aluno.getAusenciasConsecutivas() == 5) {
             var findAluno = getById(aluno.getId());
-            try {
-                alunoRepository.deleteById(findAluno.getId());
-            } catch (Exception e) {
-                throw new RuntimeException("Erro ao excluir aluno com máximo de ausências", e);
-            }
+
+            var deletedAluno = new SentEmailDeletedAlunoEfetivadoEvent(this, new String[]{aluno.getEmail()}, aluno.getNome());
+            eventPublisher.publishEvent(deletedAluno);
+
+            var listOfUsuario = usuarioRepository.findAll()
+                    .stream()
+                    .map(usuario -> mapper.map(usuario, UsuarioDTO.class))
+                    .toList();
+
+            var deletedToUsuarios = new SentAlunoDeletedToUsuariosEvent(this, listOfUsuario, aluno.getNome());
+            eventPublisher.publishEvent(deletedToUsuarios);
+
+            alunoRepository.deleteById(findAluno.getId());
         }
     }
 }

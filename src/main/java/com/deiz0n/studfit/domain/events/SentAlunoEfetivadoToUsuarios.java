@@ -4,15 +4,14 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 @Getter
-public class SentEmailRecoveryPasswordEvent extends ApplicationEvent {
+public class SentAlunoEfetivadoToUsuarios extends ApplicationEvent {
 
     private final String[] destinatario;
-    private final String codigo;
+    private final String nomeAluno;
 
-    public SentEmailRecoveryPasswordEvent(Object source, String[] destinatario, String codigo) {
+    public SentAlunoEfetivadoToUsuarios(Object source, String[] destinatario, String nomeAluno) {
         super(source);
         this.destinatario = destinatario;
-        this.codigo = codigo;
+        this.nomeAluno = nomeAluno;
     }
-
 }

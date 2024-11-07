@@ -3,7 +3,7 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
 import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.domain.enums.Cargo;
-import com.deiz0n.studfit.domain.events.SentEmailRecoveryPasswordEvent;
+import com.deiz0n.studfit.domain.events.EmailRecoveryPasswordEvent;
 import com.deiz0n.studfit.domain.events.UsuarioRecoveryPassswordEvent;
 import com.deiz0n.studfit.domain.events.UsuarioResetPasswordEvent;
 import com.deiz0n.studfit.domain.exceptions.usuario.CodigoDeRecuperacaoNotFoundException;
@@ -98,7 +98,7 @@ public class UsuarioService {
                 );
 
         var codigo = AlgorithmGenerateNumber.generateCode();
-        var emailRecoveryPasswordEvent = new SentEmailRecoveryPasswordEvent(this, usuario.getEmail(), codigo);
+        var emailRecoveryPasswordEvent = new EmailRecoveryPasswordEvent(this, usuario.getEmail(), codigo);
         eventPublisher.publishEvent(emailRecoveryPasswordEvent);
 
         usuario.setCodigoRecuperacao(codigo);
