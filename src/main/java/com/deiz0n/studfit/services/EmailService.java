@@ -39,7 +39,7 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao enviar o email", e);
+            throw new SendEmailException("Erro ao enviar o email");
         }
     }
 
@@ -54,11 +54,11 @@ public class EmailService {
     }
 
     @EventListener
-    private void sendRecoveryPassword(SentEmailRecoveryPasswordEvent sentEmailRecoveryPasswordEvent) {
+    private void sendRecoveryPassword(SentEmailRecoveryPasswordEvent emailRecoveryPasswordEvent) {
         var email = EmailDTO.builder()
-                .destinatario(sentEmailRecoveryPasswordEvent.getDestinatario())
+                .destinatario(emailRecoveryPasswordEvent.getDestinatario())
                 .titulo("Solicitação para alteração de senha")
-                .variavel("codigo", sentEmailRecoveryPasswordEvent.getCodigo())
+                .variavel("codigo", emailRecoveryPasswordEvent.getCodigo())
                 .conteudo("recovery-password.html")
                 .build();
 

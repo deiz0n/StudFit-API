@@ -14,4 +14,5 @@ public class SentEmailRecoveryPasswordEvent extends ApplicationEvent {
         this.destinatario = destinatario;
         this.codigo = codigo;
     }
+
 }

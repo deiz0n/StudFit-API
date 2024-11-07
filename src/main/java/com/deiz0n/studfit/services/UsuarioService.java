@@ -4,7 +4,6 @@ import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
 import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.domain.enums.Cargo;
 import com.deiz0n.studfit.domain.events.SentEmailRecoveryPasswordEvent;
-import com.deiz0n.studfit.domain.events.SentEmailUpdatedPasswordEvent;
 import com.deiz0n.studfit.domain.events.UsuarioRecoveryPassswordEvent;
 import com.deiz0n.studfit.domain.events.UsuarioResetPasswordEvent;
 import com.deiz0n.studfit.domain.exceptions.usuario.CodigoDeRecuperacaoNotFoundException;
@@ -120,9 +119,6 @@ public class UsuarioService {
         usuario.setSenha(passwordEncoder.encode(newSenha.getConfirmarSenha()));
         usuario.setCodigoRecuperacao(null);
         repository.save(usuario);
-
-        var updatedPassword = new SentEmailUpdatedPasswordEvent(this, new String[]{usuario.getEmail()});
-        eventPublisher.publishEvent(updatedPassword);
     }
 
 }
