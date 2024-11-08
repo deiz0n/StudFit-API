@@ -17,12 +17,10 @@ public class AuthService {
     private TokenDTO token;
     private AuthenticationManager manager;
     private ApplicationEventPublisher eventPublisher;
-    private UsuarioRepository usuarioRepository;
 
-    public AuthService(AuthenticationManager manager, ApplicationEventPublisher eventPublisher, UsuarioRepository usuarioRepository) {
+    public AuthService(AuthenticationManager manager, ApplicationEventPublisher eventPublisher) {
         this.manager = manager;
         this.eventPublisher = eventPublisher;
-        this.usuarioRepository = usuarioRepository;
     }
 
     public TokenDTO signIn(AuthDTO auth) {
