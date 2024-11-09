@@ -210,20 +210,19 @@ public class AlunoService {
 
         int quantityAusencias = aluno.getAusenciasConsecutivas();
 
-        List<Presenca> ausenciasByAluno = presencaRepository.getPresencas(aluno.getId());
+        List<Presenca> ausenciasByAluno = presencaRepository.getLastTwo(aluno.getId());
 
-        if (ausenciasByAluno.isEmpty() || !ausenciasByAluno.get(ausenciasByAluno.size()-1).getPresente())
+        if (ausenciasByAluno.isEmpty() || !ausenciasByAluno.stream().findFirst().get().getPresente()) {
             quantityAusencias++;
-        else {
+        } else {
             for (int i = 0; i < ausenciasByAluno.size() - 1; i++) {
-                if (ausenciasByAluno.get(i).getPresente()) {
-                    // Verifica se é sexta e o próximo dia é segunda
+                if (!ausenciasByAluno.get(i).getPresente()) {
                     if (ausenciasByAluno.get(i).getData().getDayOfWeek() == DayOfWeek.FRIDAY && ausenciasByAluno.get(i + 1).getData().getDayOfWeek() == DayOfWeek.MONDAY)
                         quantityAusencias++;
-                    // Verifica se as ausências estão em sequência
+                        // Verifica se as ausências estão em sequência
                     else if (ausenciasByAluno.get(i).getData().plusDays(1).equals(ausenciasByAluno.get(i + 1).getData()))
                         quantityAusencias++;
-                    // Verifica se é o último dia do mês
+                        // Verifica se é o último dia do mês
                     else if (ausenciasByAluno.get(i).getData().getDayOfMonth() == ausenciasByAluno.get(i).getData().lengthOfMonth() && ausenciasByAluno.get(i + 1).getData().getDayOfMonth() == 1)
                         quantityAusencias++;
                 } else {
