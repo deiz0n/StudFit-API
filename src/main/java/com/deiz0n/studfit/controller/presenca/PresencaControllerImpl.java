@@ -11,6 +11,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1.0/presencas")
@@ -35,12 +36,12 @@ public class PresencaControllerImpl implements PresencaController {
     }
 
     @Override
-    public ResponseEntity<Response> createPresenca(PresencaDTO request, ServletWebRequest path, LocalDate data) {
+    public ResponseEntity<Response> createPresenca(List<PresencaDTO> request, ServletWebRequest path, LocalDate data) {
         var presenca = service.create(request, data);
         var uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("id")
-                .buildAndExpand(presenca.getId())
+                .buildAndExpand()
                 .toUri();
         return ResponseEntity.created(uri)
                 .body(Response.builder()

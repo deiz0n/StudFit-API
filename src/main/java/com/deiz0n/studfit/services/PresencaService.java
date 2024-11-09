@@ -46,25 +46,25 @@ public class PresencaService {
                 .collect(Collectors.toList());
     }
 
-    public PresencaDTO create(PresencaDTO presencaDTO, LocalDate data) {
-        var presenca = mapper.map(presencaDTO, Presenca.class);
+    public List<PresencaDTO> create(List<PresencaDTO> presencaDTO, LocalDate data) {
+        var presenca = presencaDTO.stream()
+                        .map(dto -> mapper.map(dto, Presenca.class))
+                        .toList();
 
-        presenca.setData(data);
+        presenca.forEach(entity -> {
+            entity.setData(data);
+            validatePresenca(entity);
+        });
 
-        validatePresenca(presenca);
+        presencaRepository.saveAll(presenca);
 
-        presencaRepository.save(presenca);
+        presencaDTO.forEach(dto -> {
+            eventPublisher.publishEvent(new AlunoRegisterAusenciasEvent(this, dto));
+        });
 
-        var registerAusencias = new AlunoRegisterAusenciasEvent(this, presencaDTO);
-        eventPublisher.publishEvent(registerAusencias);
-
-        return PresencaDTO.builder()
-                .id(presenca.getId())
-                .data(presenca.getData())
-                .presente(presenca.getPresente())
-                .aluno(mapper.map(presenca.getAluno(), AlunoDTO.class))
-                .usuario(mapper.map(presenca.getUsuario(), UsuarioDTO.class))
-                .build();
+        return presenca.stream()
+                .map(entity -> mapper.map(entity, PresencaDTO.class))
+                .toList();
     }
 
     private void validatePresenca(Presenca presenca) {
@@ -79,7 +79,7 @@ public class PresencaService {
         if (aluno.get().getListaEspera()) // Verifica se o aluno estar efetivado
             throw new AlunoNotEfetivadoException(String.format("Aluno com ID: %s está na lista de espera", presenca.getAluno().getId().toString()));
 
-        var presencaByData = presencaRepository.getByData(presenca.getData()); // Verifica se a presença é existente
+        var presencaByData = presencaRepository.getFirstByData(presenca.getData()); // Verifica se a presença é existente
         if (presencaByData.isPresent())
             throw new PresencaAlreadyRegistered("Presenca já realizada");
         if (presenca.getData().getDayOfWeek() == DayOfWeek.SATURDAY || presenca.getData().getDayOfWeek() == DayOfWeek.SUNDAY) // Verifica se a presença foi realizada em final de semana
