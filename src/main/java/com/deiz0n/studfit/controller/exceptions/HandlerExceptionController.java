@@ -1,6 +1,7 @@
 package com.deiz0n.studfit.controller.exceptions;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotEfetivadoException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotValidException;
 import com.deiz0n.studfit.domain.exceptions.resource.ResourceAlreadyException;
@@ -191,7 +192,7 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler{
                 );
     }
 
-    @ExceptionHandler({InsufficientAuthenticationException.class, JWTVerificationException.class})
+    @ExceptionHandler({InsufficientAuthenticationException.class, JWTVerificationException.class, TokenExpiredException.class})
     public ResponseEntity<ResponseError> handleInsufficientAuthenticationException() {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(
