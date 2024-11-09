@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface PresencaController {
 
     @GetMapping
     ResponseEntity<Response> getPresencas(ServletWebRequest path);
     @PostMapping("/create")
-    ResponseEntity<Response> createPresenca(@RequestBody PresencaDTO request, ServletWebRequest path, @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") LocalDate data);
+    ResponseEntity<Response> createPresenca(@RequestBody List<PresencaDTO> request, ServletWebRequest path, @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") LocalDate data);
 
 }
