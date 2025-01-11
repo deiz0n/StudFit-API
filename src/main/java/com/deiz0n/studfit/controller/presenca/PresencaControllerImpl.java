@@ -51,4 +51,16 @@ public class PresencaControllerImpl implements PresencaController {
                         .data(presenca)
                         .build());
     }
+
+    @Override
+    public ResponseEntity<Response> getPresencasByData(ServletWebRequest path, LocalDate data) {
+        var presencas = service.getAllByData(data);
+        return ResponseEntity.ok()
+                .body(Response.builder()
+                        .code(HttpStatus.OK.value())
+                        .status(HttpStatus.OK)
+                        .path(path.getRequest().getRequestURI())
+                        .data(presencas)
+                        .build());
+    }
 }

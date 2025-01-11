@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Diagramas ###
+*.brM3
+
+### Variáveis de Ambiente ###
+.env

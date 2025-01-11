@@ -67,6 +67,13 @@ public class PresencaService {
                 .toList();
     }
 
+    public List<PresencaDTO> getAllByData(LocalDate data) {
+        return presencaRepository.getByData(data)
+                .stream()
+                .map(presenca -> mapper.map(presenca, PresencaDTO.class))
+                .toList();
+    }
+
     private void validatePresenca(Presenca presenca) {
         // Verifica se o aluno e o usuário estão cadastrados
         var aluno = alunoRepository.findById(presenca.getAluno().getId());

@@ -14,5 +14,6 @@ public interface PresencaRepository extends JpaRepository<Presenca, UUID> {
     Optional<Presenca> getFirstByData(LocalDate data);
     @Query("SELECT p FROM Presenca p WHERE p.aluno.id = :id ORDER BY p.data DESC")
     List<Presenca> getLastTwo(UUID id);
+    List<Presenca> getByData(LocalDate data);
 
 }

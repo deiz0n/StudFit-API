@@ -19,5 +19,7 @@ public interface PresencaController {
     ResponseEntity<Response> getPresencas(ServletWebRequest path);
     @PostMapping("/create")
     ResponseEntity<Response> createPresenca(@RequestBody List<PresencaDTO> request, ServletWebRequest path, @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") LocalDate data);
+    @GetMapping("/")
+    ResponseEntity<Response> getPresencasByData(ServletWebRequest path, @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") LocalDate data);
 
 }

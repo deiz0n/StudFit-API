@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "api/v1.0/alunos/efetivados",
                                 "api/v1.0/alunos/lista-espera",
+                                "api/v1.0/alunos/lista-espera/register",
                                 "api/v1.0/auth/**",
                                 "swagger-ui/**",
                                 "/v3/**"
