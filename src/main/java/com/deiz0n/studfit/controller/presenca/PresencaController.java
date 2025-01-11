@@ -15,7 +15,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import java.time.LocalDate;
 import java.util.List;
 
-@Tag(name = "Controller da Presença")
+@Tag(name = "Controller de Presença")
 public interface PresencaController {
 
     @GetMapping
