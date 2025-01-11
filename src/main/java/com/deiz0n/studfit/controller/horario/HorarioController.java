@@ -16,7 +16,7 @@ public interface HorarioController {
     @GetMapping
     ResponseEntity<Response> getHorarios(ServletWebRequest path);
 
-    @GetMapping("/turno")
+    @GetMapping("/buscar-por-turno")
     ResponseEntity<Response> getHorariosByTurno(@RequestParam String turno, ServletWebRequest path);
 
     @PostMapping("/registrar")
