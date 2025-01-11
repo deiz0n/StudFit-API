@@ -39,8 +39,8 @@ public class HorarioControllerImpl  implements HorarioController{
     }
 
     @Override
-    public ResponseEntity<Response> getHorariosByTurno(String request, ServletWebRequest path) {
-        var horarios = service.getByTurno(request);
+    public ResponseEntity<Response> getHorariosByTurno(String turno, ServletWebRequest path) {
+        var horarios = service.getByTurno(turno);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
                 .body(Response.builder()
