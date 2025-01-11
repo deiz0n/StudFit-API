@@ -22,7 +22,7 @@ public interface AlunoController {
     ResponseEntity<Response> getAlunosListaEspera(ServletWebRequest path);
 
     @Transactional
-    @PostMapping("/lista-espera/registar")
+    @PostMapping("/lista-espera/registrar")
     ResponseEntity<Response> registerAlunoListaEspera(@RequestBody @Valid AlunoListaEsperaDTO request, ServletWebRequest path);
 
     @Transactional
