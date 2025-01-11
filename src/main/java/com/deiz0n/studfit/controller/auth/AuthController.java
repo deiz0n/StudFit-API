@@ -22,7 +22,7 @@ public interface AuthController {
     @PostMapping("/recuperar-senha")
     ResponseEntity<Response> recoveryPassword(@RequestBody @Valid RecoveryPasswordDTO request, ServletWebRequest path);
 
-    @PostMapping("/recuperar-senha/")
+    @PostMapping("/alterar-senha/")
     ResponseEntity<Response> setPassword(@RequestParam String codigo, @RequestBody @Valid ResetPasswordDTO request, ServletWebRequest path);
 
     @PostMapping("/validar-token")
