@@ -5,6 +5,7 @@ import com.deiz0n.studfit.domain.enums.Turno;
 import com.deiz0n.studfit.domain.response.Response;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.ServletWebRequest;
 
@@ -19,6 +20,7 @@ public interface HorarioController {
     @GetMapping("/buscar-por-turno")
     ResponseEntity<Response> getHorariosByTurno(@RequestParam String turno, ServletWebRequest path);
 
+    @Transactional
     @PostMapping("/registrar")
     ResponseEntity<Response> createHorario(@RequestBody HorarioDTO request, ServletWebRequest path);
 
