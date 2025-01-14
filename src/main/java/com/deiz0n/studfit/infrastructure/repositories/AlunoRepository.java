@@ -15,5 +15,5 @@ public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
     Optional<Aluno> getByTelefone(String telefone);
 
     @Query("FROM Aluno a WHERE a.listaEspera = true")
-    List<Aluno> getAlunoListaEspera();
+    List<Aluno> getAlunosListaEspera();
 }

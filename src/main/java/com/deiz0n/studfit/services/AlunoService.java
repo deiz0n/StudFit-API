@@ -48,7 +48,7 @@ public class AlunoService {
 
     // Retorna todos os alunos que estão na lista de espera
     public List<AlunoListaEsperaDTO> getListaDeEspera() {
-        return alunoRepository.getAlunoListaEspera()
+        return alunoRepository.getAlunosListaEspera()
                 .stream()
                 .map(aluno -> mapper.map(aluno, AlunoListaEsperaDTO.class))
                 .filter(AlunoListaEsperaDTO::getListaEspera)
