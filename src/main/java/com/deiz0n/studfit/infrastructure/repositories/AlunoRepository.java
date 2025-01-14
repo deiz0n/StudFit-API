@@ -10,10 +10,12 @@ import java.util.UUID;
 
 public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
 
-    Optional<Aluno> getByColocacao(Integer colocacao);
-    Optional<Aluno> getByEmail(String email);
-    Optional<Aluno> getByTelefone(String telefone);
-
+    @Query("FROM Aluno a WHERE a.colocacao = :colocacao")
+    Optional<Aluno> buscarPorColocacao(Integer colocacao);
+    @Query("FROM Aluno a WHERE a.email = :email")
+    Optional<Aluno> buscarPorEmail(String email);
+    @Query("FROM Aluno a WHERE a.telefone = :telefone")
+    Optional<Aluno> buscarPorTelefone(String telefone);
     @Query("FROM Aluno a WHERE a.listaEspera = true")
-    List<Aluno> getAlunosListaEspera();
+    List<Aluno> buscarAlunosListaEspera();
 }
