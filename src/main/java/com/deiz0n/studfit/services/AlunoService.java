@@ -30,12 +30,12 @@ import java.util.stream.Collectors;
 @Service
 public class AlunoService {
 
-    private AlunoRepository alunoRepository;
-    private PresencaRepository presencaRepository;
-    private ModelMapper mapper;
-    private ApplicationEventPublisher eventPublisher;
-    private HorarioRepository horarioRepository;
-    private UsuarioRepository usuarioRepository;
+    private final AlunoRepository alunoRepository;
+    private final PresencaRepository presencaRepository;
+    private final ModelMapper mapper;
+    private final ApplicationEventPublisher eventPublisher;
+    private final HorarioRepository horarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
     public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper, ApplicationEventPublisher eventPublisher, HorarioRepository horarioRepository, UsuarioRepository usuarioRepository) {
         this.alunoRepository = alunoRepository;
@@ -47,8 +47,8 @@ public class AlunoService {
     }
 
     // Retorna todos os alunos que estão na lista de espera
-    public List<AlunoListaEsperaDTO> getListaDeEspera() {
-        return alunoRepository.getAlunosListaEspera()
+    public List<AlunoListaEsperaDTO> buscarAlunosListaEspera() {
+        return alunoRepository.buscarAlunosListaEspera()
                 .stream()
                 .map(aluno -> mapper.map(aluno, AlunoListaEsperaDTO.class))
                 .filter(AlunoListaEsperaDTO::getListaEspera)
@@ -56,26 +56,26 @@ public class AlunoService {
     }
 
     // Registra um aluno na lista de espera
-    public AlunoListaEsperaDTO registerListaEspera(AlunoListaEsperaDTO alunoListaEspera) {
-        isExisting(alunoListaEspera.getEmail());
-        alunoListaEspera.setColocacao(getCurrentColocacao());
+    public AlunoListaEsperaDTO registrarAlunosListaEspera(AlunoListaEsperaDTO alunoListaEspera) {
+        eExistente(alunoListaEspera.getEmail());
+        alunoListaEspera.setColocacao(obterColocacaoAtual());
         var aluno = mapper.map(alunoListaEspera, Aluno.class);
         alunoRepository.save(aluno);
         return alunoListaEspera;
     }
 
     // Remove um aluno da lista de espera
-    public AlunoListaEsperaDTO removeListaEspera(UUID id) {
-        var aluno = getById(id);
+    public AlunoListaEsperaDTO excluirAlunoListaEspera(UUID id) {
+        var aluno = buscarPorId(id);
         alunoRepository.delete(aluno);
 
-        reorderListaEspera(aluno);
+        reordenarListaEspera(aluno);
 
         return mapper.map(aluno, AlunoListaEsperaDTO.class);
     }
 
     // Retorna todos os alunos já cadastrados na academia
-    public List<AlunoDTO> getEfetivados() {
+    public List<AlunoDTO> buscarAlunosEfetivados() {
         return alunoRepository.findAll()
                 .stream()
                 .map(aluno -> mapper.map(aluno, AlunoDTO.class))
@@ -84,15 +84,16 @@ public class AlunoService {
     }
 
     // Realiza o cadastro completo do aluno na lista de espera
-    public AlunoDTO registerEfetivado(AlunoDTO aluno) {
-        var alunoEfetivado = alunoRepository.getByColocacao(1).orElseThrow(
+    public AlunoDTO registrarAlunoEfetivado(AlunoDTO aluno) {
+        var alunoEfetivado = alunoRepository.buscarPorColocacao(1).orElseThrow(
                 () -> new AlunoNotFoundException("Aluno não encontrado")
         );
-        isExisting(aluno, alunoEfetivado.getId());
-        isAvailable(aluno.getHorario());
+        eExistente(aluno, alunoEfetivado.getId());
+        estaDisponivel(aluno.getHorario());
+
         BeanUtils.copyProperties(aluno, alunoEfetivado, "id", "nome", "email");
 
-        reorderListaEspera(alunoEfetivado);
+        reordenarListaEspera(alunoEfetivado);
         alunoEfetivado.setColocacao(null);
 
         var vagasDisponiveisEvent = new HorarioRegisterVagasDisponiveisEvent(this, aluno.getHorario().getId());
@@ -101,12 +102,12 @@ public class AlunoService {
         var sentAlunoEfetivado = new SentEmailAlunoEfetivadoEvent(this, new String[]{alunoEfetivado.getEmail()}, alunoEfetivado.getNome());
         eventPublisher.publishEvent(sentAlunoEfetivado);
 
-        var listOfDestinatarios = usuarioRepository.findAll()
+        var listaDeDestinatarios = usuarioRepository.findAll()
                 .stream()
                 .map(Usuario::getEmail)
                 .toArray(String[]::new);
 
-        var sentAlunoEfetivadoToUsuarios = new SentAlunoEfetivadoToUsuarios(this, listOfDestinatarios, alunoEfetivado.getNome());
+        var sentAlunoEfetivadoToUsuarios = new SentAlunoEfetivadoToUsuarios(this, listaDeDestinatarios, alunoEfetivado.getNome());
         eventPublisher.publishEvent(sentAlunoEfetivadoToUsuarios);
 
         alunoRepository.save(alunoEfetivado);
@@ -115,49 +116,49 @@ public class AlunoService {
     }
 
     // Remove aluno cadastrado
-    public void removeEfetivado(UUID id) {
-        var aluno = getById(id);
+    public void excluirAlunoEfetivado(UUID id) {
+        var aluno = buscarPorId(id);
         alunoRepository.delete(aluno);
     }
 
     // Atualiza os dados do aluno cadastrado
-    public AlunoDTO updateEfetivado(UUID id, AlunoDTO alunoDTO) {
-        isExisting(alunoDTO, id);
-        var aluno = getById(id);
+    public AlunoDTO atualizarEfetivado(UUID id, AlunoDTO alunoDTO) {
+        eExistente(alunoDTO, id);
+        var aluno = buscarPorId(id);
         BeanUtils.copyProperties(alunoDTO, aluno, "id");
         alunoRepository.save(aluno);
         return mapper.map(aluno, AlunoDTO.class);
     }
 
-    private Aluno getById(UUID id) {
+    private Aluno buscarPorId(UUID id) {
         return alunoRepository.findById(id)
                 .orElseThrow(
-                        () -> new AlunoNotFoundException(String.format("Aluno com ID: %s não foi encontrado", id.toString()))
+                        () -> new AlunoNotFoundException(String.format("Aluno com ID: %s não foi encontrado", id))
                 );
     }
 
-    public AlunoDTO getAlunoById(UUID id) {
-        return mapper.map(getById(id), AlunoDTO.class);
+    public AlunoDTO buscarAlunoPorId(UUID id) {
+        return mapper.map(buscarPorId(id), AlunoDTO.class);
     }
 
     // Verifica a existência de email ao cadastrar um aluno na lista de espera
-    private void isExisting(String email) {
-        if (alunoRepository.getByEmail(email).isPresent())
+    private void eExistente(String email) {
+        if (alunoRepository.buscarPorEmail(email).isPresent())
             throw new EmailAlreadyRegisteredException("Email já cadastrado");
     }
 
     // Verifica a existência de email ou telefone ao efetivar ou atualizar dados de um aluno
-    private void isExisting(AlunoDTO aluno, UUID id) {
-        var alunoByEmail = alunoRepository.getByEmail(aluno.getEmail());
-        if (alunoByEmail.isPresent() && !alunoByEmail.get().getId().equals(id))
+    private void eExistente(AlunoDTO aluno, UUID id) {
+        var alunoPorEmail = alunoRepository.buscarPorEmail(aluno.getEmail());
+        if (alunoPorEmail.isPresent() && !alunoPorEmail.get().getId().equals(id))
             throw new EmailAlreadyRegisteredException("Email já cadastrado");
 
-        var alunoByTelefone = alunoRepository.getByTelefone(aluno.getTelefone());
-        if (alunoByTelefone.isPresent() && !alunoByTelefone.get().getId().equals(id))
-            throw new TelefoneAlreadyRegistered("Telefone já cadastradp");
+        var alunoPorTelefone = alunoRepository.buscarPorTelefone(aluno.getTelefone());
+        if (alunoPorTelefone.isPresent() && !alunoPorTelefone.get().getId().equals(id))
+            throw new TelefoneAlreadyRegistered("Telefone já cadastrado");
     }
 
-    private Integer getCurrentColocacao() {
+    private Integer obterColocacaoAtual() {
         return Math.toIntExact(alunoRepository.findAll()
                 .stream()
                 .filter(Aluno::getListaEspera)
@@ -166,22 +167,22 @@ public class AlunoService {
     }
 
     // Reorganiza a lista de espera
-    private void reorderListaEspera(Aluno aluno) {
-        List<Aluno> listOfAlunos = new ArrayList<>(
+    private void reordenarListaEspera(Aluno aluno) {
+        List<Aluno> listaAlunos = new ArrayList<>(
                 alunoRepository.findAll()
                 .stream()
                 .filter(Aluno::getListaEspera)
                 .toList()
         );
 
-        var lastAluno = listOfAlunos.get(listOfAlunos.size()-1);
-        var currentColocacao = 0;
+        var ultimoAluno = listaAlunos.get(listaAlunos.size()-1);
+        var colocacaoAtual = 0;
 
-        if (!aluno.equals(lastAluno)) {
-            for (Aluno x : listOfAlunos) {
-                currentColocacao = x.getColocacao();
+        if (!aluno.equals(ultimoAluno)) {
+            for (Aluno x : listaAlunos) {
+                colocacaoAtual = x.getColocacao();
                 if (aluno.getColocacao() < x.getColocacao()) {
-                    x.setColocacao(currentColocacao-1);
+                    x.setColocacao(colocacaoAtual-1);
                     alunoRepository.save(x);
                 }
             }
@@ -189,50 +190,50 @@ public class AlunoService {
     }
 
     // Verifica se o horário informado está disponível
-    private void isAvailable(HorarioDTO horario) {
-        var getHorarioById = horarioRepository.findById(horario.getId())
+    private void estaDisponivel(HorarioDTO horario) {
+        var buscarHorarioPorId = horarioRepository.findById(horario.getId())
                 .orElseThrow(
                         () -> new HorarioNotFoundException(String.format("O horário com id: %s não foi encontrado", horario.getId().toString()))
                 );
 
-        if (getHorarioById.getVagasDisponiveis() == 0)
+        if (buscarHorarioPorId.getVagasDisponiveis() == 0)
             throw new HorarioINotAvailableException("O horário informado atingiu o número máximo de alunos");
     }
 
     // Registra as ausências dos alunos
     @EventListener
-    private void setAusencias(AlunoRegisterAusenciasEvent registerAusencias) {
-        var aluno = getById(registerAusencias
+    private void atualizarAusencias(AlunoRegisterAusenciasEvent registerAusencias) {
+        var aluno = buscarPorId(registerAusencias
                 .getPresenca()
                 .getAluno()
                 .getId()
         );
 
-        int quantityAusencias = aluno.getAusenciasConsecutivas();
+        int quantidadeAusencias = aluno.getAusenciasConsecutivas();
 
-        List<Presenca> ausenciasByAluno = presencaRepository.getLastTwo(aluno.getId());
+        List<Presenca> ausenciasPorAluno = presencaRepository.getLastTwo(aluno.getId());
 
-        if (ausenciasByAluno.isEmpty() || !ausenciasByAluno.stream().findFirst().get().getPresente()) {
-            quantityAusencias++;
+        if (ausenciasPorAluno.isEmpty() || !ausenciasPorAluno.stream().findFirst().get().getPresente()) {
+            quantidadeAusencias++;
         } else {
-            for (int i = 0; i < ausenciasByAluno.size() - 1; i++) {
-                if (!ausenciasByAluno.get(i).getPresente()) {
-                    if (ausenciasByAluno.get(i).getData().getDayOfWeek() == DayOfWeek.FRIDAY && ausenciasByAluno.get(i + 1).getData().getDayOfWeek() == DayOfWeek.MONDAY)
-                        quantityAusencias++;
+            for (int i = 0; i < ausenciasPorAluno.size() - 1; i++) {
+                if (!ausenciasPorAluno.get(i).getPresente()) {
+                    if (ausenciasPorAluno.get(i).getData().getDayOfWeek() == DayOfWeek.FRIDAY && ausenciasPorAluno.get(i + 1).getData().getDayOfWeek() == DayOfWeek.MONDAY)
+                        quantidadeAusencias++;
                         // Verifica se as ausências estão em sequência
-                    else if (ausenciasByAluno.get(i).getData().plusDays(1).equals(ausenciasByAluno.get(i + 1).getData()))
-                        quantityAusencias++;
+                    else if (ausenciasPorAluno.get(i).getData().plusDays(1).equals(ausenciasPorAluno.get(i + 1).getData()))
+                        quantidadeAusencias++;
                         // Verifica se é o último dia do mês
-                    else if (ausenciasByAluno.get(i).getData().getDayOfMonth() == ausenciasByAluno.get(i).getData().lengthOfMonth() && ausenciasByAluno.get(i + 1).getData().getDayOfMonth() == 1)
-                        quantityAusencias++;
+                    else if (ausenciasPorAluno.get(i).getData().getDayOfMonth() == ausenciasPorAluno.get(i).getData().lengthOfMonth() && ausenciasPorAluno.get(i + 1).getData().getDayOfMonth() == 1)
+                        quantidadeAusencias++;
                 } else {
-                    quantityAusencias = 0;
+                    quantidadeAusencias = 0;
                     break;
                 }
             }
         }
 
-        aluno.setAusenciasConsecutivas(quantityAusencias);
+        aluno.setAusenciasConsecutivas(quantidadeAusencias);
         alunoRepository.save(aluno);
 
         var registerStatus = new AlunoRegisterStatusEvent(this, aluno.getId());
@@ -243,8 +244,8 @@ public class AlunoService {
     }
 
     @EventListener
-    private void setStatus(AlunoRegisterStatusEvent registerStatusEvent) {
-        var aluno = getById(registerStatusEvent.getId());
+    private void atualizarStatusAluno(AlunoRegisterStatusEvent registerStatusEvent) {
+        var aluno = buscarPorId(registerStatusEvent.getId());
         if (aluno.getAusenciasConsecutivas() >= 3)
             aluno.setStatus(Status.EM_ALERTA);
         else
@@ -253,23 +254,23 @@ public class AlunoService {
     }
 
     @EventListener
-    private void deleteByMaxAusencias(AlunoDeletedByAusenciasEvent deletedAlunoStatus) {
+    private void excluirPorMaxAusencias(AlunoDeletedByAusenciasEvent deletedAlunoStatus) {
         var aluno = deletedAlunoStatus.getAluno();
         if (aluno.getAusenciasConsecutivas() == 5) {
-            var findAluno = getById(aluno.getId());
+            var buscarAluno = buscarPorId(aluno.getId());
 
-            var deletedAluno = new SentEmailDeletedAlunoEfetivadoEvent(this, new String[]{aluno.getEmail()}, aluno.getNome());
-            eventPublisher.publishEvent(deletedAluno);
+            var alunoExcluido = new SentEmailDeletedAlunoEfetivadoEvent(this, new String[]{aluno.getEmail()}, aluno.getNome());
+            eventPublisher.publishEvent(alunoExcluido);
 
-            var listOfUsuario = usuarioRepository.findAll()
+            var listaDeUsuarios = usuarioRepository.findAll()
                     .stream()
                     .map(usuario -> mapper.map(usuario, UsuarioDTO.class))
                     .toList();
 
-            var deletedToUsuarios = new SentAlunoDeletedToUsuariosEvent(this, listOfUsuario, aluno.getNome());
+            var deletedToUsuarios = new SentAlunoDeletedToUsuariosEvent(this, listaDeUsuarios, aluno.getNome());
             eventPublisher.publishEvent(deletedToUsuarios);
 
-            alunoRepository.deleteById(findAluno.getId());
+            alunoRepository.deleteById(buscarAluno.getId());
         }
     }
 }
