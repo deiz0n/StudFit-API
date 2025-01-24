@@ -1,9 +1,9 @@
 package com.deiz0n.studfit.services;
 
-import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.PresencaDTO;
-import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
+import com.deiz0n.studfit.domain.entites.Aluno;
 import com.deiz0n.studfit.domain.entites.Presenca;
+import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.domain.events.AlunoRegisterAusenciasEvent;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotEfetivadoException;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotFoundException;
@@ -20,16 +20,17 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class PresencaService {
 
-    private PresencaRepository presencaRepository;
-    private AlunoRepository alunoRepository;
-    private UsuarioRepository usuarioRepository;
-    private ModelMapper mapper;
-    private ApplicationEventPublisher eventPublisher;
+    private final PresencaRepository presencaRepository;
+    private final AlunoRepository alunoRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final ModelMapper mapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     public PresencaService(PresencaRepository presencaRepository, AlunoRepository alunoRepository, UsuarioRepository usuarioRepository, ModelMapper mapper, ApplicationEventPublisher eventPublisher) {
         this.presencaRepository = presencaRepository;
@@ -39,21 +40,21 @@ public class PresencaService {
         this.eventPublisher = eventPublisher;
     }
 
-    public List<PresencaDTO> getAll() {
+    public List<PresencaDTO> buscarPresencas() {
         return presencaRepository.findAll()
                 .stream()
                 .map(presenca -> mapper.map(presenca, PresencaDTO.class))
                 .collect(Collectors.toList());
     }
 
-    public List<PresencaDTO> create(List<PresencaDTO> presencaDTO, LocalDate data) {
-        var presenca = presencaDTO.stream()
+    public List<PresencaDTO> registar(List<PresencaDTO> presencaDTO, LocalDate data) {
+        List<Presenca> presenca = presencaDTO.stream()
                         .map(dto -> mapper.map(dto, Presenca.class))
                         .toList();
 
         presenca.forEach(entity -> {
             entity.setData(data);
-            validatePresenca(entity);
+            validarPresenca(entity);
         });
 
         presencaRepository.saveAll(presenca);
@@ -67,27 +68,27 @@ public class PresencaService {
                 .toList();
     }
 
-    public List<PresencaDTO> getAllByData(LocalDate data) {
+    public List<PresencaDTO> buscarPorData(LocalDate data) {
         return presencaRepository.getByData(data)
                 .stream()
                 .map(presenca -> mapper.map(presenca, PresencaDTO.class))
                 .toList();
     }
 
-    private void validatePresenca(Presenca presenca) {
+    private void validarPresenca(Presenca presenca) {
         // Verifica se o aluno e o usuário estão cadastrados
-        var aluno = alunoRepository.findById(presenca.getAluno().getId());
+        Optional<Aluno> aluno = alunoRepository.findById(presenca.getAluno().getId());
         if (aluno.isEmpty())
             throw new AlunoNotFoundException(String.format("Aluno com ID: %s não foi encontrado", presenca.getAluno().getId().toString()));
-        var usuario = usuarioRepository.findById(presenca.getUsuario().getId());
+
+        Optional<Usuario> usuario = usuarioRepository.findById(presenca.getUsuario().getId());
         if (usuario.isEmpty())
             throw new UsuarioNotFoundException(String.format("Usuário com ID: %s não foi encontrado", presenca.getUsuario().getId().toString()));
-
         if (aluno.get().getListaEspera()) // Verifica se o aluno estar efetivado
             throw new AlunoNotEfetivadoException(String.format("Aluno com ID: %s está na lista de espera", presenca.getAluno().getId().toString()));
 
-        var presencaByData = presencaRepository.getFirstByData(presenca.getData()); // Verifica se a presença é existente
-        if (presencaByData.isPresent())
+        Optional<Presenca> presencaPorData = presencaRepository.getFirstByData(presenca.getData()); // Verifica se a presença é existente
+        if (presencaPorData.isPresent())
             throw new PresencaAlreadyRegistered("Presenca já realizada");
         if (presenca.getData().getDayOfWeek() == DayOfWeek.SATURDAY || presenca.getData().getDayOfWeek() == DayOfWeek.SUNDAY) // Verifica se a presença foi realizada em final de semana
             throw new PresencaNotValidException("Presença não pode ser realizada em sábados e domingos");
