@@ -3,8 +3,6 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.*;
 import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.domain.events.*;
-import com.deiz0n.studfit.domain.exceptions.usuario.UsuarioNotFoundException;
-import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,41 +13,41 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private TokenDTO token;
-    private AuthenticationManager manager;
-    private ApplicationEventPublisher eventPublisher;
+    private final AuthenticationManager manager;
+    private final ApplicationEventPublisher eventPublisher;
 
     public AuthService(AuthenticationManager manager, ApplicationEventPublisher eventPublisher) {
         this.manager = manager;
         this.eventPublisher = eventPublisher;
     }
 
-    public TokenDTO signIn(AuthDTO auth) {
-        var user = new UsernamePasswordAuthenticationToken(auth.getEmail(), auth.getSenha());
-        var authentication = manager.authenticate(user);
-        var tokenGeneration = new TokenGenerationEvent(this, (Usuario) authentication.getPrincipal());
+    public TokenDTO login(AuthDTO auth) {
+        var usuario = new UsernamePasswordAuthenticationToken(auth.getEmail(), auth.getSenha());
+        var usuarioAutenticado = manager.authenticate(usuario);
+        var gerarToken = new TokenGenerationEvent(this, (Usuario) usuarioAutenticado.getPrincipal());
 
-        eventPublisher.publishEvent(tokenGeneration);
+        eventPublisher.publishEvent(gerarToken);
 
         return token;
     }
 
-    public void recovery(RecoveryPasswordDTO recoveryPassword) {
+    public void recuperarSenha(RecoveryPasswordDTO recoveryPassword) {
         var recoveryPasswordEvent = new UsuarioRecoveryPassswordEvent(this, recoveryPassword.getEmail());
         eventPublisher.publishEvent(recoveryPasswordEvent);
     }
 
-    public void reset(String codigo, ResetPasswordDTO resetPasswordDTO) {
+    public void atualizaSenha(String codigo, ResetPasswordDTO resetPasswordDTO) {
         var resetPasswordEvent = new UsuarioResetPasswordEvent(this, codigo, resetPasswordDTO);
         eventPublisher.publishEvent(resetPasswordEvent);
     }
 
-    public void validateToken(TokenDTO tokenDTO) {
+    public void validarToken(TokenDTO tokenDTO) {
         var validateTokenEvent = new AuthValidateTokenEvent(this, tokenDTO.getToken());
         eventPublisher.publishEvent(validateTokenEvent);
     }
 
     @EventListener
-    private void getToken(TokenGeneratedEvent tokenGenerated) {
+    private void obterTokenGerado(TokenGeneratedEvent tokenGenerated) {
         token = TokenDTO.builder()
                 .token(tokenGenerated.getToken())
                 .build();

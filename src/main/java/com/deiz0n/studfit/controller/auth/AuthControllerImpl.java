@@ -24,7 +24,7 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<Response> singIn(AuthDTO request, ServletWebRequest path) {
-        var token = service.signIn(request);
+        var token = service.login(request);
         return ResponseEntity.ok()
                 .body(Response.builder()
                         .code(HttpStatus.OK.value())
@@ -36,7 +36,7 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<Response> recoveryPassword(RecoveryPasswordDTO request, ServletWebRequest path) {
-        service.recovery(request);
+        service.recuperarSenha(request);
         return ResponseEntity.accepted()
                 .body(Response.builder()
                         .code(HttpStatus.ACCEPTED.value())
@@ -48,7 +48,7 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<Response> setPassword(String codigo, ResetPasswordDTO request, ServletWebRequest path) {
-        service.reset(codigo, request);
+        service.atualizaSenha(codigo, request);
         return ResponseEntity.ok()
                 .body(Response.builder()
                         .code(HttpStatus.OK.value())
@@ -60,7 +60,7 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<Response> validateToken(TokenDTO request, ServletWebRequest path) {
-        service.validateToken(request);
+        service.validarToken(request);
         return ResponseEntity.ok()
                 .body(Response.builder()
                         .code(HttpStatus.OK.value())
