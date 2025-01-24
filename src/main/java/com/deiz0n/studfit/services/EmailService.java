@@ -18,23 +18,23 @@ public class EmailService {
 
     @Value("${spring.mail.username}")
     private String emailFrom;
-    private JavaMailSender mailSender;
-    private Configuration freeMakerConfig;
+    private final JavaMailSender mailSender;
+    private final Configuration freeMakerConfig;
 
     public EmailService(JavaMailSender mailSender, Configuration freeMakerConfig) {
         this.mailSender = mailSender;
         this.freeMakerConfig = freeMakerConfig;
     }
 
-    private void sendMail(EmailDTO message) {
-        var content = processTemplate(message);
+    private void enviarEmail(EmailDTO message) {
+        var conteudo = processarTemplate(message);
         var mimeMessage = mailSender.createMimeMessage();
         var helper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
         try {
             helper.setTo(message.getDestinatario());
             helper.setSubject(message.getTitulo());
-            helper.setText(content, true);
+            helper.setText(conteudo, true);
             helper.setFrom(emailFrom);
 
             mailSender.send(mimeMessage);
@@ -43,7 +43,7 @@ public class EmailService {
         }
     }
 
-    private String processTemplate(EmailDTO message) {
+    private String processarTemplate(EmailDTO message) {
         try {
             Template template = freeMakerConfig.getTemplate(message.getConteudo());
 
@@ -54,7 +54,7 @@ public class EmailService {
     }
 
     @EventListener
-    private void sendRecoveryPassword(SentEmailRecoveryPasswordEvent sentEmailRecoveryPasswordEvent) {
+    private void enviarRecuperacaoSenha(SentEmailRecoveryPasswordEvent sentEmailRecoveryPasswordEvent) {
         var email = EmailDTO.builder()
                 .destinatario(sentEmailRecoveryPasswordEvent.getDestinatario())
                 .titulo("Solicitação para alteração de senha")
@@ -62,22 +62,22 @@ public class EmailService {
                 .conteudo("recovery-password.html")
                 .build();
 
-        sendMail(email);
+        enviarEmail(email);
     }
 
     @EventListener
-    private void sendConfirmUpdatedPassword(SentEmailUpdatedPasswordEvent updatedPassword) {
+    private void enviarConfirmacaoSenhaAlterada(SentEmailUpdatedPasswordEvent updatedPassword) {
         var email = EmailDTO.builder()
                 .destinatario(updatedPassword.getDestinatario())
                 .titulo("Sua senha foi alterada com sucesso")
                 .conteudo("updated-password-success.html")
                 .build();
 
-        sendMail(email);
+        enviarEmail(email);
     }
 
     @EventListener
-    private void sendDeletedAlunoEfetivado(SentEmailDeletedAlunoEfetivadoEvent deletedAlunoEfetivado) {
+    private void enviarConfirmacaoExclucao(SentEmailDeletedAlunoEfetivadoEvent deletedAlunoEfetivado) {
         var email = EmailDTO.builder()
                 .destinatario(deletedAlunoEfetivado.getDestinatario())
                 .titulo("Exclusão de cadastro")
@@ -85,11 +85,11 @@ public class EmailService {
                 .conteudo("removed-by-absences.html")
                 .build();
 
-        sendMail(email);
+        enviarEmail(email);
     }
 
     @EventListener
-    private void sendAlunoDeletedToUsuarios(SentAlunoDeletedToUsuariosEvent deletedToUsuarios) {
+    private void enviarConfirmacaoAlunoExcluido(SentAlunoDeletedToUsuariosEvent deletedToUsuarios) {
         var listOfEmails = deletedToUsuarios.getUsuarios()
                 .stream()
                 .map(UsuarioDTO::getEmail)
@@ -102,11 +102,11 @@ public class EmailService {
                 .conteudo("aluno-removed.html")
                 .build();
 
-        sendMail(email);
+        enviarEmail(email);
     }
 
     @EventListener
-    private void sendAlunoEfetivado(SentEmailAlunoEfetivadoEvent alunoEfetivado) {
+    private void enviarConfirmacaoEfetivacao(SentEmailAlunoEfetivadoEvent alunoEfetivado) {
         var email = EmailDTO.builder()
                 .destinatario(alunoEfetivado.getDestinatario())
                 .titulo("Efetivação de cadastro")
@@ -114,11 +114,11 @@ public class EmailService {
                 .conteudo("aluno-efetivado.html")
                 .build();
 
-        sendMail(email);
+        enviarEmail(email);
     }
 
     @EventListener
-    private void sendAlunoEfetivadoToUsuarios(SentAlunoEfetivadoToUsuarios alunoEfetivadoToUsuarios) {
+    private void enviarConfirmacaoAlunoEfetivado(SentAlunoEfetivadoToUsuarios alunoEfetivadoToUsuarios) {
         var email = EmailDTO.builder()
                 .destinatario(alunoEfetivadoToUsuarios.getDestinatario())
                 .titulo("Efetivação de cadastro")
@@ -126,6 +126,6 @@ public class EmailService {
                 .conteudo("aluno-efetivado-to-usuarios.html")
                 .build();
 
-        sendMail(email);
+        enviarEmail(email);
     }
 }
