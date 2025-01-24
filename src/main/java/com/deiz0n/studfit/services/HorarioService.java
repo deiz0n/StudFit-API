@@ -21,15 +21,15 @@ import java.util.stream.Collectors;
 @Service
 public class HorarioService {
 
-    private HorarioRepository repository;
-    private ModelMapper mapper;
+    private final HorarioRepository repository;
+    private final ModelMapper mapper;
 
     public HorarioService(HorarioRepository repository, ModelMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }
 
-    public List<HorarioDTO> getAll() {
+    public List<HorarioDTO> buscarHorarios() {
         return repository.findAll()
                 .stream()
                 .map(horario -> mapper.map(horario, HorarioDTO.class))
@@ -37,19 +37,19 @@ public class HorarioService {
                 .collect(Collectors.toList());
     }
 
-    public List<HorarioDTO> getByTurno(String turno) {
-        return repository.getByTurno(validateTurno(turno))
+    public List<HorarioDTO> buscarPorTurno(String turno) {
+        return repository.getByTurno(validarTurno(turno))
                 .stream()
                 .map(horario -> mapper.map(horario, HorarioDTO.class))
                 .collect(Collectors.toList());
     }
 
-    public HorarioDTO create(HorarioDTO horarioDTO) {
-        validateHorarios(horarioDTO);
+    public HorarioDTO registar(HorarioDTO horarioDTO) {
+        validarHorario(horarioDTO);
 
-        var horario = mapper.map(horarioDTO, Horario.class);
+        Horario horario = mapper.map(horarioDTO, Horario.class);
 
-        horario.setTurno(defineTurno(horarioDTO));
+        horario.setTurno(definirTurno(horarioDTO));
         repository.save(horario);
 
         return HorarioDTO.builder()
@@ -61,22 +61,22 @@ public class HorarioService {
                 .build();
     }
 
-    public void delete(UUID id) {
-        var horario = findByID(id);
+    public void excluir(UUID id) {
+        Horario horario = buscarPorHorario(id);
         repository.delete(horario);
     }
 
     @EventListener
-    private void setVagasDisponiveis(HorarioRegisterVagasDisponiveisEvent vagasDisponiveisEvent) {
-        var horario = repository.findById(vagasDisponiveisEvent.getId()).get();
+    private void atualizarVagasDisponiveis(HorarioRegisterVagasDisponiveisEvent vagasDisponiveisEvent) {
+        Horario horario = repository.findById(vagasDisponiveisEvent.getId()).get();
         var vagasDisponiveis = horario.getVagasDisponiveis();
-        var quantityAlunos = horario.getAlunos().size();
+        var quantidadeAlunos = horario.getAlunos().size();
 
-        horario.setVagasDisponiveis(vagasDisponiveis - quantityAlunos);
+        horario.setVagasDisponiveis(vagasDisponiveis - quantidadeAlunos);
         repository.save(horario);
     }
 
-    private Horario findByID(UUID id) {
+    private Horario buscarPorHorario(UUID id) {
         return repository.findById(id)
                 .map(horario -> mapper.map(horario, Horario.class))
                 .orElseThrow(
@@ -84,7 +84,7 @@ public class HorarioService {
                 );
     }
 
-    private void validateHorarios(HorarioDTO horario) {
+    private void validarHorario(HorarioDTO horario) {
         try {
             if (repository.getHorario(horario.getHorarioInicial(), horario.getHorarioFinal()).isPresent())
                 throw new HorarioAlreadyRegistered("Horário já cadastrado");
@@ -99,7 +99,7 @@ public class HorarioService {
     }
 
     // Define os turnos automaticamente com base nos horários informados
-    private String defineTurno(HorarioDTO horarioDTO) {
+    private String definirTurno(HorarioDTO horarioDTO) {
         if (horarioDTO.getHorarioInicial().getHour() >= 6 && horarioDTO.getHorarioFinal().getHour() <= 12)
             return Turno.MANHA.toString();
         if (horarioDTO.getHorarioInicial().getHour() >= 12 && horarioDTO.getHorarioFinal().getHour() <= 18)
@@ -108,7 +108,7 @@ public class HorarioService {
             return Turno.NOITE.toString();
     }
 
-    private String validateTurno(String turno) {
+    private String validarTurno(String turno) {
         try {
             return Turno.valueOf(turno.toUpperCase()).toString();
         } catch (Exception e) {

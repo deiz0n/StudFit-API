@@ -1,7 +1,6 @@
 package com.deiz0n.studfit.controller.horario;
 
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
-import com.deiz0n.studfit.domain.enums.Turno;
 import com.deiz0n.studfit.domain.response.Response;
 import com.deiz0n.studfit.services.HorarioService;
 import org.springframework.http.CacheControl;
@@ -19,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("api/v1.0/horarios")
 public class HorarioControllerImpl  implements HorarioController{
 
-    private HorarioService service;
+    private final HorarioService service;
 
     public HorarioControllerImpl(HorarioService service) {
         this.service = service;
@@ -27,7 +26,7 @@ public class HorarioControllerImpl  implements HorarioController{
 
     @Override
     public ResponseEntity<Response> getHorarios(ServletWebRequest path) {
-        var horarios = service.getAll();
+        var horarios = service.buscarHorarios();
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
                 .body(Response.builder()
@@ -40,7 +39,7 @@ public class HorarioControllerImpl  implements HorarioController{
 
     @Override
     public ResponseEntity<Response> getHorariosByTurno(String turno, ServletWebRequest path) {
-        var horarios = service.getByTurno(turno);
+        var horarios = service.buscarPorTurno(turno);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
                 .body(Response.builder()
@@ -53,7 +52,7 @@ public class HorarioControllerImpl  implements HorarioController{
 
     @Override
     public ResponseEntity<Response> createHorario(HorarioDTO request, ServletWebRequest path) {
-        var horario = service.create(request);
+        var horario = service.registar(request);
         var uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("id")
@@ -71,7 +70,7 @@ public class HorarioControllerImpl  implements HorarioController{
 
     @Override
     public ResponseEntity deleteHorario(UUID id) {
-        service.delete(id);
+        service.excluir(id);
         return ResponseEntity.noContent().build();
     }
 }
