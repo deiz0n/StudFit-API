@@ -17,15 +17,15 @@ import org.springframework.web.context.request.ServletWebRequest;
 public interface AuthController {
 
     @PostMapping("/login")
-    ResponseEntity<Response> singIn(@RequestBody @Valid AuthDTO request, ServletWebRequest path);
+    ResponseEntity<Response> entrar(@RequestBody @Valid AuthDTO request, ServletWebRequest path);
 
     @PostMapping("/recuperar-senha")
-    ResponseEntity<Response> recoveryPassword(@RequestBody @Valid RecoveryPasswordDTO request, ServletWebRequest path);
+    ResponseEntity<Response> recuperarSenha(@RequestBody @Valid RecoveryPasswordDTO request, ServletWebRequest path);
 
-    @PostMapping("/alterar-senha/")
-    ResponseEntity<Response> setPassword(@RequestParam String codigo, @RequestBody @Valid ResetPasswordDTO request, ServletWebRequest path);
+    @PostMapping("/atualizar-senha/")
+    ResponseEntity<Response> atualizarSenha(@RequestParam String codigo, @RequestBody @Valid ResetPasswordDTO request, ServletWebRequest path);
 
     @PostMapping("/validar-token")
-    ResponseEntity<Response> validateToken(@RequestBody TokenDTO request, ServletWebRequest path);
+    ResponseEntity<Response> validarToken(@RequestBody TokenDTO request, ServletWebRequest path);
 
 }
