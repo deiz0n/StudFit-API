@@ -50,5 +50,7 @@ public class Aluno {
 
     @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL)
     private List<Presenca> presencas;
+    @ManyToOne
+    private AlunoInteressado alunoInteressado;
 
 }
