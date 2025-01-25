@@ -14,7 +14,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Entity(name = "tb_horario")
 public class Horario {
 
     @Id
@@ -24,11 +24,9 @@ public class Horario {
     private LocalTime horarioInicial;
     @Column(name = "horario_final")
     private LocalTime horarioFinal;
-    private String turno;
+    @Enumerated(EnumType.STRING)
+    private Turno turno;
     @Column(name = "vagas_disponiveis")
     private Integer vagasDisponiveis;
-
-    @OneToMany(mappedBy = "horario")
-    private List<Aluno> alunos;
 
 }
