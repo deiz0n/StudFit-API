@@ -25,7 +25,7 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<Response> getAluno(UUID id, ServletWebRequest path) {
+    public ResponseEntity<Response> buscarAluno(UUID id, ServletWebRequest path) {
         var aluno = service.buscarAlunoPorId(id);
         return ResponseEntity.ok()
                 .body(Response.builder()
@@ -37,7 +37,7 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<Response> getAlunosListaEspera(ServletWebRequest path) {
+    public ResponseEntity<Response> buscarAlunosListaEspera(ServletWebRequest path) {
         var alunos = service.buscarAlunosListaEspera();
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
@@ -50,7 +50,7 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<Response> registerAlunoListaEspera(AlunoListaEsperaDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response> registrarAlunoListaEspera(AlunoListaEsperaDTO request, ServletWebRequest path) {
         var aluno = service.registrarAlunosListaEspera(request);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
@@ -63,13 +63,13 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity removeAlunoListaEspera(UUID id, ServletWebRequest path) {
+    public ResponseEntity excluirAlunoListaEspera(UUID id, ServletWebRequest path) {
         var aluno = service.excluirAlunoListaEspera(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<Response> getAlunosEfetivados(ServletWebRequest path) {
+    public ResponseEntity<Response> buscarAlunosEfetivados(ServletWebRequest path) {
         var alunos = service.buscarAlunosEfetivados();
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
@@ -82,7 +82,7 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<Response> registerAlunoEfetivado(AlunoDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response> registrarAlunoEfetivado(AlunoDTO request, ServletWebRequest path) {
         var aluno = service.registrarAlunoEfetivado(request);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
@@ -95,13 +95,13 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity removeAlunoEfetivado(UUID id) {
+    public ResponseEntity excluirAlunoEfetivado(UUID id) {
         service.excluirAlunoEfetivado(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<Response> updateAlunoEfetivado(UUID id, AlunoDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response> atualizarAlunoEfetivado(UUID id, AlunoDTO request, ServletWebRequest path) {
         var aluno = service.atualizarEfetivado(id, request);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
