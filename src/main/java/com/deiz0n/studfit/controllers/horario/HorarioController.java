@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller.horario;
+package com.deiz0n.studfit.controllers.horario;
 
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
 import com.deiz0n.studfit.domain.response.Response;
@@ -14,15 +14,15 @@ import java.util.UUID;
 public interface HorarioController {
 
     @GetMapping
-    ResponseEntity<Response> buscarHorarios(ServletWebRequest path);
+    ResponseEntity<Response<?>> buscarHorarios(ServletWebRequest path);
 
     @GetMapping("/buscar-por-turno")
-    ResponseEntity<Response> buscarPorTurno(@RequestParam String turno, ServletWebRequest path);
+    ResponseEntity<Response<?>> buscarPorTurno(@RequestParam String turno, ServletWebRequest path);
 
     @Transactional
     @PostMapping("/registrar")
-    ResponseEntity<Response> registrar(@RequestBody HorarioDTO request, ServletWebRequest path);
+    ResponseEntity<Response<?>> registrar(@RequestBody HorarioDTO request, ServletWebRequest path);
 
     @DeleteMapping("/excluir/{id}")
-    ResponseEntity excluir(@PathVariable UUID id);
+    ResponseEntity<?> excluir(@PathVariable UUID id);
 }

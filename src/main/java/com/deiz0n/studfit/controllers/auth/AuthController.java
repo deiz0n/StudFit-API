@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller.auth;
+package com.deiz0n.studfit.controllers.auth;
 
 import com.deiz0n.studfit.domain.dtos.AuthDTO;
 import com.deiz0n.studfit.domain.dtos.RecoveryPasswordDTO;
@@ -17,15 +17,15 @@ import org.springframework.web.context.request.ServletWebRequest;
 public interface AuthController {
 
     @PostMapping("/login")
-    ResponseEntity<Response> entrar(@RequestBody @Valid AuthDTO request, ServletWebRequest path);
+    ResponseEntity<Response<?>> entrar(@RequestBody @Valid AuthDTO request, ServletWebRequest path);
 
     @PostMapping("/recuperar-senha")
-    ResponseEntity<Response> recuperarSenha(@RequestBody @Valid RecoveryPasswordDTO request, ServletWebRequest path);
+    ResponseEntity<Response<?>> recuperarSenha(@RequestBody @Valid RecoveryPasswordDTO request, ServletWebRequest path);
 
     @PostMapping("/atualizar-senha/")
-    ResponseEntity<Response> atualizarSenha(@RequestParam String codigo, @RequestBody @Valid ResetPasswordDTO request, ServletWebRequest path);
+    ResponseEntity<Response<?>> atualizarSenha(@RequestParam String codigo, @RequestBody @Valid ResetPasswordDTO request, ServletWebRequest path);
 
     @PostMapping("/validar-token")
-    ResponseEntity<Response> validarToken(@RequestBody TokenDTO request, ServletWebRequest path);
+    ResponseEntity<Response<?>> validarToken(@RequestBody TokenDTO request, ServletWebRequest path);
 
 }

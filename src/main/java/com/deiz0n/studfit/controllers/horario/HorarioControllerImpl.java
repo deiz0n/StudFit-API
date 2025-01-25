@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller.horario;
+package com.deiz0n.studfit.controllers.horario;
 
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
 import com.deiz0n.studfit.domain.response.Response;
@@ -25,7 +25,7 @@ public class HorarioControllerImpl  implements HorarioController{
     }
 
     @Override
-    public ResponseEntity<Response> buscarHorarios(ServletWebRequest path) {
+    public ResponseEntity<Response<?>> buscarHorarios(ServletWebRequest path) {
         var horarios = service.buscarHorarios();
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
@@ -38,7 +38,7 @@ public class HorarioControllerImpl  implements HorarioController{
     }
 
     @Override
-    public ResponseEntity<Response> buscarPorTurno(String turno, ServletWebRequest path) {
+    public ResponseEntity<Response<?>> buscarPorTurno(String turno, ServletWebRequest path) {
         var horarios = service.buscarPorTurno(turno);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
@@ -51,7 +51,7 @@ public class HorarioControllerImpl  implements HorarioController{
     }
 
     @Override
-    public ResponseEntity<Response> registrar(HorarioDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response<?>> registrar(HorarioDTO request, ServletWebRequest path) {
         var horario = service.registar(request);
         var uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -69,7 +69,7 @@ public class HorarioControllerImpl  implements HorarioController{
     }
 
     @Override
-    public ResponseEntity excluir(UUID id) {
+    public ResponseEntity<?> excluir(UUID id) {
         service.excluir(id);
         return ResponseEntity.noContent().build();
     }

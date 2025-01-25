@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller.presenca;
+package com.deiz0n.studfit.controllers.presenca;
 
 import com.deiz0n.studfit.domain.dtos.PresencaDTO;
 import com.deiz0n.studfit.domain.response.Response;
@@ -19,13 +19,13 @@ import java.util.List;
 public interface PresencaController {
 
     @GetMapping
-    ResponseEntity<Response> buscarPresencas(ServletWebRequest path);
+    ResponseEntity<Response<?>> buscarPresencas(ServletWebRequest path);
 
     @Transactional
     @PostMapping("/registrar")
-    ResponseEntity<Response> registrar(@RequestBody List<PresencaDTO> request, ServletWebRequest path, @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") LocalDate data);
+    ResponseEntity<Response<?>> registrar(@RequestBody List<PresencaDTO> request, ServletWebRequest path, @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") LocalDate data);
 
     @GetMapping("/buscar-por-data")
-    ResponseEntity<Response> buscarPorData(ServletWebRequest path, @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") LocalDate data);
+    ResponseEntity<Response<?>> buscarPorData(ServletWebRequest path, @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") LocalDate data);
 
 }

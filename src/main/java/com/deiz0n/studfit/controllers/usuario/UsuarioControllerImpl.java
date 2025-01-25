@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller.usuario;
+package com.deiz0n.studfit.controllers.usuario;
 
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
 import com.deiz0n.studfit.domain.response.Response;
@@ -16,14 +16,14 @@ import java.util.UUID;
 @RequestMapping("api/v1.0/usuarios")
 public class UsuarioControllerImpl implements UsuarioController {
 
-    private UsuarioService service;
+    private final UsuarioService service;
 
     public UsuarioControllerImpl(UsuarioService service) {
         this.service = service;
     }
 
     @Override
-    public ResponseEntity<Response> buscarUsuarios(ServletWebRequest path) {
+    public ResponseEntity<Response<?>> buscarUsuarios(ServletWebRequest path) {
         var usuarios = service.buscarHorarios();
         return ResponseEntity.ok()
                 .body(Response.builder()
@@ -35,7 +35,7 @@ public class UsuarioControllerImpl implements UsuarioController {
     }
 
     @Override
-    public ResponseEntity<Response> registrar(UsuarioDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response<?>> registrar(UsuarioDTO request, ServletWebRequest path) {
         var usuario = service.registrar(request);
         var uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -52,10 +52,9 @@ public class UsuarioControllerImpl implements UsuarioController {
     }
 
     @Override
-    public ResponseEntity excluir(UUID id) {
+    public ResponseEntity<?> excluir(UUID id) {
         service.excluir(id);
         return ResponseEntity.noContent().build();
     }
-
 
 }

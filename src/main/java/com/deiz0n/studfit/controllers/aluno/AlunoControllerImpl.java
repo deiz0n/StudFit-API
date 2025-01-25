@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller.aluno;
+package com.deiz0n.studfit.controllers.aluno;
 
 import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
@@ -18,14 +18,14 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("api/v1.0/alunos")
 public class AlunoControllerImpl implements AlunoController {
 
-    private AlunoService service;
+    private final AlunoService service;
 
     public AlunoControllerImpl(AlunoService service) {
         this.service = service;
     }
 
     @Override
-    public ResponseEntity<Response> buscarAluno(UUID id, ServletWebRequest path) {
+    public ResponseEntity<Response<?>> buscarAluno(UUID id, ServletWebRequest path) {
         var aluno = service.buscarAlunoPorId(id);
         return ResponseEntity.ok()
                 .body(Response.builder()
@@ -37,7 +37,7 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<Response> buscarAlunosListaEspera(ServletWebRequest path) {
+    public ResponseEntity<Response<?>> buscarAlunosListaEspera(ServletWebRequest path) {
         var alunos = service.buscarAlunosListaEspera();
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
@@ -50,7 +50,7 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<Response> registrarAlunoListaEspera(AlunoListaEsperaDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response<?>> registrarAlunoListaEspera(AlunoListaEsperaDTO request, ServletWebRequest path) {
         var aluno = service.registrarAlunosListaEspera(request);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
@@ -63,13 +63,13 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity excluirAlunoListaEspera(UUID id, ServletWebRequest path) {
-        var aluno = service.excluirAlunoListaEspera(id);
+    public ResponseEntity<?> excluirAlunoListaEspera(UUID id, ServletWebRequest path) {
+        service.excluirAlunoListaEspera(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<Response> buscarAlunosEfetivados(ServletWebRequest path) {
+    public ResponseEntity<Response<?>> buscarAlunosEfetivados(ServletWebRequest path) {
         var alunos = service.buscarAlunosEfetivados();
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
@@ -82,7 +82,7 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<Response> registrarAlunoEfetivado(AlunoDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response<?>> registrarAlunoEfetivado(AlunoDTO request, ServletWebRequest path) {
         var aluno = service.registrarAlunoEfetivado(request);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
@@ -95,13 +95,13 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity excluirAlunoEfetivado(UUID id) {
+    public ResponseEntity<?> excluirAlunoEfetivado(UUID id) {
         service.excluirAlunoEfetivado(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<Response> atualizarAlunoEfetivado(UUID id, AlunoDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response<?>> atualizarAlunoEfetivado(UUID id, AlunoDTO request, ServletWebRequest path) {
         var aluno = service.atualizarEfetivado(id, request);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))

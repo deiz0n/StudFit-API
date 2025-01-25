@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller.auth;
+package com.deiz0n.studfit.controllers.auth;
 
 import com.deiz0n.studfit.domain.dtos.AuthDTO;
 import com.deiz0n.studfit.domain.dtos.RecoveryPasswordDTO;
@@ -16,14 +16,14 @@ import org.springframework.web.context.request.ServletWebRequest;
 @RequestMapping("api/v1.0/auth")
 public class AuthControllerImpl implements AuthController {
 
-    private AuthService service;
+    private final AuthService service;
 
     public AuthControllerImpl(AuthService service) {
         this.service = service;
     }
 
     @Override
-    public ResponseEntity<Response> entrar(AuthDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response<?>> entrar(AuthDTO request, ServletWebRequest path) {
         var token = service.login(request);
         return ResponseEntity.ok()
                 .body(Response.builder()
@@ -35,7 +35,7 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public ResponseEntity<Response> recuperarSenha(RecoveryPasswordDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response<?>> recuperarSenha(RecoveryPasswordDTO request, ServletWebRequest path) {
         service.recuperarSenha(request);
         return ResponseEntity.accepted()
                 .body(Response.builder()
@@ -47,7 +47,7 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public ResponseEntity<Response> atualizarSenha(String codigo, ResetPasswordDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response<?>> atualizarSenha(String codigo, ResetPasswordDTO request, ServletWebRequest path) {
         service.atualizaSenha(codigo, request);
         return ResponseEntity.ok()
                 .body(Response.builder()
@@ -59,7 +59,7 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public ResponseEntity<Response> validarToken(TokenDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response<?>> validarToken(TokenDTO request, ServletWebRequest path) {
         service.validarToken(request);
         return ResponseEntity.ok()
                 .body(Response.builder()

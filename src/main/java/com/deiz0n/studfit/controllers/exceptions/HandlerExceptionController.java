@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller.exceptions;
+package com.deiz0n.studfit.controllers.exceptions;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;

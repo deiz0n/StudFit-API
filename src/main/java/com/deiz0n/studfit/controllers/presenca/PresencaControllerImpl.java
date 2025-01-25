@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller.presenca;
+package com.deiz0n.studfit.controllers.presenca;
 
 import com.deiz0n.studfit.domain.dtos.PresencaDTO;
 import com.deiz0n.studfit.domain.response.Response;
@@ -17,14 +17,14 @@ import java.util.List;
 @RequestMapping("api/v1.0/presencas")
 public class PresencaControllerImpl implements PresencaController {
 
-    private PresencaService service;
+    private final PresencaService service;
 
     public PresencaControllerImpl(PresencaService service) {
         this.service = service;
     }
 
     @Override
-    public ResponseEntity<Response> buscarPresencas(ServletWebRequest path) {
+    public ResponseEntity<Response<?>> buscarPresencas(ServletWebRequest path) {
         var presencas = service.buscarPresencas();
         return ResponseEntity.ok()
                 .body(Response.builder()
@@ -36,7 +36,7 @@ public class PresencaControllerImpl implements PresencaController {
     }
 
     @Override
-    public ResponseEntity<Response> registrar(List<PresencaDTO> request, ServletWebRequest path, LocalDate data) {
+    public ResponseEntity<Response<?>> registrar(List<PresencaDTO> request, ServletWebRequest path, LocalDate data) {
         var presenca = service.registar(request, data);
         var uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -53,7 +53,7 @@ public class PresencaControllerImpl implements PresencaController {
     }
 
     @Override
-    public ResponseEntity<Response> buscarPorData(ServletWebRequest path, LocalDate data) {
+    public ResponseEntity<Response<?>> buscarPorData(ServletWebRequest path, LocalDate data) {
         var presencas = service.buscarPorData(data);
         return ResponseEntity.ok()
                 .body(Response.builder()

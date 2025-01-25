@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller.usuario;
+package com.deiz0n.studfit.controllers.usuario;
 
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
 import com.deiz0n.studfit.domain.response.Response;
@@ -15,14 +15,14 @@ import java.util.UUID;
 public interface UsuarioController {
 
     @GetMapping
-    ResponseEntity<Response> buscarUsuarios(ServletWebRequest path);
+    ResponseEntity<Response<?>> buscarUsuarios(ServletWebRequest path);
 
     @Transactional
     @PostMapping("/registrar")
-    ResponseEntity<Response> registrar(@RequestBody @Valid UsuarioDTO request, ServletWebRequest path);
+    ResponseEntity<Response<?>> registrar(@RequestBody @Valid UsuarioDTO request, ServletWebRequest path);
 
     @Transactional
     @DeleteMapping("/excluir/{id}")
-    ResponseEntity excluir(@PathVariable UUID id);
+    ResponseEntity<?> excluir(@PathVariable UUID id);
 
 }

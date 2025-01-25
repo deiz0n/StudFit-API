@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.controller.aluno;
+package com.deiz0n.studfit.controllers.aluno;
 
 import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
@@ -16,31 +16,31 @@ import java.util.UUID;
 public interface AlunoController {
 
     @GetMapping("/{id}")
-    ResponseEntity<Response> buscarAluno(@PathVariable UUID id, ServletWebRequest path);
+    ResponseEntity<Response<?>> buscarAluno(@PathVariable UUID id, ServletWebRequest path);
 
     @GetMapping("lista-espera")
-    ResponseEntity<Response> buscarAlunosListaEspera(ServletWebRequest path);
+    ResponseEntity<Response<?>> buscarAlunosListaEspera(ServletWebRequest path);
 
     @Transactional
     @PostMapping("/lista-espera/registrar")
-    ResponseEntity<Response> registrarAlunoListaEspera(@RequestBody @Valid AlunoListaEsperaDTO request, ServletWebRequest path);
+    ResponseEntity<Response<?>> registrarAlunoListaEspera(@RequestBody @Valid AlunoListaEsperaDTO request, ServletWebRequest path);
 
     @Transactional
     @DeleteMapping("/lista-espera/excluir/{id}")
     ResponseEntity excluirAlunoListaEspera(@PathVariable UUID id, ServletWebRequest path);
 
     @GetMapping("efetivados")
-    ResponseEntity<Response> buscarAlunosEfetivados(ServletWebRequest path);
+    ResponseEntity<Response<?>> buscarAlunosEfetivados(ServletWebRequest path);
 
     @Transactional
     @PatchMapping("efetivados/efetivar")
-    ResponseEntity<Response> registrarAlunoEfetivado(@RequestBody @Valid AlunoDTO request, ServletWebRequest path);
+    ResponseEntity<Response<?>> registrarAlunoEfetivado(@RequestBody @Valid AlunoDTO request, ServletWebRequest path);
 
     @Transactional
     @DeleteMapping("efetivados/excluir/{id}")
-    ResponseEntity excluirAlunoEfetivado(@PathVariable UUID id);
+    ResponseEntity<?> excluirAlunoEfetivado(@PathVariable UUID id);
 
     @Transactional
     @PatchMapping("efetivado/atualizar/{id}")
-    ResponseEntity<Response> atualizarAlunoEfetivado(@PathVariable UUID id, @RequestBody @Valid AlunoDTO request, ServletWebRequest path);
+    ResponseEntity<Response<?>> atualizarAlunoEfetivado(@PathVariable UUID id, @RequestBody @Valid AlunoDTO request, ServletWebRequest path);
 }
