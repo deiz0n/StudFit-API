@@ -1,5 +1,6 @@
 package com.deiz0n.studfit.services;
 
+import com.deiz0n.studfit.domain.dtos.ResetPasswordDTO;
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
 import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.domain.enums.Cargo;
@@ -28,10 +29,10 @@ import java.util.stream.Collectors;
 @Service
 public class UsuarioService {
 
-    private UsuarioRepository repository;
-    private ModelMapper mapper;
-    private BCryptPasswordEncoder passwordEncoder;
-    private ApplicationEventPublisher eventPublisher;
+    private final UsuarioRepository repository;
+    private final ModelMapper mapper;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
 
     public UsuarioService(UsuarioRepository repository, ModelMapper mapper, BCryptPasswordEncoder passwordEncoder, ApplicationEventPublisher eventPublisher) {
         this.repository = repository;
@@ -40,19 +41,19 @@ public class UsuarioService {
         this.eventPublisher = eventPublisher;
     }
 
-    public List<UsuarioDTO> getAll() {
+    public List<UsuarioDTO> buscarHorarios() {
         return repository.findAll()
                 .stream()
                 .map(usuario -> mapper.map(usuario, UsuarioDTO.class))
                 .collect(Collectors.toList());
     }
 
-    public UsuarioDTO create(UsuarioDTO usuarioDTO) {
-        isExisting(usuarioDTO.getEmail());
+    public UsuarioDTO registrar(UsuarioDTO usuarioDTO) {
+        eExistente(usuarioDTO.getEmail());
         var usuario = mapper.map(usuarioDTO, Usuario.class);
 
         usuario.setSenha(passwordEncoder.encode(usuario.getPassword()));
-        usuario.setCargo(validateCargo(usuarioDTO.getCargo()));
+        usuario.setCargo(validarCargo(usuarioDTO.getCargo()));
 
         repository.save(usuario);
 
@@ -65,12 +66,12 @@ public class UsuarioService {
 
     }
 
-    public void delete(UUID id) {
-        var usuario = findByID(id);
+    public void excluir(UUID id) {
+        var usuario = buscarPorId(id);
         repository.delete(usuario);
     }
 
-    private Usuario findByID(UUID id) {
+    private Usuario buscarPorId(UUID id) {
         return repository.findById(id)
                 .map(user -> mapper.map(user, Usuario.class))
                 .orElseThrow(
@@ -78,7 +79,7 @@ public class UsuarioService {
                 );
     }
 
-    private Cargo validateCargo(String cargo) {
+    private Cargo validarCargo(String cargo) {
         try {
             return Cargo.valueOf(cargo.toUpperCase());
         } catch (Exception e) {
@@ -86,19 +87,19 @@ public class UsuarioService {
         }
     }
 
-    private void isExisting(String email) {
+    private void eExistente(String email) {
         if (repository.findByEmail(email).isPresent())
             throw new EmailAlreadyRegisteredException("Email já cadastrado");
     }
 
     @EventListener
-    private void setCodigoRecuperacao(UsuarioRecoveryPassswordEvent recoveryPassswordEvent) {
-        var usuario = repository.findByEmail(recoveryPassswordEvent.getEmail())
+    private void geraCodigoRecuperacao(UsuarioRecoveryPassswordEvent recoveryPassswordEvent) {
+        Usuario usuario = repository.findByEmail(recoveryPassswordEvent.getEmail())
                 .orElseThrow(
                         () -> new UsuarioNotFoundException("Usuário não encontrado")
                 );
 
-        var codigo = AlgorithmGenerateNumber.generateCode();
+        String codigo = AlgorithmGenerateNumber.generateCode();
         var emailRecoveryPasswordEvent = new SentEmailRecoveryPasswordEvent(this, new String[]{usuario.getEmail()}, codigo);
         eventPublisher.publishEvent(emailRecoveryPasswordEvent);
 
@@ -107,9 +108,9 @@ public class UsuarioService {
     }
 
     @EventListener
-    private void resetPassword(UsuarioResetPasswordEvent resetPasswordEvent) {
-        var newSenha = resetPasswordEvent.getResetPassword();
-        var usuario = repository.findByCodigoRecuperacao(resetPasswordEvent.getCodigo())
+    private void atualizaSenha(UsuarioResetPasswordEvent resetPasswordEvent) {
+        ResetPasswordDTO newSenha = resetPasswordEvent.getResetPassword();
+        Usuario usuario = repository.findByCodigoRecuperacao(resetPasswordEvent.getCodigo())
                 .orElseThrow(
                         () -> new CodigoDeRecuperacaoNotFoundException("Código de recuperação não encontrado")
                 );
