@@ -20,6 +20,6 @@ public class AlunoInteressado {
 
     @OneToMany(mappedBy = "alunoInteressado", fetch = FetchType.LAZY)
     private List<Aluno> aluno;
-
+    @ManyToOne
     private AlunoHorarioPreferencia alunoHorarioPreferencia;
 }
