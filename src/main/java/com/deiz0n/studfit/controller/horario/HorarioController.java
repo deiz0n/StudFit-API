@@ -1,7 +1,6 @@
 package com.deiz0n.studfit.controller.horario;
 
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
-import com.deiz0n.studfit.domain.enums.Turno;
 import com.deiz0n.studfit.domain.response.Response;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +14,15 @@ import java.util.UUID;
 public interface HorarioController {
 
     @GetMapping
-    ResponseEntity<Response> getHorarios(ServletWebRequest path);
+    ResponseEntity<Response> buscarHorarios(ServletWebRequest path);
 
     @GetMapping("/buscar-por-turno")
-    ResponseEntity<Response> getHorariosByTurno(@RequestParam String turno, ServletWebRequest path);
+    ResponseEntity<Response> buscarPorTurno(@RequestParam String turno, ServletWebRequest path);
 
     @Transactional
     @PostMapping("/registrar")
-    ResponseEntity<Response> createHorario(@RequestBody HorarioDTO request, ServletWebRequest path);
+    ResponseEntity<Response> registrar(@RequestBody HorarioDTO request, ServletWebRequest path);
 
     @DeleteMapping("/excluir/{id}")
-    ResponseEntity deleteHorario(@PathVariable UUID id);
+    ResponseEntity excluir(@PathVariable UUID id);
 }

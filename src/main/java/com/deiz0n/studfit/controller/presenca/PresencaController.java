@@ -19,13 +19,13 @@ import java.util.List;
 public interface PresencaController {
 
     @GetMapping
-    ResponseEntity<Response> getPresencas(ServletWebRequest path);
+    ResponseEntity<Response> buscarPresencas(ServletWebRequest path);
 
     @Transactional
     @PostMapping("/registrar")
-    ResponseEntity<Response> createPresenca(@RequestBody List<PresencaDTO> request, ServletWebRequest path, @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") LocalDate data);
+    ResponseEntity<Response> registrar(@RequestBody List<PresencaDTO> request, ServletWebRequest path, @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") LocalDate data);
 
     @GetMapping("/buscar-por-data")
-    ResponseEntity<Response> getPresencasByData(ServletWebRequest path, @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") LocalDate data);
+    ResponseEntity<Response> buscarPorData(ServletWebRequest path, @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") LocalDate data);
 
 }

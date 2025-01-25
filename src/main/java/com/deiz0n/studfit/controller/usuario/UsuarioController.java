@@ -15,14 +15,14 @@ import java.util.UUID;
 public interface UsuarioController {
 
     @GetMapping
-    ResponseEntity<Response> getUsuarios(ServletWebRequest path);
+    ResponseEntity<Response> buscarUsuarios(ServletWebRequest path);
 
     @Transactional
     @PostMapping("/registrar")
-    ResponseEntity<Response> createUsuario(@RequestBody @Valid UsuarioDTO request, ServletWebRequest path);
+    ResponseEntity<Response> registrar(@RequestBody @Valid UsuarioDTO request, ServletWebRequest path);
 
     @Transactional
     @DeleteMapping("/excluir/{id}")
-    ResponseEntity deleteUsuario(@PathVariable UUID id);
+    ResponseEntity excluir(@PathVariable UUID id);
 
 }

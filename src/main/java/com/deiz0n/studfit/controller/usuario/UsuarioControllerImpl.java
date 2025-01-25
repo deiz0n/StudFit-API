@@ -23,8 +23,8 @@ public class UsuarioControllerImpl implements UsuarioController {
     }
 
     @Override
-    public ResponseEntity<Response> getUsuarios(ServletWebRequest path) {
-        var usuarios = service.getAll();
+    public ResponseEntity<Response> buscarUsuarios(ServletWebRequest path) {
+        var usuarios = service.buscarHorarios();
         return ResponseEntity.ok()
                 .body(Response.builder()
                         .code(HttpStatus.OK.value())
@@ -35,8 +35,8 @@ public class UsuarioControllerImpl implements UsuarioController {
     }
 
     @Override
-    public ResponseEntity<Response> createUsuario(UsuarioDTO request, ServletWebRequest path) {
-        var usuario = service.create(request);
+    public ResponseEntity<Response> registrar(UsuarioDTO request, ServletWebRequest path) {
+        var usuario = service.registrar(request);
         var uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("{id}")
@@ -52,8 +52,8 @@ public class UsuarioControllerImpl implements UsuarioController {
     }
 
     @Override
-    public ResponseEntity deleteUsuario(UUID id) {
-        service.delete(id);
+    public ResponseEntity excluir(UUID id) {
+        service.excluir(id);
         return ResponseEntity.noContent().build();
     }
 

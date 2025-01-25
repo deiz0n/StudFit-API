@@ -24,8 +24,8 @@ public class PresencaControllerImpl implements PresencaController {
     }
 
     @Override
-    public ResponseEntity<Response> getPresencas(ServletWebRequest path) {
-        var presencas = service.getAll();
+    public ResponseEntity<Response> buscarPresencas(ServletWebRequest path) {
+        var presencas = service.buscarPresencas();
         return ResponseEntity.ok()
                 .body(Response.builder()
                 .code(HttpStatus.OK.value())
@@ -36,8 +36,8 @@ public class PresencaControllerImpl implements PresencaController {
     }
 
     @Override
-    public ResponseEntity<Response> createPresenca(List<PresencaDTO> request, ServletWebRequest path, LocalDate data) {
-        var presenca = service.create(request, data);
+    public ResponseEntity<Response> registrar(List<PresencaDTO> request, ServletWebRequest path, LocalDate data) {
+        var presenca = service.registar(request, data);
         var uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("id")
@@ -53,8 +53,8 @@ public class PresencaControllerImpl implements PresencaController {
     }
 
     @Override
-    public ResponseEntity<Response> getPresencasByData(ServletWebRequest path, LocalDate data) {
-        var presencas = service.getAllByData(data);
+    public ResponseEntity<Response> buscarPorData(ServletWebRequest path, LocalDate data) {
+        var presencas = service.buscarPorData(data);
         return ResponseEntity.ok()
                 .body(Response.builder()
                         .code(HttpStatus.OK.value())
