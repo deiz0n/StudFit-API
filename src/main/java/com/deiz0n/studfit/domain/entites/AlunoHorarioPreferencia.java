@@ -19,6 +19,7 @@ public class AlunoHorarioPreferencia {
     private UUID id;
 
     @OneToMany(mappedBy = "alunoHorarioPreferencia", fetch = FetchType.LAZY)
-    private List<AlunoInteressado> alunoInteressado;
-    private HorarioInteresse horarioInteresse;
+    private List<AlunoInteressado> alunosInteressados;
+    @OneToMany(mappedBy = "alunoHorarioPreferencia", fetch = FetchType.LAZY)
+    private List<HorarioInteresse> horariosInteresse;
 }

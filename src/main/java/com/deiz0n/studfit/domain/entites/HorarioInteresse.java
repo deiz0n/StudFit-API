@@ -1,9 +1,6 @@
 package com.deiz0n.studfit.domain.entites;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,5 +16,9 @@ public class HorarioInteresse {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+
+    @ManyToOne
+    private AlunoHorarioPreferencia alunoHorarioPreferencia;
+    private Horario horario;
 
 }
