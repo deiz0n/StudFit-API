@@ -1,1 +1,0 @@
-ALTER TABLE horario ADD COLUMN vagas_disponiveis integer

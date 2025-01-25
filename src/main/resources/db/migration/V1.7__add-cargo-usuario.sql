@@ -1,1 +1,0 @@
-ALTER TABLE usuario ADd COLUMN cargo varchar(20) not null

@@ -1,1 +1,0 @@
-ALTER TABLE aluno RENAME COLUMN "cirurguas" TO "cirurgias"

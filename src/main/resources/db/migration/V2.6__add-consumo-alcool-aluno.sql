@@ -1,1 +1,0 @@
-ALTER TABLE aluno ADD COLUMN consumo_alcool boolean;

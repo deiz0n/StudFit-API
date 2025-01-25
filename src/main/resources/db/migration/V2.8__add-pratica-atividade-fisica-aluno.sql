@@ -1,1 +1,0 @@
-ALTER TABLE aluno ADD COLUMN pratica_exercicio_fisico boolean;

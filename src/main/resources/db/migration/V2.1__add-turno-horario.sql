@@ -1,1 +1,0 @@
-ALTER TABLE horario ADD COLUMN turno varchar(10)
