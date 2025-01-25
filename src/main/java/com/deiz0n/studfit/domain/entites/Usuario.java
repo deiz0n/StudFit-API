@@ -23,12 +23,14 @@ public class Usuario implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+    @Column(length = 150)
     private String nome;
-    @Column(unique = true)
+    @Column(unique = true, length = 50)
     private String email;
     private String senha;
     @Column(name = "codigo_recuperacao")
     private String codigoRecuperacao;
+    @Enumerated(EnumType.STRING)
     private Cargo cargo;
 
     @OneToOne
