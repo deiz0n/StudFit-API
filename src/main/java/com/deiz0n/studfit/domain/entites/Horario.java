@@ -27,4 +27,7 @@ public class Horario {
     @Column(name = "vagas_disponiveis")
     private Integer vagasDisponiveis;
 
+    @ManyToOne
+    private HorarioInteresse horarioInteresse;
+
 }
