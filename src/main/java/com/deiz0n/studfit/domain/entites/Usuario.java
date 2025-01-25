@@ -17,7 +17,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Entity(name = "tb_usuario")
 public class Usuario implements UserDetails {
 
     @Id
@@ -28,7 +28,7 @@ public class Usuario implements UserDetails {
     @Column(unique = true, length = 50)
     private String email;
     private String senha;
-    @Column(name = "codigo_recuperacao")
+    @Column(name = "codigo_recuperacao", length = 6)
     private String codigoRecuperacao;
     @Enumerated(EnumType.STRING)
     private Cargo cargo;
