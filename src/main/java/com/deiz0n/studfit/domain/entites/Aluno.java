@@ -12,19 +12,20 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Entity(name = "tb_aluno")
 public class Aluno {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private Integer colocacao;
+    @Column(length = 150)
     private String nome;
     private Double peso;
     private Integer altura;
-    @Column(unique = true)
+    @Column(unique = true, length = 50)
     private String email;
-    @Column(unique = true)
+    @Column(unique = true, length = 11)
     private String telefone;
     private String cirurgias;
     private String patologias;
@@ -32,6 +33,7 @@ public class Aluno {
     private Integer mesesExperienciaMusculacao;
     @Column(name = "diagnostico_lesao_joelho")
     private String diagnosticoLesaoJoelho;
+    @Enumerated(EnumType.STRING)
     private Status status;
     @Column(name = "ausencias_consecutivas")
     private Integer ausenciasConsecutivas;
@@ -43,10 +45,10 @@ public class Aluno {
     private Boolean consumoCigarro;
     @Column(name = "pratica_exercicio_fisico")
     private Boolean praticaExercicioFisico;
+    @Lob
+    private byte[] atestado;
 
     @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL)
     private List<Presenca> presencas;
-    @ManyToOne
-    private Horario horario;
 
 }
