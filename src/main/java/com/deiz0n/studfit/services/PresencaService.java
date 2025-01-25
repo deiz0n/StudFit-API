@@ -55,13 +55,10 @@ public class PresencaService {
         presenca.forEach(entity -> {
             entity.setData(data);
             validarPresenca(entity);
+            eventPublisher.publishEvent(new AlunoRegisterAusenciasEvent(this, mapper.map(entity, PresencaDTO.class)));
         });
 
         presencaRepository.saveAll(presenca);
-
-        presencaDTO.forEach(dto -> {
-            eventPublisher.publishEvent(new AlunoRegisterAusenciasEvent(this, dto));
-        });
 
         return presenca.stream()
                 .map(entity -> mapper.map(entity, PresencaDTO.class))
