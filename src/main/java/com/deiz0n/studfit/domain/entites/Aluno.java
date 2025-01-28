@@ -52,5 +52,7 @@ public class Aluno {
     private List<Presenca> presencas;
     @ManyToOne
     private AlunoInteressado alunoInteressado;
+    @ManyToOne
+    private Horario horario;
 
 }

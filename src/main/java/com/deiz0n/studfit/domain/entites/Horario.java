@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -29,5 +30,7 @@ public class Horario {
 
     @ManyToOne
     private HorarioInteresse horarioInteresse;
+    @OneToMany(mappedBy = "horario", fetch = FetchType.LAZY)
+    private List<Aluno> alunos;
 
 }
