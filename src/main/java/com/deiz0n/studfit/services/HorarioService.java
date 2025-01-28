@@ -99,13 +99,13 @@ public class HorarioService {
     }
 
     // Define os turnos automaticamente com base nos horários informados
-    private String definirTurno(HorarioDTO horarioDTO) {
+    private Turno definirTurno(HorarioDTO horarioDTO) {
         if (horarioDTO.getHorarioInicial().getHour() >= 6 && horarioDTO.getHorarioFinal().getHour() <= 12)
-            return Turno.MANHA.toString();
+            return Turno.MANHA;
         if (horarioDTO.getHorarioInicial().getHour() >= 12 && horarioDTO.getHorarioFinal().getHour() <= 18)
-            return Turno.TARDE.toString();
+            return Turno.TARDE;
         else
-            return Turno.NOITE.toString();
+            return Turno.NOITE;
     }
 
     private String validarTurno(String turno) {
