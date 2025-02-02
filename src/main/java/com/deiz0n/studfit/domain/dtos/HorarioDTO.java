@@ -26,7 +26,7 @@ public class HorarioDTO implements Comparable<HorarioDTO> {
     private LocalTime horarioInicial;
     @JsonFormat(pattern = "HH:mm")
     @JsonProperty("horario_final")
-    @NotBlank(message = "O campo horario_inicial é obrigatório")
+    @NotBlank(message = "O campo horario_final é obrigatório")
     private LocalTime horarioFinal;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Turno turno;
