@@ -33,8 +33,8 @@ public class Usuario implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Cargo cargo;
 
-    @OneToOne
-    private Presenca presenca;
+    @OneToMany(mappedBy = "usuario")
+    private List<Presenca> presenca;
 
     @JsonIgnore
     @Override

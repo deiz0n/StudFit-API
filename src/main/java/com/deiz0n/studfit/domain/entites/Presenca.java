@@ -22,6 +22,6 @@ public class Presenca {
 
     @ManyToOne
     private Aluno aluno;
-    @OneToOne
+    @ManyToOne
     private Usuario usuario;
 }
