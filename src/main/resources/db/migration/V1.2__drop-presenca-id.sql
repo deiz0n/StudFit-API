@@ -1,0 +1,1 @@
+alter table tb_usuario drop column presenca_id;

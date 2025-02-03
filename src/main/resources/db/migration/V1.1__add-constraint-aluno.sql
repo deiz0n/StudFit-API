@@ -1,3 +1,3 @@
-alter table tb_horario add column aluno_id uuid;
+alter table tb_aluno add column horario_id uuid;
 
-alter table tb_horario add constraint fk_aluno_horario foreign key (aluno_id) references tb_aluno(id);
+alter table tb_aluno add constraint fk_horario_aluno foreign key (horario_id) references tb_horario(id);
