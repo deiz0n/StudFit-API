@@ -15,7 +15,15 @@ public interface PresencaRepository extends JpaRepository<Presenca, UUID> {
     Optional<Presenca> getFirstByData(LocalDate data);
     @Query("SELECT p FROM tb_presenca p WHERE p.aluno.id = :id ORDER BY p.data DESC")
     List<Presenca> getLastTwo(UUID id);
-    List<Presenca> getByData(LocalDate data);
+
+    @Query("SELECT NEW " +
+            "com.deiz0n.studfit.domain.dtos.PresencaDTO(p.id, p.data, p.presente, " +
+            "NEW com.deiz0n.studfit.domain.dtos.AlunoEfetivadoDTO(a.id, a.nome, null)) " +
+            "FROM tb_presenca p JOIN tb_aluno a ON p.aluno.id = a.id " +
+            "AND p.usuario IS NOT NULL " +
+            "AND p.data = :data"
+    )
+    List<PresencaDTO> buscarPresencaPorData(LocalDate data);
 
     @Query("SELECT NEW " +
             "com.deiz0n.studfit.domain.dtos.PresencaDTO(p.id, p.data, p.presente, " +
