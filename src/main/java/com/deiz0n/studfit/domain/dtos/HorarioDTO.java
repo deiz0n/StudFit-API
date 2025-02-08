@@ -19,21 +19,31 @@ import java.util.UUID;
 @Builder
 public class HorarioDTO implements Comparable<HorarioDTO> {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private UUID id;
+
     @JsonFormat(pattern = "HH:mm")
     @JsonProperty("horario_inicial")
     @NotBlank(message = "O campo horario_inicial é obrigatório")
     private LocalTime horarioInicial;
+
     @JsonFormat(pattern = "HH:mm")
     @JsonProperty("horario_final")
     @NotBlank(message = "O campo horario_final é obrigatório")
     private LocalTime horarioFinal;
+
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Turno turno;
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(value = "vagas_disponiveis", access = JsonProperty.Access.READ_ONLY)
     private Integer vagasDisponiveis;
-    private HorarioDTO horarioDTO;
+
+    public HorarioDTO(LocalTime horarioInicial, LocalTime horarioFinal, Turno turno) {
+        this.horarioInicial = horarioInicial;
+        this.horarioFinal = horarioFinal;
+        this.turno = turno;
+    }
 
     @Override
     public int compareTo(HorarioDTO horario) {
