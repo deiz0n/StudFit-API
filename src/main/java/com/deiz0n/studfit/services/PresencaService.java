@@ -21,7 +21,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class PresencaService {
@@ -63,10 +62,7 @@ public class PresencaService {
     }
 
     public List<PresencaDTO> buscarPorData(LocalDate data) {
-        return presencaRepository.getByData(data)
-                .stream()
-                .map(presenca -> mapper.map(presenca, PresencaDTO.class))
-                .toList();
+        return presencaRepository.buscarPresencaPorData(data);
     }
 
     private void validarPresenca(Presenca presenca) {
