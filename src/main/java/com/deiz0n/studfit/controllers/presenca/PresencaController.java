@@ -25,7 +25,7 @@ public interface PresencaController {
     @PostMapping("/registrar")
     ResponseEntity<Response<?>> registrar(@RequestBody List<PresencaDTO> request, ServletWebRequest path, @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") LocalDate data);
 
-    @GetMapping("/buscar-por-data")
+    @GetMapping("/buscar-por-data/")
     ResponseEntity<Response<?>> buscarPorData(ServletWebRequest path, @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") LocalDate data);
 
 }
