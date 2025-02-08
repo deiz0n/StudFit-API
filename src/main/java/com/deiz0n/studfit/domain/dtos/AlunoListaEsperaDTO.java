@@ -35,4 +35,10 @@ public class AlunoListaEsperaDTO {
     @JsonIgnore
     private Boolean listaEspera = true;
 
+    public AlunoListaEsperaDTO(UUID id, String nome, Integer colocacao) {
+        this.id = id;
+        this.nome = nome;
+        this.colocacao = colocacao;
+    }
+
 }
