@@ -26,7 +26,9 @@ public class AlunoListaEsperaDTO {
     private String nome;
     @NotBlank(message = "O campo \"email\" é obrigatório")
     @Email(message = "Email inválido. Tente novamente")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String email;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String telefone;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer colocacao;
