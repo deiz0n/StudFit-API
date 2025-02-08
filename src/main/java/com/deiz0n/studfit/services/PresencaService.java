@@ -41,10 +41,7 @@ public class PresencaService {
     }
 
     public List<PresencaDTO> buscarPresencas() {
-        return presencaRepository.findAll()
-                .stream()
-                .map(presenca -> mapper.map(presenca, PresencaDTO.class))
-                .collect(Collectors.toList());
+        return presencaRepository.buscarPresencas();
     }
 
     public List<PresencaDTO> registar(List<PresencaDTO> presencaDTO, LocalDate data) {
