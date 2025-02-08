@@ -21,7 +21,14 @@ public class PresencaDTO {
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate data;
     private Boolean presente;
-    private AlunoDTO aluno;
+    private AlunoEfetivadoDTO aluno;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private UsuarioDTO usuario;
+
+    public PresencaDTO(UUID id, LocalDate data, Boolean presente, AlunoEfetivadoDTO aluno) {
+        this.id = id;
+        this.data = data;
+        this.presente = presente;
+        this.aluno = aluno;
+    }
 }
