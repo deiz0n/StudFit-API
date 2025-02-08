@@ -23,12 +23,13 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class AlunoService {
+public class AlunoService<T> {
 
     private final AlunoRepository alunoRepository;
     private final PresencaRepository presencaRepository;
@@ -75,12 +76,8 @@ public class AlunoService {
     }
 
     // Retorna todos os alunos já cadastrados na academia
-    public List<AlunoDTO> buscarAlunosEfetivados() {
-        return alunoRepository.findAll()
-                .stream()
-                .map(aluno -> mapper.map(aluno, AlunoDTO.class))
-                .filter(aluno -> !aluno.getListaEspera())
-                .collect(Collectors.toList());
+    public List<AlunoEfetivadoDTO> buscarAlunosEfetivados() {
+        return alunoRepository.buscarAlunosEfetivados();
     }
 
     // Realiza o cadastro completo do aluno na lista de espera
