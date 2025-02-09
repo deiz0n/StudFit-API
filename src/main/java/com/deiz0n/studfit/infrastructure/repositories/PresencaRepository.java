@@ -2,6 +2,7 @@ package com.deiz0n.studfit.infrastructure.repositories;
 
 import com.deiz0n.studfit.domain.dtos.PresencaDTO;
 import com.deiz0n.studfit.domain.entites.Presenca;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,7 +24,7 @@ public interface PresencaRepository extends JpaRepository<Presenca, UUID> {
             "AND p.usuario IS NOT NULL " +
             "AND p.data = :data"
     )
-    List<PresencaDTO> buscarPresencaPorData(LocalDate data);
+    List<PresencaDTO> buscarPresencaPorData(LocalDate data, Pageable pageable);
 
     @Query("SELECT NEW " +
             "com.deiz0n.studfit.domain.dtos.PresencaDTO(p.id, p.data, p.presente, " +
@@ -31,6 +32,6 @@ public interface PresencaRepository extends JpaRepository<Presenca, UUID> {
             "FROM tb_presenca p JOIN tb_aluno a ON p.aluno.id = a.id " +
             "AND p.usuario IS NOT NULL"
     )
-    List<PresencaDTO> buscarPresencas();
+    List<PresencaDTO> buscarPresencas(Pageable pageable);
 
 }
