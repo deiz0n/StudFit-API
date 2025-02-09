@@ -19,7 +19,7 @@ public interface AlunoController {
     ResponseEntity<Response<?>> buscarAluno(@PathVariable UUID id, ServletWebRequest path);
 
     @GetMapping("lista-espera")
-    ResponseEntity<Response<?>> buscarAlunosListaEspera(ServletWebRequest path);
+    ResponseEntity<Response<?>> buscarAlunosListaEspera(ServletWebRequest path, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "10") int quantidade);
 
     @Transactional
     @PostMapping("/lista-espera/registrar")
@@ -30,7 +30,7 @@ public interface AlunoController {
     ResponseEntity excluirAlunoListaEspera(@PathVariable UUID id, ServletWebRequest path);
 
     @GetMapping("efetivados")
-    ResponseEntity<Response<?>> buscarAlunosEfetivados(ServletWebRequest path);
+    ResponseEntity<Response<?>> buscarAlunosEfetivados(ServletWebRequest path, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "10") int quantidade);
 
     @Transactional
     @PatchMapping("efetivados/efetivar")

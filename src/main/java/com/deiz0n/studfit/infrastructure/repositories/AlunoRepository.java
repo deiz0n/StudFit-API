@@ -3,6 +3,7 @@ package com.deiz0n.studfit.infrastructure.repositories;
 import com.deiz0n.studfit.domain.dtos.AlunoEfetivadoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.domain.entites.Aluno;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -22,10 +23,10 @@ public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
     Optional<Aluno> buscarPorTelefone(String telefone);
 
     @Query("SELECT NEW com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO(a.id, a.nome, a.colocacao) FROM tb_aluno a WHERE a.listaEspera = true")
-    List<AlunoListaEsperaDTO> buscarAlunosListaEspera();
+    List<AlunoListaEsperaDTO> buscarAlunosListaEspera(Pageable pageable);
 
     @Query("SELECT NEW " +
             "com.deiz0n.studfit.domain.dtos.AlunoEfetivadoDTO(a.id, a.nome, NEW com.deiz0n.studfit.domain.dtos.HorarioDTO(h.horarioInicial, h.horarioFinal, h.turno))" +
             " FROM tb_aluno a JOIN FETCH tb_horario h ON a.horario.id = h.id")
-    List<AlunoEfetivadoDTO> buscarAlunosEfetivados();
+    List<AlunoEfetivadoDTO> buscarAlunosEfetivados(Pageable pageable);
 }

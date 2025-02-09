@@ -19,14 +19,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class AlunoService<T> {
@@ -48,8 +48,9 @@ public class AlunoService<T> {
     }
 
     // Retorna todos os alunos que estão na lista de espera
-    public List<AlunoListaEsperaDTO> buscarAlunosListaEspera() {
-        return alunoRepository.buscarAlunosListaEspera();
+    public List<AlunoListaEsperaDTO> buscarAlunosListaEspera(int numeroPagina, int quantidade) {
+        var pageable = PageRequest.of(numeroPagina, quantidade);
+        return alunoRepository.buscarAlunosListaEspera(pageable);
     }
 
     // Registra um aluno na lista de espera
@@ -72,8 +73,9 @@ public class AlunoService<T> {
     }
 
     // Retorna todos os alunos já cadastrados na academia
-    public List<AlunoEfetivadoDTO> buscarAlunosEfetivados() {
-        return alunoRepository.buscarAlunosEfetivados();
+    public List<AlunoEfetivadoDTO> buscarAlunosEfetivados(int numeroPagina, int quantidade) {
+        var pageable = PageRequest.of(numeroPagina, quantidade);
+        return alunoRepository.buscarAlunosEfetivados(pageable);
     }
 
     // Realiza o cadastro completo do aluno na lista de espera

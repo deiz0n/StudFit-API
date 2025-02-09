@@ -8,6 +8,7 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
 
@@ -37,8 +38,8 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<Response<?>> buscarAlunosListaEspera(ServletWebRequest path) {
-        var alunos = service.buscarAlunosListaEspera();
+    public ResponseEntity<Response<?>> buscarAlunosListaEspera(ServletWebRequest path, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "10") int quantidade) {
+        var alunos = service.buscarAlunosListaEspera(numeroPagina, quantidade);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
                 .body(Response.builder()
@@ -69,8 +70,8 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<Response<?>> buscarAlunosEfetivados(ServletWebRequest path) {
-        var alunos = service.buscarAlunosEfetivados();
+    public ResponseEntity<Response<?>> buscarAlunosEfetivados(ServletWebRequest path, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "10") int quantidade) {
+        var alunos = service.buscarAlunosEfetivados(numeroPagina, quantidade);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
                 .body(Response.builder()
