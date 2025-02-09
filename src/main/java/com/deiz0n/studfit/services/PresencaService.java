@@ -77,12 +77,11 @@ public class PresencaService {
         if (aluno.getListaEspera()) // Verifica se o aluno está efetivado
             throw new AlunoNotEfetivadoException(String.format("Aluno com ID: %s está na lista de espera", presenca.getAluno().getId().toString()));
 
-        var usuario = usuarioRepository.findById(presenca.getUsuario().getId()).orElseThrow(
+        usuarioRepository.findById(presenca.getUsuario().getId()).orElseThrow(
                 () -> new UsuarioNotFoundException(String.format("Usuário com ID: %s não foi encontrado", presenca.getUsuario().getId().toString()))
         );
 
-        var pageable = Pageable.ofSize(1);
-        Optional<Presenca> presencaPorData = presencaRepository.buscarPorData(presenca.getData(), pageable); // Verifica se a presença é existente
+        Optional<Presenca> presencaPorData = presencaRepository.buscarPorData(presenca.getData()); // Verifica se a presença é existente
         if (presencaPorData.isPresent())
             throw new PresencaAlreadyRegistered("Presenca já realizada");
         if (presenca.getData().getDayOfWeek() == DayOfWeek.SATURDAY || presenca.getData().getDayOfWeek() == DayOfWeek.SUNDAY) // Verifica se a presença foi realizada em final de semana
