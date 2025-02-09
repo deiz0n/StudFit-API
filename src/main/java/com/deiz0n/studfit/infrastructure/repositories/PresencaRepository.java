@@ -13,9 +13,11 @@ import java.util.UUID;
 
 public interface PresencaRepository extends JpaRepository<Presenca, UUID> {
 
-    Optional<Presenca> getFirstByData(LocalDate data);
+    @Query("FROM tb_presenca p WHERE p.data = :data")
+    Optional<Presenca> buscarPorData(LocalDate data, Pageable pageable);
+
     @Query("SELECT p FROM tb_presenca p WHERE p.aluno.id = :id ORDER BY p.data DESC")
-    List<Presenca> getLastTwo(UUID id);
+    List<Presenca> buscarUltimasPresencas(UUID id);
 
     @Query("SELECT NEW " +
             "com.deiz0n.studfit.domain.dtos.PresencaDTO(p.id, p.data, p.presente, " +
