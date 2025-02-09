@@ -38,7 +38,7 @@ public class HorarioService {
     }
 
     public List<HorarioDTO> buscarPorTurno(String turno) {
-        return repository.getByTurno(validarTurno(turno))
+        return repository.buscarHorariosPorTurno(validarTurno(turno))
                 .stream()
                 .map(horario -> mapper.map(horario, HorarioDTO.class))
                 .collect(Collectors.toList());
@@ -86,7 +86,7 @@ public class HorarioService {
 
     private void validarHorario(HorarioDTO horario) {
         try {
-            if (repository.getHorario(horario.getHorarioInicial(), horario.getHorarioFinal()).isPresent())
+            if (repository.buscarHorario(horario.getHorarioInicial(), horario.getHorarioFinal()).isPresent())
                 throw new HorarioAlreadyRegistered("Horário já cadastrado");
             if ( horario.getHorarioFinal().getHour() - horario.getHorarioInicial().getHour() < 1)
                 throw new HorarioNotValidException("A diferença mínima entre o horário final e inicial é de 1 hora");
@@ -108,9 +108,9 @@ public class HorarioService {
             return Turno.NOITE;
     }
 
-    private String validarTurno(String turno) {
+    private Turno validarTurno(String turno) {
         try {
-            return Turno.valueOf(turno.toUpperCase()).toString();
+            return Turno.valueOf(turno.toUpperCase());
         } catch (Exception e) {
             throw new ResourceNotExistingException(String.format("Os turnos existentes são: %s", Arrays.toString(Turno.values())));
         }
