@@ -15,6 +15,8 @@ import com.deiz0n.studfit.infrastructure.repositories.PresencaRepository;
 import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -39,8 +41,9 @@ public class PresencaService {
         this.eventPublisher = eventPublisher;
     }
 
-    public List<PresencaDTO> buscarPresencas() {
-        return presencaRepository.buscarPresencas();
+    public List<PresencaDTO> buscarPresencas(int numeroPagina, int quantidade) {
+        var pageable = PageRequest.of(numeroPagina, quantidade);
+        return presencaRepository.buscarPresencas(pageable);
     }
 
     public List<PresencaDTO> registar(List<PresencaDTO> presencaDTO, LocalDate data) {
@@ -61,8 +64,9 @@ public class PresencaService {
                 .toList();
     }
 
-    public List<PresencaDTO> buscarPorData(LocalDate data) {
-        return presencaRepository.buscarPresencaPorData(data);
+    public List<PresencaDTO> buscarPorData(LocalDate data, int numeroPagina, int quantidade) {
+        var pageable = PageRequest.of(numeroPagina, quantidade);
+        return presencaRepository.buscarPresencaPorData(data, pageable);
     }
 
     private void validarPresenca(Presenca presenca) {
