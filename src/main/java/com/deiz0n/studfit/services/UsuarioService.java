@@ -88,13 +88,13 @@ public class UsuarioService {
     }
 
     private void eExistente(String email) {
-        if (repository.findByEmail(email).isPresent())
+        if (repository.buscarPorEmail(email).isPresent())
             throw new EmailAlreadyRegisteredException("Email já cadastrado");
     }
 
     @EventListener
     private void geraCodigoRecuperacao(UsuarioRecoveryPassswordEvent recoveryPassswordEvent) {
-        Usuario usuario = repository.findByEmail(recoveryPassswordEvent.getEmail())
+        Usuario usuario = repository.buscarPorEmail(recoveryPassswordEvent.getEmail())
                 .orElseThrow(
                         () -> new UsuarioNotFoundException("Usuário não encontrado")
                 );
@@ -110,7 +110,7 @@ public class UsuarioService {
     @EventListener
     private void atualizaSenha(UsuarioResetPasswordEvent resetPasswordEvent) {
         ResetPasswordDTO newSenha = resetPasswordEvent.getResetPassword();
-        Usuario usuario = repository.findByCodigoRecuperacao(resetPasswordEvent.getCodigo())
+        Usuario usuario = repository.buscarPorCodigoRecuperacao(resetPasswordEvent.getCodigo())
                 .orElseThrow(
                         () -> new CodigoDeRecuperacaoNotFoundException("Código de recuperação não encontrado")
                 );
