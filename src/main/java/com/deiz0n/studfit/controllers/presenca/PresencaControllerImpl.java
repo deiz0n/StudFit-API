@@ -6,6 +6,7 @@ import com.deiz0n.studfit.services.PresencaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -24,8 +25,8 @@ public class PresencaControllerImpl implements PresencaController {
     }
 
     @Override
-    public ResponseEntity<Response<?>> buscarPresencas(ServletWebRequest path) {
-        var presencas = service.buscarPresencas();
+    public ResponseEntity<Response<?>> buscarPresencas(ServletWebRequest path, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "10") int quantidade) {
+        var presencas = service.buscarPresencas(numeroPagina, quantidade);
         return ResponseEntity.ok()
                 .body(Response.builder()
                 .code(HttpStatus.OK.value())
@@ -53,8 +54,8 @@ public class PresencaControllerImpl implements PresencaController {
     }
 
     @Override
-    public ResponseEntity<Response<?>> buscarPorData(ServletWebRequest path, LocalDate data) {
-        var presencas = service.buscarPorData(data);
+    public ResponseEntity<Response<?>> buscarPorData(ServletWebRequest path, LocalDate data, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "10") int quantidade) {
+        var presencas = service.buscarPorData(data, numeroPagina, quantidade);
         return ResponseEntity.ok()
                 .body(Response.builder()
                         .code(HttpStatus.OK.value())
