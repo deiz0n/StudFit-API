@@ -71,17 +71,18 @@ public class PresencaService {
 
     private void validarPresenca(Presenca presenca) {
         // Verifica se o aluno e o usuário estão cadastrados
-        Optional<Aluno> aluno = alunoRepository.findById(presenca.getAluno().getId());
-        if (aluno.isEmpty())
-            throw new AlunoNotFoundException(String.format("Aluno com ID: %s não foi encontrado", presenca.getAluno().getId().toString()));
-
-        Optional<Usuario> usuario = usuarioRepository.findById(presenca.getUsuario().getId());
-        if (usuario.isEmpty())
-            throw new UsuarioNotFoundException(String.format("Usuário com ID: %s não foi encontrado", presenca.getUsuario().getId().toString()));
-        if (aluno.get().getListaEspera()) // Verifica se o aluno estar efetivado
+        var aluno = alunoRepository.findById(presenca.getAluno().getId()).orElseThrow(
+                () -> new AlunoNotFoundException(String.format("Aluno com ID: %s não foi encontrado", presenca.getAluno().getId().toString()))
+        );
+        if (aluno.getListaEspera()) // Verifica se o aluno está efetivado
             throw new AlunoNotEfetivadoException(String.format("Aluno com ID: %s está na lista de espera", presenca.getAluno().getId().toString()));
 
-        Optional<Presenca> presencaPorData = presencaRepository.getFirstByData(presenca.getData()); // Verifica se a presença é existente
+        var usuario = usuarioRepository.findById(presenca.getUsuario().getId()).orElseThrow(
+                () -> new UsuarioNotFoundException(String.format("Usuário com ID: %s não foi encontrado", presenca.getUsuario().getId().toString()))
+        );
+
+        var pageable = Pageable.ofSize(1);
+        Optional<Presenca> presencaPorData = presencaRepository.buscarPorData(presenca.getData(), pageable); // Verifica se a presença é existente
         if (presencaPorData.isPresent())
             throw new PresencaAlreadyRegistered("Presenca já realizada");
         if (presenca.getData().getDayOfWeek() == DayOfWeek.SATURDAY || presenca.getData().getDayOfWeek() == DayOfWeek.SUNDAY) // Verifica se a presença foi realizada em final de semana
