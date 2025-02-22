@@ -3,10 +3,9 @@ package com.deiz0n.studfit.infrastructure.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.deiz0n.studfit.domain.events.AuthValidateTokenEvent;
-import com.deiz0n.studfit.domain.events.TokenGeneratedEvent;
-import com.deiz0n.studfit.domain.events.TokenGenerationEvent;
+import com.deiz0n.studfit.domain.events.ValidarTokenAuthEvent;
+import com.deiz0n.studfit.domain.events.GerarTokenAuthEvent;
+import com.deiz0n.studfit.domain.events.SolicitarGeracaoTokenAuthEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -29,17 +28,17 @@ public class TokenService {
     }
 
     @EventListener
-    public void generateToken(TokenGenerationEvent tokenGeneration) {
+    public void generateToken(SolicitarGeracaoTokenAuthEvent tokenGeneration) {
         try {
             var algorithm = Algorithm.HMAC256(secret);
             var token = JWT.create()
                     .withIssuer(ISSUER)
-                    .withSubject(tokenGeneration.getUsuario().getEmail())
+                    .withSubject(tokenGeneration.usuario().getEmail())
                     .withExpiresAt(expirationInstant())
                     .sign(algorithm);
-            var tokenGenerated = new TokenGeneratedEvent(this, token);
+            var tokenGerado = new GerarTokenAuthEvent(token);
 
-            eventPublisher.publishEvent(tokenGenerated);
+            eventPublisher.publishEvent(tokenGerado);
 
         } catch (JWTCreationException e) {
             throw new RuntimeException("Erro ao criar Token", e);
@@ -55,8 +54,8 @@ public class TokenService {
     }
 
     @EventListener
-    private void validateTokenRequest(AuthValidateTokenEvent tokenEvent) {
-        validateToken(tokenEvent.getToken());
+    private void validarToken(ValidarTokenAuthEvent tokenEvent) {
+        validateToken(tokenEvent.token());
     }
 
     public Instant expirationInstant() {

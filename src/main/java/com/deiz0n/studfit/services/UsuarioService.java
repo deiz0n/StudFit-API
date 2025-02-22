@@ -4,10 +4,10 @@ import com.deiz0n.studfit.domain.dtos.ResetPasswordDTO;
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
 import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.domain.enums.Cargo;
-import com.deiz0n.studfit.domain.events.SentEmailRecoveryPasswordEvent;
-import com.deiz0n.studfit.domain.events.SentEmailUpdatedPasswordEvent;
-import com.deiz0n.studfit.domain.events.UsuarioRecoveryPassswordEvent;
-import com.deiz0n.studfit.domain.events.UsuarioResetPasswordEvent;
+import com.deiz0n.studfit.domain.events.EnviarEmailRecuperacaoSenhaEvent;
+import com.deiz0n.studfit.domain.events.EnviarEmailAlteracaoSenhaEvent;
+import com.deiz0n.studfit.domain.events.SolicitarRecuperacaoSenhaEvent;
+import com.deiz0n.studfit.domain.events.AtualizarSenhaUsuarioEvent;
 import com.deiz0n.studfit.domain.exceptions.usuario.CodigoDeRecuperacaoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.usuario.EmailAlreadyRegisteredException;
 import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotExistingException;
@@ -93,24 +93,24 @@ public class UsuarioService {
     }
 
     @EventListener
-    private void geraCodigoRecuperacao(UsuarioRecoveryPassswordEvent recoveryPassswordEvent) {
-        Usuario usuario = repository.buscarPorEmail(recoveryPassswordEvent.getEmail())
+    private void geraCodigoRecuperacao(SolicitarRecuperacaoSenhaEvent recoveryPassswordEvent) {
+        Usuario usuario = repository.buscarPorEmail(recoveryPassswordEvent.email())
                 .orElseThrow(
                         () -> new UsuarioNotFoundException("Usuário não encontrado")
                 );
 
         String codigo = AlgorithmGenerateNumber.generateCode();
-        var emailRecoveryPasswordEvent = new SentEmailRecoveryPasswordEvent(this, new String[]{usuario.getEmail()}, codigo);
-        eventPublisher.publishEvent(emailRecoveryPasswordEvent);
+        var enviarRecuperacaoSenha = new EnviarEmailRecuperacaoSenhaEvent(new String[]{usuario.getEmail()}, codigo);
+        eventPublisher.publishEvent(enviarRecuperacaoSenha);
 
         usuario.setCodigoRecuperacao(codigo);
         repository.save(usuario);
     }
 
     @EventListener
-    private void atualizaSenha(UsuarioResetPasswordEvent resetPasswordEvent) {
-        ResetPasswordDTO newSenha = resetPasswordEvent.getResetPassword();
-        Usuario usuario = repository.buscarPorCodigoRecuperacao(resetPasswordEvent.getCodigo())
+    private void atualizaSenha(AtualizarSenhaUsuarioEvent resetPasswordEvent) {
+        ResetPasswordDTO newSenha = resetPasswordEvent.resetPassword();
+        Usuario usuario = repository.buscarPorCodigoRecuperacao(resetPasswordEvent.codigo())
                 .orElseThrow(
                         () -> new CodigoDeRecuperacaoNotFoundException("Código de recuperação não encontrado")
                 );
@@ -122,7 +122,7 @@ public class UsuarioService {
         usuario.setCodigoRecuperacao(null);
         repository.save(usuario);
 
-        var updatedPassword = new SentEmailUpdatedPasswordEvent(this, new String[]{usuario.getEmail()});
+        var updatedPassword = new EnviarEmailAlteracaoSenhaEvent(new String[]{usuario.getEmail()});
         eventPublisher.publishEvent(updatedPassword);
     }
 

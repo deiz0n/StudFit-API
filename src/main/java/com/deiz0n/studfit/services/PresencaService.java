@@ -1,10 +1,8 @@
 package com.deiz0n.studfit.services;
 
 import com.deiz0n.studfit.domain.dtos.PresencaDTO;
-import com.deiz0n.studfit.domain.entites.Aluno;
 import com.deiz0n.studfit.domain.entites.Presenca;
-import com.deiz0n.studfit.domain.entites.Usuario;
-import com.deiz0n.studfit.domain.events.AlunoRegisterAusenciasEvent;
+import com.deiz0n.studfit.domain.events.RegistrarAusenciasAlunoEvent;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotEfetivadoException;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.presenca.PresencaAlreadyRegistered;
@@ -16,7 +14,6 @@ import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -54,7 +51,7 @@ public class PresencaService {
         presenca.forEach(entity -> {
             entity.setData(data);
             validarPresenca(entity);
-            eventPublisher.publishEvent(new AlunoRegisterAusenciasEvent(this, mapper.map(entity, PresencaDTO.class)));
+            eventPublisher.publishEvent(new RegistrarAusenciasAlunoEvent(mapper.map(entity, PresencaDTO.class)));
         });
 
         presencaRepository.saveAll(presenca);

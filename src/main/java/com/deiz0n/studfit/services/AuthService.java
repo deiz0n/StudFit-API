@@ -24,32 +24,32 @@ public class AuthService {
     public TokenDTO login(AuthDTO auth) {
         var usuario = new UsernamePasswordAuthenticationToken(auth.getEmail(), auth.getSenha());
         var usuarioAutenticado = manager.authenticate(usuario);
-        var gerarToken = new TokenGenerationEvent(this, (Usuario) usuarioAutenticado.getPrincipal());
+        var solicitarToken = new SolicitarGeracaoTokenAuthEvent((Usuario) usuarioAutenticado.getPrincipal());
 
-        eventPublisher.publishEvent(gerarToken);
+        eventPublisher.publishEvent(solicitarToken);
 
         return token;
     }
 
     public void recuperarSenha(RecoveryPasswordDTO recoveryPassword) {
-        var recoveryPasswordEvent = new UsuarioRecoveryPassswordEvent(this, recoveryPassword.getEmail());
+        var recoveryPasswordEvent = new SolicitarRecuperacaoSenhaEvent(recoveryPassword.getEmail());
         eventPublisher.publishEvent(recoveryPasswordEvent);
     }
 
     public void atualizaSenha(String codigo, ResetPasswordDTO resetPasswordDTO) {
-        var resetPasswordEvent = new UsuarioResetPasswordEvent(this, codigo, resetPasswordDTO);
-        eventPublisher.publishEvent(resetPasswordEvent);
+        var atualizarSenha = new AtualizarSenhaUsuarioEvent(codigo, resetPasswordDTO);
+        eventPublisher.publishEvent(atualizarSenha);
     }
 
     public void validarToken(TokenDTO tokenDTO) {
-        var validateTokenEvent = new AuthValidateTokenEvent(this, tokenDTO.getToken());
-        eventPublisher.publishEvent(validateTokenEvent);
+        var validarToken = new ValidarTokenAuthEvent(tokenDTO.getToken());
+        eventPublisher.publishEvent(validarToken);
     }
 
     @EventListener
-    private void obterTokenGerado(TokenGeneratedEvent tokenGenerated) {
+    private void obterTokenGerado(GerarTokenAuthEvent evento) {
         token = TokenDTO.builder()
-                .token(tokenGenerated.getToken())
+                .token(evento.token())
                 .build();
     }
 }

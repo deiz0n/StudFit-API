@@ -54,11 +54,11 @@ public class EmailService {
     }
 
     @EventListener
-    private void enviarRecuperacaoSenha(SentEmailRecoveryPasswordEvent sentEmailRecoveryPasswordEvent) {
+    private void enviarRecuperacaoSenha(EnviarEmailRecuperacaoSenhaEvent evento) {
         var email = EmailDTO.builder()
-                .destinatario(sentEmailRecoveryPasswordEvent.getDestinatario())
+                .destinatario(evento.destinatario())
                 .titulo("Solicitação para alteração de senha")
-                .variavel("codigo", sentEmailRecoveryPasswordEvent.getCodigo())
+                .variavel("codigo", evento.codigo())
                 .conteudo("recovery-password.html")
                 .build();
 
@@ -66,9 +66,9 @@ public class EmailService {
     }
 
     @EventListener
-    private void enviarConfirmacaoSenhaAlterada(SentEmailUpdatedPasswordEvent updatedPassword) {
+    private void enviarConfirmacaoSenhaAlterada(EnviarEmailAlteracaoSenhaEvent evento) {
         var email = EmailDTO.builder()
-                .destinatario(updatedPassword.getDestinatario())
+                .destinatario(evento.destinatario())
                 .titulo("Sua senha foi alterada com sucesso")
                 .conteudo("updated-password-success.html")
                 .build();
@@ -77,11 +77,11 @@ public class EmailService {
     }
 
     @EventListener
-    private void enviarConfirmacaoExclucao(SentEmailDeletedAlunoEfetivadoEvent deletedAlunoEfetivado) {
+    private void enviarConfirmacaoExclucao(NotificarAlunoCadastroExcluidoEvent evento) {
         var email = EmailDTO.builder()
-                .destinatario(deletedAlunoEfetivado.getDestinatario())
+                .destinatario(evento.destinatario())
                 .titulo("Exclusão de cadastro")
-                .variavel("nome_aluno", deletedAlunoEfetivado.getNome())
+                .variavel("nome_aluno", evento.nome())
                 .conteudo("removed-by-absences.html")
                 .build();
 
@@ -89,8 +89,8 @@ public class EmailService {
     }
 
     @EventListener
-    private void enviarConfirmacaoAlunoExcluido(SentAlunoDeletedToUsuariosEvent deletedToUsuarios) {
-        var listOfEmails = deletedToUsuarios.getUsuarios()
+    private void enviarConfirmacaoAlunoExcluido(NotificarUsuarioCadastroExcluidoEvent evento) {
+        var listOfEmails = evento.usuarios()
                 .stream()
                 .map(UsuarioDTO::getEmail)
                 .toArray(String[]::new);
@@ -98,7 +98,7 @@ public class EmailService {
         var email = EmailDTO.builder()
                 .destinatario(listOfEmails)
                 .titulo("Exclusão de cadastro")
-                .variavel("nome_aluno", deletedToUsuarios.getNomeAluno())
+                .variavel("nome_aluno", evento.nomeAluno())
                 .conteudo("aluno-removed.html")
                 .build();
 
@@ -106,11 +106,11 @@ public class EmailService {
     }
 
     @EventListener
-    private void enviarConfirmacaoEfetivacao(SentEmailAlunoEfetivadoEvent alunoEfetivado) {
+    private void enviarConfirmacaoEfetivacao(NotificarAlunoCadastroEfetivado evento) {
         var email = EmailDTO.builder()
-                .destinatario(alunoEfetivado.getDestinatario())
+                .destinatario(evento.destinatario())
                 .titulo("Efetivação de cadastro")
-                .variavel("nome_aluno", alunoEfetivado.getNomeAluno())
+                .variavel("nome_aluno", evento.nomeAluno())
                 .conteudo("aluno-efetivado.html")
                 .build();
 
@@ -118,11 +118,11 @@ public class EmailService {
     }
 
     @EventListener
-    private void enviarConfirmacaoAlunoEfetivado(SentAlunoEfetivadoToUsuarios alunoEfetivadoToUsuarios) {
+    private void enviarConfirmacaoAlunoEfetivado(NotificarUsuarioCadastroEfetivadoEvent evento) {
         var email = EmailDTO.builder()
-                .destinatario(alunoEfetivadoToUsuarios.getDestinatario())
+                .destinatario(evento.destinatario())
                 .titulo("Efetivação de cadastro")
-                .variavel("nome_aluno", alunoEfetivadoToUsuarios.getNomeAluno())
+                .variavel("nome_aluno", evento.nomeAluno())
                 .conteudo("aluno-efetivado-to-usuarios.html")
                 .build();
 

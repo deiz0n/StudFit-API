@@ -3,7 +3,7 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
 import com.deiz0n.studfit.domain.entites.Horario;
 import com.deiz0n.studfit.domain.enums.Turno;
-import com.deiz0n.studfit.domain.events.HorarioRegisterVagasDisponiveisEvent;
+import com.deiz0n.studfit.domain.events.RegitrarVagasDisponiveisEvent;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioAlreadyRegistered;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotValidException;
@@ -67,8 +67,8 @@ public class HorarioService {
     }
 
     @EventListener
-    private void atualizarVagasDisponiveis(HorarioRegisterVagasDisponiveisEvent vagasDisponiveisEvent) {
-        Horario horario = repository.findById(vagasDisponiveisEvent.getId()).get();
+    private void atualizarVagasDisponiveis(RegitrarVagasDisponiveisEvent vagasDisponiveisEvent) {
+        Horario horario = repository.findById(vagasDisponiveisEvent.id()).get();
         var vagasDisponiveis = horario.getVagasDisponiveis();
         var quantidadeAlunos = horario.getAlunos().size();
 

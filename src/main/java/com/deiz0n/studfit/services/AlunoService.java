@@ -90,19 +90,19 @@ public class AlunoService {
         reordenarListaEspera(alunoEfetivado);
         alunoEfetivado.setColocacao(null);
 
-        var vagasDisponiveisEvent = new HorarioRegisterVagasDisponiveisEvent(this, aluno.getHorario().getId());
-        eventPublisher.publishEvent(vagasDisponiveisEvent);
+        var vagasDisponiveis = new RegitrarVagasDisponiveisEvent(aluno.getHorario().getId());
+        eventPublisher.publishEvent(vagasDisponiveis);
 
-        var sentAlunoEfetivado = new SentEmailAlunoEfetivadoEvent(this, new String[]{alunoEfetivado.getEmail()}, alunoEfetivado.getNome());
-        eventPublisher.publishEvent(sentAlunoEfetivado);
+        var notificarAlunoCadastroEfetivado = new NotificarAlunoCadastroEfetivado(new String[]{alunoEfetivado.getEmail()}, alunoEfetivado.getNome());
+        eventPublisher.publishEvent(notificarAlunoCadastroEfetivado);
 
         var listaDeDestinatarios = usuarioRepository.findAll()
                 .stream()
                 .map(Usuario::getEmail)
                 .toArray(String[]::new);
 
-        var sentAlunoEfetivadoToUsuarios = new SentAlunoEfetivadoToUsuarios(this, listaDeDestinatarios, alunoEfetivado.getNome());
-        eventPublisher.publishEvent(sentAlunoEfetivadoToUsuarios);
+        var notificarUsuarioCadastroEfetivado = new NotificarUsuarioCadastroEfetivadoEvent(listaDeDestinatarios, alunoEfetivado.getNome());
+        eventPublisher.publishEvent(notificarUsuarioCadastroEfetivado);
 
         alunoRepository.save(alunoEfetivado);
 
@@ -196,9 +196,9 @@ public class AlunoService {
 
     // Registra as ausências dos alunos
     @EventListener
-    private void atualizarAusencias(AlunoRegisterAusenciasEvent registerAusencias) {
-        var aluno = buscarPorId(registerAusencias
-                .getPresenca()
+    private void atualizarAusencias(RegistrarAusenciasAlunoEvent registarAusencias) {
+        var aluno = buscarPorId(registarAusencias
+                .presenca()
                 .getAluno()
                 .getId()
         );
@@ -230,16 +230,16 @@ public class AlunoService {
         aluno.setAusenciasConsecutivas(quantidadeAusencias);
         alunoRepository.save(aluno);
 
-        var registerStatus = new AlunoRegisterStatusEvent(this, aluno.getId());
-        eventPublisher.publishEvent(registerStatus);
+        var atualizarStatus = new AtualizarStatusAlunoEvent(aluno.getId());
+        eventPublisher.publishEvent(atualizarStatus);
 
-        var deletedAluno = new AlunoDeletedByAusenciasEvent(this, mapper.map(aluno, AlunoDTO.class));
-        eventPublisher.publishEvent(deletedAluno);
+        var alunoExcluido = new ExclusaoAlunoPorAusenciasEvent(mapper.map(aluno, AlunoDTO.class));
+        eventPublisher.publishEvent(alunoExcluido);
     }
 
     @EventListener
-    private void atualizarStatusAluno(AlunoRegisterStatusEvent registerStatusEvent) {
-        var aluno = buscarPorId(registerStatusEvent.getId());
+    private void atualizarStatusAluno(AtualizarStatusAlunoEvent registerStatusEvent) {
+        var aluno = buscarPorId(registerStatusEvent.id());
         if (aluno.getAusenciasConsecutivas() >= 3)
             aluno.setStatus(Status.EM_ALERTA);
         else
@@ -248,21 +248,21 @@ public class AlunoService {
     }
 
     @EventListener
-    private void excluirPorMaxAusencias(AlunoDeletedByAusenciasEvent deletedAlunoStatus) {
-        var aluno = deletedAlunoStatus.getAluno();
+    private void excluirPorMaxAusencias(ExclusaoAlunoPorAusenciasEvent deletedAlunoStatus) {
+        var aluno = deletedAlunoStatus.aluno();
         if (aluno.getAusenciasConsecutivas() == 5) {
             var buscarAluno = buscarPorId(aluno.getId());
 
-            var alunoExcluido = new SentEmailDeletedAlunoEfetivadoEvent(this, new String[]{aluno.getEmail()}, aluno.getNome());
-            eventPublisher.publishEvent(alunoExcluido);
+            var notificarAlunoCadastroExcluido = new NotificarAlunoCadastroExcluidoEvent(new String[]{aluno.getEmail()}, aluno.getNome());
+            eventPublisher.publishEvent(notificarAlunoCadastroExcluido);
 
             var listaDeUsuarios = usuarioRepository.findAll()
                     .stream()
                     .map(usuario -> mapper.map(usuario, UsuarioDTO.class))
                     .toList();
 
-            var deletedToUsuarios = new SentAlunoDeletedToUsuariosEvent(this, listaDeUsuarios, aluno.getNome());
-            eventPublisher.publishEvent(deletedToUsuarios);
+            var notificarUsuarioCadastroExcluido = new NotificarUsuarioCadastroExcluidoEvent(listaDeUsuarios, aluno.getNome());
+            eventPublisher.publishEvent(notificarUsuarioCadastroExcluido);
 
             alunoRepository.deleteById(buscarAluno.getId());
         }
