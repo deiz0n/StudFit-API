@@ -20,7 +20,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -29,7 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class AlunoService<T> {
+public class AlunoService {
 
     private final AlunoRepository alunoRepository;
     private final PresencaRepository presencaRepository;
@@ -206,7 +205,7 @@ public class AlunoService<T> {
 
         int quantidadeAusencias = aluno.getAusenciasConsecutivas();
 
-        List<Presenca> ausenciasPorAluno = presencaRepository.getLastTwo(aluno.getId());
+        List<Presenca> ausenciasPorAluno = presencaRepository.buscarUltimasPresencas(aluno.getId());
 
         if (ausenciasPorAluno.isEmpty() || !ausenciasPorAluno.stream().findFirst().get().getPresente()) {
             quantidadeAusencias++;
