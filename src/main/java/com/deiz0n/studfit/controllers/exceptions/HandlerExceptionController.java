@@ -12,6 +12,10 @@ import com.deiz0n.studfit.domain.exceptions.usuario.CargoNotExistentException;
 import com.deiz0n.studfit.domain.exceptions.usuario.SendEmailException;
 import com.deiz0n.studfit.domain.exceptions.usuario.SenhaNotCoincideException;
 import com.deiz0n.studfit.domain.response.ResponseError;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -28,6 +32,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class HandlerExceptionController extends ResponseEntityExceptionHandler{
@@ -62,6 +68,12 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler{
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+
+        Throwable rootCause = ExceptionUtils.getRootCause(ex);
+
+        if (rootCause instanceof MismatchedInputException)
+            return handleInvalidFormatException((MismatchedInputException) rootCause, headers, status, request);
+
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(
@@ -74,6 +86,27 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler{
                 );
 
     }
+
+    private ResponseEntity<Object> handleInvalidFormatException(MismatchedInputException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        String fieldName = ex.getPath()
+                .stream()
+                .map(JsonMappingException.Reference::getFieldName)
+                .collect(Collectors.joining("."));
+
+        var detail = String.format("O campo '%s' aceita somentes valores do tipo '%S'", fieldName, ex.getTargetType().getSimpleName());
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.NOT_FOUND.value())
+                                .title("Campo inválido")
+                                .status(HttpStatus.NOT_FOUND)
+                                .description(detail)
+                                .build()
+                );
+    }
+
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ResponseError> handleResourceNotFoundException(ResourceNotFoundException exception) {
