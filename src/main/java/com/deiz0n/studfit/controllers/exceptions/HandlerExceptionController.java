@@ -12,9 +12,9 @@ import com.deiz0n.studfit.domain.exceptions.usuario.CargoNotExistentException;
 import com.deiz0n.studfit.domain.exceptions.usuario.SendEmailException;
 import com.deiz0n.studfit.domain.exceptions.usuario.SenhaNotCoincideException;
 import com.deiz0n.studfit.domain.response.ResponseError;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.fasterxml.jackson.databind.exc.*;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,7 +36,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
-public class HandlerExceptionController extends ResponseEntityExceptionHandler{
+public class HandlerExceptionController extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -71,8 +71,24 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler{
 
         Throwable rootCause = ExceptionUtils.getRootCause(ex);
 
+        if (rootCause instanceof UnrecognizedPropertyException)
+            return handleUnrecognizedPropertyException((UnrecognizedPropertyException) rootCause, headers, status, request);
+        if (rootCause instanceof IgnoredPropertyException)
+            return handleUnrecognizedPropertyException((IgnoredPropertyException) rootCause, headers, status, request);
         if (rootCause instanceof MismatchedInputException)
             return handleInvalidFormatException((MismatchedInputException) rootCause, headers, status, request);
+        if (rootCause instanceof JsonParseException)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(
+                            ResponseError.builder()
+                                    .code(HttpStatus.BAD_REQUEST.value())
+                                    .title("JSON inválido")
+                                    .status(HttpStatus.BAD_REQUEST)
+                                    .description("O JSON informado possui formato inválido")
+                                    .build()
+                    );
+
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -84,7 +100,6 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler{
                                 .description(ex.getMessage())
                                 .build()
                 );
-
     }
 
     private ResponseEntity<Object> handleInvalidFormatException(MismatchedInputException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -96,17 +111,36 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler{
         var detail = String.format("O campo '%s' aceita somentes valores do tipo '%S'", fieldName, ex.getTargetType().getSimpleName());
 
         return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
+                .status(HttpStatus.BAD_REQUEST)
                 .body(
                         ResponseError.builder()
-                                .code(HttpStatus.NOT_FOUND.value())
+                                .code(HttpStatus.BAD_REQUEST.value())
                                 .title("Campo inválido")
-                                .status(HttpStatus.NOT_FOUND)
+                                .status(HttpStatus.BAD_REQUEST)
                                 .description(detail)
                                 .build()
                 );
     }
 
+    private ResponseEntity<Object> handleUnrecognizedPropertyException(PropertyBindingException ex, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
+        String fieldName = ex.getPath()
+                .stream()
+                .map(JsonMappingException.Reference::getFieldName)
+                .collect(Collectors.joining());
+
+        var detail = String.format("O campo '%s' não existe", fieldName);
+
+        return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.BAD_REQUEST.value())
+                                .title("Campo inválido")
+                                .status(HttpStatus.BAD_REQUEST)
+                                .description(detail)
+                                .build()
+                );
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ResponseError> handleResourceNotFoundException(ResourceNotFoundException exception) {
