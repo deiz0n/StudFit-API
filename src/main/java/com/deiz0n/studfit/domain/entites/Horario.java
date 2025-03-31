@@ -32,5 +32,7 @@ public class Horario {
     private HorarioInteresse horarioInteresse;
     @OneToMany(mappedBy = "horario", fetch = FetchType.LAZY)
     private List<Aluno> alunos;
+    @ManyToOne
+    private com.deiz0n.studfit.domain.entites.Turno turnoHorario;
 
 }
