@@ -32,6 +32,7 @@ public class HorarioDTO implements Comparable<HorarioDTO> {
     @NotBlank(message = "O campo horario_final é obrigatório")
     private LocalTime horarioFinal;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Turno turno;
 
@@ -42,10 +43,10 @@ public class HorarioDTO implements Comparable<HorarioDTO> {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private TurnoDTO tipoTurno;
 
-    public HorarioDTO(LocalTime horarioInicial, LocalTime horarioFinal, Turno turno) {
+    public HorarioDTO(LocalTime horarioInicial, LocalTime horarioFinal, TurnoDTO tipoTurno) {
         this.horarioInicial = horarioInicial;
         this.horarioFinal = horarioFinal;
-        this.turno = turno;
+        this.tipoTurno = tipoTurno;
     }
 
     @Override
