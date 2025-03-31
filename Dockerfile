@@ -6,8 +6,6 @@ COPY target/*.jar /app/studfit-api.jar
 COPY wait-for-it.sh /wait-for-it.sh
 RUN sed -i 's/\r$//' /wait-for-it.sh && chmod +x /wait-for-it.sh
 
-COPY .env /app/.env
-
 RUN chmod +x /wait-for-it.sh  \
     && apt-get update && apt-get install -y locales \
     && locale-gen pt_BR.UTF-8 \
