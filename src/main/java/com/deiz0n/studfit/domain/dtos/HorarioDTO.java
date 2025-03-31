@@ -39,6 +39,9 @@ public class HorarioDTO implements Comparable<HorarioDTO> {
     @JsonProperty(value = "vagas_disponiveis", access = JsonProperty.Access.READ_ONLY)
     private Integer vagasDisponiveis;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private TurnoDTO tipoTurno;
+
     public HorarioDTO(LocalTime horarioInicial, LocalTime horarioFinal, Turno turno) {
         this.horarioInicial = horarioInicial;
         this.horarioFinal = horarioFinal;
