@@ -7,6 +7,7 @@ DELETE FROM tb_horario;
 DELETE FROM tb_aluno_interessado;
 DELETE FROM tb_horario_interesse;
 DELETE FROM tb_aluno_horario_preferencia;
+DELETE FROM tb_turno;
 
 INSERT INTO tb_usuario(id, nome, email, senha, codigo_recuperacao, cargo) VALUES
     (gen_random_uuid(), 'admin', 'admin@example.com', crypt('123', gen_salt('bf')), null, 'ADMINISTRADOR'),
@@ -48,21 +49,26 @@ INSERT INTO tb_horario_interesse (id, aluno_horario_preferencia_id) VALUES
     ('e752b035-1afc-469e-a1c7-df8c75c637f8', null),
     ('c9e86dee-812a-4b10-8549-7ce9b38d5095', null);
 
-INSERT INTO tb_horario (id, horario_inicial, horario_final, horario_interesse_id, turno, vagas_disponiveis) VALUES
-    ('6667a4c1-9bfd-422e-9dbc-602f8d0c8e27', '07:00:00', '08:00:00', null, 'MANHA', 14),
-    ('56e88ae8-6a11-468a-a6fb-08cd2ac07a0b', '08:00:00', '09:00:00', null, 'MANHA', 14),
-    ('fe2baa3a-59fc-43c7-a5b2-8e3e872471d7', '09:00:00', '10:00:00', null, 'MANHA', 14),
-    ('2f2866be-4738-4602-b1ea-27da45143b6c', '10:00:00', '11:00:00', null, 'MANHA', 14),
-    ('1bfac9c7-4652-48bb-b4b7-46983225831b', '11:00:00', '12:00:00', null, 'MANHA', 14),
-    ('cc738671-91f2-4c41-8575-ad928f5ef892', '12:00:00', '13:00:00', null, 'TARDE', 15),
-    ('b5e51f92-03a9-40a0-9f05-2ea211703d3c', '13:00:00', '14:00:00', null, 'TARDE', 15),
-    ('3e291362-6377-43a6-a3a7-bf73918f5120', '14:00:00', '15:00:00', null, 'TARDE', 13),
-    ('a780503d-88ff-4541-903f-f033f45f42c2', '15:00:00', '16:00:00', null, 'TARDE', 12),
-    ('4efea951-827d-4736-b399-668525227873', '16:00:00', '17:00:00', null, 'TARDE', 14),
-    ('6f160df3-f6d0-4e96-99fd-36c4b0ad23cd', '17:00:00', '18:00:00', null, 'NOITE', 14),
-    ('0f0fd5be-b0c2-4726-953a-68fe80ffc434', '18:00:00', '19:00:00', null, 'NOITE', 14),
-    ('dc93003f-59b9-4b4c-b8dd-9681a7c6d8a8', '19:00:00', '20:00:00', null, 'NOITE', 14),
-    ('d47d73f0-70db-4cb1-aa1b-243d363b476b', '20:00:00', '21:00:00', null, 'NOITE', 9);
+INSERT INTO tb_turno (id, tipo_turno) VALUES
+    ('d2fc474d-9f9e-4317-a04e-baaa857e4f07', 'MANHA'),
+    ('a74212ab-aae0-48b2-b51e-a397f8794287', 'TARDE'),
+    ('54afc908-af82-4992-98d6-80f73e3b2d24', 'NOITE');
+
+INSERT INTO tb_horario (id, horario_inicial, horario_final, horario_interesse_id, turno, vagas_disponiveis, turno_horario_id) VALUES
+    ('6667a4c1-9bfd-422e-9dbc-602f8d0c8e27', '07:00:00', '08:00:00', null, 'MANHA', 14, 'd2fc474d-9f9e-4317-a04e-baaa857e4f07'),
+    ('56e88ae8-6a11-468a-a6fb-08cd2ac07a0b', '08:00:00', '09:00:00', null, 'MANHA', 14, 'd2fc474d-9f9e-4317-a04e-baaa857e4f07'),
+    ('fe2baa3a-59fc-43c7-a5b2-8e3e872471d7', '09:00:00', '10:00:00', null, 'MANHA', 14, 'd2fc474d-9f9e-4317-a04e-baaa857e4f07'),
+    ('2f2866be-4738-4602-b1ea-27da45143b6c', '10:00:00', '11:00:00', null, 'MANHA', 14, 'd2fc474d-9f9e-4317-a04e-baaa857e4f07'),
+    ('1bfac9c7-4652-48bb-b4b7-46983225831b', '11:00:00', '12:00:00', null, 'MANHA', 14, 'd2fc474d-9f9e-4317-a04e-baaa857e4f07'),
+    ('cc738671-91f2-4c41-8575-ad928f5ef892', '12:00:00', '13:00:00', null, 'TARDE', 15, 'a74212ab-aae0-48b2-b51e-a397f8794287'),
+    ('b5e51f92-03a9-40a0-9f05-2ea211703d3c', '13:00:00', '14:00:00', null, 'TARDE', 15, 'a74212ab-aae0-48b2-b51e-a397f8794287'),
+    ('3e291362-6377-43a6-a3a7-bf73918f5120', '14:00:00', '15:00:00', null, 'TARDE', 13, 'a74212ab-aae0-48b2-b51e-a397f8794287'),
+    ('a780503d-88ff-4541-903f-f033f45f42c2', '15:00:00', '16:00:00', null, 'TARDE', 12, 'a74212ab-aae0-48b2-b51e-a397f8794287'),
+    ('4efea951-827d-4736-b399-668525227873', '16:00:00', '17:00:00', null, 'TARDE', 14, 'a74212ab-aae0-48b2-b51e-a397f8794287'),
+    ('6f160df3-f6d0-4e96-99fd-36c4b0ad23cd', '17:00:00', '18:00:00', null, 'NOITE', 14, '54afc908-af82-4992-98d6-80f73e3b2d24'),
+    ('0f0fd5be-b0c2-4726-953a-68fe80ffc434', '18:00:00', '19:00:00', null, 'NOITE', 14, '54afc908-af82-4992-98d6-80f73e3b2d24'),
+    ('dc93003f-59b9-4b4c-b8dd-9681a7c6d8a8', '19:00:00', '20:00:00', null, 'NOITE', 14, '54afc908-af82-4992-98d6-80f73e3b2d24'),
+    ('d47d73f0-70db-4cb1-aa1b-243d363b476b', '20:00:00', '21:00:00', null, 'NOITE', 9, '54afc908-af82-4992-98d6-80f73e3b2d24');
 
 INSERT INTO tb_aluno_interessado(id, aluno_horario_preferencia_id) VALUES
     ('b4e876c4-a977-442f-a746-7317de9d70e2', '74b330d4-026a-46f0-8e67-a49a0c1ad538'),
