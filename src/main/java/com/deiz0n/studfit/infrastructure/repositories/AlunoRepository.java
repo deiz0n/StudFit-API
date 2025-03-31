@@ -26,7 +26,7 @@ public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
     List<AlunoListaEsperaDTO> buscarAlunosListaEspera(Pageable pageable);
 
     @Query("SELECT NEW " +
-            "com.deiz0n.studfit.domain.dtos.AlunoEfetivadoDTO(a.id, a.nome, NEW com.deiz0n.studfit.domain.dtos.HorarioDTO(h.horarioInicial, h.horarioFinal, h.turno))" +
-            " FROM tb_aluno a JOIN FETCH tb_horario h ON a.horario.id = h.id")
+            "com.deiz0n.studfit.domain.dtos.AlunoEfetivadoDTO(a.id, a.nome, NEW com.deiz0n.studfit.domain.dtos.HorarioDTO(h.horarioInicial, h.horarioFinal, new com.deiz0n.studfit.domain.dtos.TurnoDTO(t.tipoTurno)))" +
+            " FROM tb_aluno a JOIN FETCH tb_horario h ON a.horario.id = h.id JOIN FETCH tb_turno t ON h.turnoHorario.id = t.id")
     List<AlunoEfetivadoDTO> buscarAlunosEfetivados(Pageable pageable);
 }
