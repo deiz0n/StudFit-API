@@ -1,6 +1,7 @@
 package com.deiz0n.studfit.domain.entites;
 
 import com.deiz0n.studfit.domain.enums.Turno;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class Horario {
     @Column(name = "vagas_disponiveis")
     private Integer vagasDisponiveis;
 
+    @JsonIgnore
     @ManyToOne
     private HorarioInteresse horarioInteresse;
     @OneToMany(mappedBy = "horario", fetch = FetchType.LAZY)
