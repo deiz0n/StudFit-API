@@ -2,15 +2,17 @@ package com.deiz0n.studfit.services;
 
 import com.deiz0n.studfit.domain.dtos.*;
 import com.deiz0n.studfit.domain.entites.Aluno;
+import com.deiz0n.studfit.domain.entites.Horario;
 import com.deiz0n.studfit.domain.entites.Presenca;
 import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.domain.enums.Status;
+import com.deiz0n.studfit.domain.enums.Turno;
 import com.deiz0n.studfit.domain.events.*;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioINotAvailableException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.usuario.EmailAlreadyRegisteredException;
-import com.deiz0n.studfit.domain.exceptions.usuario.TelefoneAlreadyRegistered;
+import com.deiz0n.studfit.domain.exceptions.usuario.TelefoneAlreadyRegisteredException;
 import com.deiz0n.studfit.infrastructure.repositories.AlunoRepository;
 import com.deiz0n.studfit.infrastructure.repositories.HorarioRepository;
 import com.deiz0n.studfit.infrastructure.repositories.PresencaRepository;
@@ -20,12 +22,15 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AlunoService {
@@ -54,7 +59,7 @@ public class AlunoService {
 
     // Registra um aluno na lista de espera
     public AlunoListaEsperaDTO registrarAlunosListaEspera(AlunoListaEsperaDTO alunoListaEspera) {
-        eExistente(alunoListaEspera.getEmail());
+        eExistente(alunoListaEspera.getEmail(), alunoListaEspera.getTelefone());
         alunoListaEspera.setColocacao(obterColocacaoAtual());
         var aluno = mapper.map(alunoListaEspera, Aluno.class);
         alunoRepository.save(aluno);
@@ -77,36 +82,37 @@ public class AlunoService {
         return alunoRepository.buscarAlunosEfetivados(pageable);
     }
 
-    // Realiza o cadastro completo do aluno na lista de espera
-    public AlunoDTO registrarAlunoEfetivado(AlunoDTO aluno) {
-        var alunoEfetivado = alunoRepository.buscarPorColocacao(1).orElseThrow(
-                () -> new AlunoNotFoundException("Aluno não encontrado")
-        );
-        eExistente(aluno, alunoEfetivado.getId());
-        estaDisponivel(aluno.getHorario());
+    @Scheduled(fixedRate = 10000)
+    public void registrarAlunoEfetivado() {
+        var alunoEfetivado = alunoRepository.buscarPorColocacao(1);
 
-        BeanUtils.copyProperties(aluno, alunoEfetivado, "id", "nome", "email");
+        if (alunoEfetivado.isPresent()) {
 
-        reordenarListaEspera(alunoEfetivado);
-        alunoEfetivado.setColocacao(null);
+            String turnosPreferenciais = alunoEfetivado.get().getTurnosPreferenciais()[0];
 
-        var vagasDisponiveis = new RegitrarVagasDisponiveisEvent(aluno.getHorario().getId());
-        eventPublisher.publishEvent(vagasDisponiveis);
+            if (turnosPreferenciais.isEmpty()) {
+                alunoEfetivado.get().setListaEspera(false);
+            } else {
 
-        var notificarAlunoCadastroEfetivado = new NotificarAlunoCadastroEfetivado(new String[]{alunoEfetivado.getEmail()}, alunoEfetivado.getNome());
-        eventPublisher.publishEvent(notificarAlunoCadastroEfetivado);
 
-        var listaDeDestinatarios = usuarioRepository.findAll()
-                .stream()
-                .map(Usuario::getEmail)
-                .toArray(String[]::new);
+                Turno turnoEnum = Turno.valueOf(turnosPreferenciais.toUpperCase());
+                System.out.println("Turno escolhido: " + turnoEnum);
 
-        var notificarUsuarioCadastroEfetivado = new NotificarUsuarioCadastroEfetivadoEvent(listaDeDestinatarios, alunoEfetivado.getNome());
-        eventPublisher.publishEvent(notificarUsuarioCadastroEfetivado);
+                List<Horario> horarios = horarioRepository.buscarHorariosPorTurno(turnoEnum);
 
-        alunoRepository.save(alunoEfetivado);
+                for (Horario horarioDisponivel : horarios) {
+                    if (horarioDisponivel.getVagasDisponiveis() > 0) {
+                        alunoEfetivado.get().setListaEspera(false);
+                        alunoEfetivado.get().setHorario(horarioDisponivel);
+                        break;
+                    }
+                    }
+            }
 
-        return mapper.map(alunoEfetivado, AlunoDTO.class);
+            reordenarListaEspera(alunoEfetivado.get());
+            alunoEfetivado.get().setColocacao(null);
+            alunoRepository.save(alunoEfetivado.get());
+        }
     }
 
     // Remove aluno cadastrado
@@ -136,9 +142,12 @@ public class AlunoService {
     }
 
     // Verifica a existência de email ao cadastrar um aluno na lista de espera
-    private void eExistente(String email) {
+    private void eExistente(String email, String telefone) {
         if (alunoRepository.buscarPorEmail(email).isPresent())
             throw new EmailAlreadyRegisteredException("Email já cadastrado");
+
+        if (alunoRepository.buscarPorTelefone(telefone).isPresent())
+            throw new TelefoneAlreadyRegisteredException("Telefone já cadastrado");
     }
 
     // Verifica a existência de email ou telefone ao efetivar ou atualizar dados de um aluno
@@ -149,7 +158,7 @@ public class AlunoService {
 
         var alunoPorTelefone = alunoRepository.buscarPorTelefone(aluno.getTelefone());
         if (alunoPorTelefone.isPresent() && !alunoPorTelefone.get().getId().equals(id))
-            throw new TelefoneAlreadyRegistered("Telefone já cadastrado");
+            throw new TelefoneAlreadyRegisteredException("Telefone já cadastrado");
     }
 
     private Integer obterColocacaoAtual() {
@@ -177,6 +186,7 @@ public class AlunoService {
                 colocacaoAtual = x.getColocacao();
                 if (aluno.getColocacao() < x.getColocacao()) {
                     x.setColocacao(colocacaoAtual-1);
+                    System.out.println(x.getColocacao());
                     alunoRepository.save(x);
                 }
             }
