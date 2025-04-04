@@ -34,11 +34,13 @@ public class AlunoListaEsperaDTO {
     private Integer colocacao;
     @JsonIgnore
     private Boolean listaEspera = true;
+    private String[] turnosPreferenciais;
 
-    public AlunoListaEsperaDTO(UUID id, String nome, Integer colocacao) {
+    public AlunoListaEsperaDTO(UUID id, String nome, Integer colocacao, String[] turnosPreferenciais) {
         this.id = id;
         this.nome = nome;
         this.colocacao = colocacao;
+        this.turnosPreferenciais = turnosPreferenciais;
     }
 
 }
