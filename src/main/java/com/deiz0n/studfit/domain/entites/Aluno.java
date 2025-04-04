@@ -2,17 +2,17 @@ package com.deiz0n.studfit.domain.entites;
 
 import com.deiz0n.studfit.domain.enums.Status;
 import com.deiz0n.studfit.domain.enums.Turno;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Types;
 import java.util.List;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "tb_aluno")
@@ -52,7 +52,7 @@ public class Aluno {
     @Column(name = "turnos_preferenciais", columnDefinition = "varchar[]")
     private String[] turnosPreferenciais;
 
-
+    @JsonIgnore
     @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL)
     private List<Presenca> presencas;
     @ManyToOne
