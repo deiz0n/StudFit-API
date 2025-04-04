@@ -1,0 +1,1 @@
+alter table tb_aluno add column turnos_preferenciais varchar[];

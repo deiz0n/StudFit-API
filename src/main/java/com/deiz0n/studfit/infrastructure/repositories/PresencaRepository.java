@@ -22,7 +22,7 @@ public interface PresencaRepository extends JpaRepository<Presenca, UUID> {
 
     @Query("SELECT NEW " +
             "com.deiz0n.studfit.domain.dtos.PresencaDTO(p.id, p.data, p.presente, " +
-            "NEW com.deiz0n.studfit.domain.dtos.AlunoEfetivadoDTO(a.id, a.nome, null)) " +
+            "NEW com.deiz0n.studfit.domain.dtos.AlunoEfetivadoDTO(a.id, a.nome, null, a.status)) " +
             "FROM tb_presenca p JOIN tb_aluno a ON p.aluno.id = a.id " +
             "AND p.usuario IS NOT NULL " +
             "AND p.data = :data"
@@ -31,7 +31,7 @@ public interface PresencaRepository extends JpaRepository<Presenca, UUID> {
 
     @Query("SELECT NEW " +
             "com.deiz0n.studfit.domain.dtos.PresencaDTO(p.id, p.data, p.presente, " +
-            "NEW com.deiz0n.studfit.domain.dtos.AlunoEfetivadoDTO(a.id, a.nome, null)) " +
+            "NEW com.deiz0n.studfit.domain.dtos.AlunoEfetivadoDTO(a.id, a.nome, null, a.status)) " +
             "FROM tb_presenca p JOIN tb_aluno a ON p.aluno.id = a.id " +
             "AND p.usuario IS NOT NULL"
     )

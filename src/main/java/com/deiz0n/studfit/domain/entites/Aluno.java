@@ -1,11 +1,14 @@
 package com.deiz0n.studfit.domain.entites;
 
 import com.deiz0n.studfit.domain.enums.Status;
+import com.deiz0n.studfit.domain.enums.Turno;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
 
+import java.sql.Types;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,8 +48,10 @@ public class Aluno {
     private Boolean consumoCigarro;
     @Column(name = "pratica_exercicio_fisico")
     private Boolean praticaExercicioFisico;
-    @Lob
-    private byte[] atestado;
+    @JdbcTypeCode(Types.ARRAY)
+    @Column(name = "turnos_preferenciais", columnDefinition = "varchar[]")
+    private String[] turnosPreferenciais;
+
 
     @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL)
     private List<Presenca> presencas;

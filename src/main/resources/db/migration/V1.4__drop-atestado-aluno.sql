@@ -1,0 +1,1 @@
+alter table tb_aluno drop column atestado;

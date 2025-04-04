@@ -22,11 +22,11 @@ public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
     @Query("FROM tb_aluno a WHERE a.telefone = :telefone")
     Optional<Aluno> buscarPorTelefone(String telefone);
 
-    @Query("SELECT NEW com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO(a.id, a.nome, a.colocacao) FROM tb_aluno a WHERE a.listaEspera = true")
+    @Query("SELECT NEW com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO(a.id, a.nome, a.colocacao, a.turnosPreferenciais) FROM tb_aluno a WHERE a.listaEspera = true")
     List<AlunoListaEsperaDTO> buscarAlunosListaEspera(Pageable pageable);
 
     @Query("SELECT NEW " +
-            "com.deiz0n.studfit.domain.dtos.AlunoEfetivadoDTO(a.id, a.nome, NEW com.deiz0n.studfit.domain.dtos.HorarioDTO(h.horarioInicial, h.horarioFinal, h.turno))" +
+            "com.deiz0n.studfit.domain.dtos.AlunoEfetivadoDTO(a.id, a.nome, NEW com.deiz0n.studfit.domain.dtos.HorarioDTO(h.horarioInicial, h.horarioFinal, h.turno), a.status)" +
             " FROM tb_aluno a JOIN FETCH tb_horario h ON a.horario.id = h.id")
     List<AlunoEfetivadoDTO> buscarAlunosEfetivados(Pageable pageable);
 }
