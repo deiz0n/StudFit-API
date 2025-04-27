@@ -1,6 +1,7 @@
 package com.deiz0n.studfit.services;
 
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
+import com.deiz0n.studfit.domain.dtos.TurnoDTO;
 import com.deiz0n.studfit.domain.entites.Horario;
 import com.deiz0n.studfit.domain.enums.Turno;
 import com.deiz0n.studfit.domain.events.RegitrarVagasDisponiveisEvent;
@@ -38,7 +39,7 @@ public class HorarioService {
     }
 
     public List<HorarioDTO> buscarPorTurno(String turno) {
-        return repository.buscarHorariosPorTurno(validarTurno(turno))
+        return repository.buscarHorariosPorTurno(turno)
                 .stream()
                 .map(horario -> mapper.map(horario, HorarioDTO.class))
                 .collect(Collectors.toList());
@@ -49,14 +50,13 @@ public class HorarioService {
 
         Horario horario = mapper.map(horarioDTO, Horario.class);
 
-        horario.setTurno(definirTurno(horarioDTO));
         repository.save(horario);
 
         return HorarioDTO.builder()
                 .id(horario.getId())
                 .horarioInicial(horario.getHorarioInicial())
                 .horarioFinal(horario.getHorarioFinal())
-                .turno(horario.getTurno())
+                .turno(mapper.map(horario.getTurno(), TurnoDTO.class))
                 .vagasDisponiveis(horario.getVagasDisponiveis())
                 .build();
     }
@@ -95,24 +95,6 @@ public class HorarioService {
 
         } catch (NullPointerException e) {
             throw new HorarioNotValidException("Os campos de horário são obrigatórios");
-        }
-    }
-
-    // Define os turnos automaticamente com base nos horários informados
-    private Turno definirTurno(HorarioDTO horarioDTO) {
-        if (horarioDTO.getHorarioInicial().getHour() >= 6 && horarioDTO.getHorarioFinal().getHour() <= 12)
-            return Turno.MANHA;
-        if (horarioDTO.getHorarioInicial().getHour() >= 12 && horarioDTO.getHorarioFinal().getHour() <= 18)
-            return Turno.TARDE;
-        else
-            return Turno.NOITE;
-    }
-
-    private Turno validarTurno(String turno) {
-        try {
-            return Turno.valueOf(turno.toUpperCase());
-        } catch (Exception e) {
-            throw new ResourceNotExistingException(String.format("Os turnos existentes são: %s", Arrays.toString(Turno.values())));
         }
     }
 }
