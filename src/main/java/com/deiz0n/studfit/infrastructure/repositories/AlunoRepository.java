@@ -33,9 +33,9 @@ public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
             "NEW com.deiz0n.studfit.domain.dtos.HorarioDTO(h.horarioInicial, h.horarioFinal, " +
             "NEW com.deiz0n.studfit.domain.dtos.TurnoDTO(t.id, t.nome)), a.status) " +
             "FROM tb_aluno a " +
-            "LEFT JOIN tb_horario h " +
+            "JOIN tb_horario h " +
             "ON a.horario.id = h.id " +
-            "LEFT JOIN tb_turno t " +
+            "JOIN tb_turno t " +
             "ON h.turno.id = t.id")
     List<AlunoEfetivadoDTO> buscarAlunosEfetivados(Pageable pageable);
 }
