@@ -1,36 +1,26 @@
 package com.deiz0n.studfit.services;
 
 import com.deiz0n.studfit.domain.dtos.*;
-import com.deiz0n.studfit.domain.entites.Aluno;
-import com.deiz0n.studfit.domain.entites.Horario;
-import com.deiz0n.studfit.domain.entites.Presenca;
-import com.deiz0n.studfit.domain.entites.Usuario;
+import com.deiz0n.studfit.domain.entites.*;
 import com.deiz0n.studfit.domain.enums.Status;
-import com.deiz0n.studfit.domain.enums.Turno;
 import com.deiz0n.studfit.domain.events.*;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioINotAvailableException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.usuario.EmailAlreadyRegisteredException;
 import com.deiz0n.studfit.domain.exceptions.usuario.TelefoneAlreadyRegisteredException;
-import com.deiz0n.studfit.infrastructure.repositories.AlunoRepository;
-import com.deiz0n.studfit.infrastructure.repositories.HorarioRepository;
-import com.deiz0n.studfit.infrastructure.repositories.PresencaRepository;
-import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
+import com.deiz0n.studfit.infrastructure.repositories.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class AlunoService {
@@ -49,12 +39,21 @@ public class AlunoService {
         this.eventPublisher = eventPublisher;
         this.horarioRepository = horarioRepository;
         this.usuarioRepository = usuarioRepository;
+
     }
 
-    // Retorna todos os alunos que estão na lista de espera
     public List<AlunoListaEsperaDTO> buscarAlunosListaEspera(int numeroPagina, int quantidade) {
-        var pageable = PageRequest.of(numeroPagina, quantidade);
-        return alunoRepository.buscarAlunosListaEspera(pageable);
+        List<AlunoListaEsperaDTO> alunos = alunoRepository.buscarAlunosListaEspera()
+                .stream()
+                .map(aluno -> mapper.map(aluno, AlunoListaEsperaDTO.class))
+                .toList();
+
+        int inicio = numeroPagina * quantidade;
+        int fim = Math.min(inicio + quantidade, alunos.size());
+
+        if (inicio > alunos.size()) return new ArrayList<>();
+
+        return alunos.subList(inicio, fim);
     }
 
     // Registra um aluno na lista de espera
@@ -82,38 +81,38 @@ public class AlunoService {
         return alunoRepository.buscarAlunosEfetivados(pageable);
     }
 
-    @Scheduled(fixedRate = 10000)
-    public void registrarAlunoEfetivado() {
-        var alunoEfetivado = alunoRepository.buscarPorColocacao(1);
-
-        if (alunoEfetivado.isPresent()) {
-
-            String turnosPreferenciais = alunoEfetivado.get().getTurnosPreferenciais()[0];
-
-            if (turnosPreferenciais.isEmpty()) {
-                alunoEfetivado.get().setListaEspera(false);
-            } else {
-
-
-                Turno turnoEnum = Turno.valueOf(turnosPreferenciais.toUpperCase());
-                System.out.println("Turno escolhido: " + turnoEnum);
-
-                List<Horario> horarios = horarioRepository.buscarHorariosPorTurno(turnoEnum);
-
-                for (Horario horarioDisponivel : horarios) {
-                    if (horarioDisponivel.getVagasDisponiveis() > 0) {
-                        alunoEfetivado.get().setListaEspera(false);
-                        alunoEfetivado.get().setHorario(horarioDisponivel);
-                        break;
-                    }
-                    }
-            }
-
-            reordenarListaEspera(alunoEfetivado.get());
-            alunoEfetivado.get().setColocacao(null);
-            alunoRepository.save(alunoEfetivado.get());
-        }
-    }
+//    @Scheduled(fixedRate = 10000)
+//    public void registrarAlunoEfetivado() {
+//        var alunoEfetivado = alunoRepository.buscarPorColocacao(1);
+//
+//        if (alunoEfetivado.isPresent()) {
+//
+//            String turnosPreferenciais = alunoEfetivado.get().getTurnosPreferenciais()[0];
+//
+//            if (turnosPreferenciais.isEmpty()) {
+//                alunoEfetivado.get().setListaEspera(false);
+//            } else {
+//
+//
+//                Turno turnoEnum = Turno.valueOf(turnosPreferenciais.toUpperCase());
+//                System.out.println("Turno escolhido: " + turnoEnum);
+//
+//                List<Horario> horarios = horarioRepository.buscarHorariosPorTurno(turnoEnum);
+//
+//                for (Horario horarioDisponivel : horarios) {
+//                    if (horarioDisponivel.getVagasDisponiveis() > 0) {
+//                        alunoEfetivado.get().setListaEspera(false);
+//                        alunoEfetivado.get().setHorario(horarioDisponivel);
+//                        break;
+//                    }
+//                }
+//            }
+//
+//            reordenarListaEspera(alunoEfetivado.get());
+//            alunoEfetivado.get().setColocacao(null);
+//            alunoRepository.save(alunoEfetivado.get());
+//        }
+//    }
 
     // Remove aluno cadastrado
     public void excluirAlunoEfetivado(UUID id) {
