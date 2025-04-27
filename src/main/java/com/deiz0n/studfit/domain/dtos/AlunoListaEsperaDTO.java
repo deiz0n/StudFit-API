@@ -1,5 +1,6 @@
 package com.deiz0n.studfit.domain.dtos;
 
+import com.deiz0n.studfit.domain.entites.TurnosPreferenciais;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,6 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -34,9 +36,15 @@ public class AlunoListaEsperaDTO {
     private Integer colocacao;
     @JsonIgnore
     private Boolean listaEspera = true;
-    private String[] turnosPreferenciais;
+    private List<TurnosPreferenciaisDTO> turnosPreferenciais;
 
-    public AlunoListaEsperaDTO(UUID id, String nome, Integer colocacao, String[] turnosPreferenciais) {
+    public AlunoListaEsperaDTO(UUID id, String nome, Integer colocacao) {
+        this.id = id;
+        this.nome = nome;
+        this.colocacao = colocacao;
+    }
+
+    public AlunoListaEsperaDTO(UUID id, String nome, Integer colocacao, List<TurnosPreferenciaisDTO> turnosPreferenciais) {
         this.id = id;
         this.nome = nome;
         this.colocacao = colocacao;
