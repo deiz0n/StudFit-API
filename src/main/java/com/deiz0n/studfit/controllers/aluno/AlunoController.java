@@ -19,7 +19,7 @@ public interface AlunoController {
     ResponseEntity<Response<?>> buscarAluno(@PathVariable UUID id, ServletWebRequest path);
 
     @GetMapping("lista-espera")
-    ResponseEntity<Response<?>> buscarAlunosListaEspera(ServletWebRequest path, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "100") int quantidade);
+    ResponseEntity<Response<?>> buscarAlunosListaEspera(ServletWebRequest path, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "10") int quantidade, @RequestParam String turno);
 
     @Transactional
     @PostMapping("/lista-espera/registrar")

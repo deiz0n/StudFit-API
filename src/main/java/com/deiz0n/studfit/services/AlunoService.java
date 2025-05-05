@@ -7,6 +7,7 @@ import com.deiz0n.studfit.domain.events.*;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioINotAvailableException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotFoundException;
+import com.deiz0n.studfit.domain.exceptions.horario.TurnoNotExistentException;
 import com.deiz0n.studfit.domain.exceptions.usuario.EmailAlreadyRegisteredException;
 import com.deiz0n.studfit.domain.exceptions.usuario.TelefoneAlreadyRegisteredException;
 import com.deiz0n.studfit.infrastructure.repositories.*;
@@ -31,19 +32,26 @@ public class AlunoService {
     private final ApplicationEventPublisher eventPublisher;
     private final HorarioRepository horarioRepository;
     private final UsuarioRepository usuarioRepository;
+    private final TurnoRepository turnoRepository;
 
-    public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper, ApplicationEventPublisher eventPublisher, HorarioRepository horarioRepository, UsuarioRepository usuarioRepository) {
+    public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper, ApplicationEventPublisher eventPublisher, HorarioRepository horarioRepository, UsuarioRepository usuarioRepository, TurnoRepository turnoRepository) {
         this.alunoRepository = alunoRepository;
         this.presencaRepository = presencaRepository;
         this.mapper = mapper;
         this.eventPublisher = eventPublisher;
         this.horarioRepository = horarioRepository;
         this.usuarioRepository = usuarioRepository;
-
+        this.turnoRepository = turnoRepository;
     }
 
-    public List<AlunoListaEsperaDTO> buscarAlunosListaEspera(int numeroPagina, int quantidade) {
-        List<AlunoListaEsperaDTO> alunos = alunoRepository.buscarAlunosListaEspera()
+    public List<AlunoListaEsperaDTO> buscarAlunosListaEspera(int numeroPagina, int quantidade, String turno) {
+        TurnoDTO turnoDTO = turnoRepository
+                .buscarPorNome(turno)
+                .orElseThrow(
+                        () -> new TurnoNotExistentException(String.format("O turno: %s não foi encontrado", turno))
+                );
+
+        List<AlunoListaEsperaDTO> alunos = alunoRepository.buscarAlunosListaEspera(turnoDTO.getNome())
                 .stream()
                 .map(aluno -> mapper.map(aluno, AlunoListaEsperaDTO.class))
                 .toList();

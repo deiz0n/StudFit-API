@@ -38,8 +38,8 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<Response<?>> buscarAlunosListaEspera(ServletWebRequest path, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "10") int quantidade) {
-        var alunos = service.buscarAlunosListaEspera(numeroPagina, quantidade);
+    public ResponseEntity<Response<?>> buscarAlunosListaEspera(ServletWebRequest path, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "10") int quantidade, @RequestParam String turno) {
+        var alunos = service.buscarAlunosListaEspera(numeroPagina, quantidade, turno);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
                 .body(Response.builder()

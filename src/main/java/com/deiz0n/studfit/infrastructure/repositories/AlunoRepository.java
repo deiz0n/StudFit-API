@@ -1,6 +1,7 @@
 package com.deiz0n.studfit.infrastructure.repositories;
 
 import com.deiz0n.studfit.domain.dtos.AlunoEfetivadoDTO;
+import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.domain.entites.Aluno;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,8 +27,9 @@ public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
             "LEFT JOIN FETCH a.turnosPreferenciais tp " +
             "LEFT JOIN FETCH tp.turno t " +
             "LEFT JOIN FETCH a.horario h " +
+            "WHERE t.nome = :turno "  +
             "ORDER BY a.colocacao")
-    List<Aluno> buscarAlunosListaEspera();
+    List<Aluno> buscarAlunosListaEspera(String turno);
 
     @Query("SELECT NEW com.deiz0n.studfit.domain.dtos.AlunoEfetivadoDTO(a.id, a.nome, " +
             "NEW com.deiz0n.studfit.domain.dtos.HorarioDTO(h.horarioInicial, h.horarioFinal, " +
