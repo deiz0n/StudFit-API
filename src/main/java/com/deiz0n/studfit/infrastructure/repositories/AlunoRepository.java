@@ -13,8 +13,26 @@ import java.util.UUID;
 
 public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
 
-    @Query("FROM tb_aluno a WHERE a.colocacao = :colocacao")
-    Optional<Aluno> buscarPorColocacao(Integer colocacao);
+    @Query("SELECT NEW " +
+            "com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO(a.id, a.nome, a.colocacao) " +
+            "FROM tb_aluno a " +
+            "JOIN FETCH tb_turnos_preferenciais tp " +
+            "ON a.id = tp.aluno.id " +
+            "JOIN FETCH tb_turno t " +
+            "ON tp.turno.id = t.id " +
+            "WHERE a.colocacao = 1 " +
+            "AND t.nome = :turno")
+    Optional<AlunoListaEsperaDTO> buscarPrimeiroColocado(String turno);
+
+    @Query("SELECT COUNT(a.id) " +
+            "FROM tb_aluno a " +
+            "JOIN FETCH tb_turnos_preferenciais tp " +
+            "ON a.id = tp.aluno.id " +
+            "JOIN FETCH tb_turno t " +
+            "ON tp.turno.id = t.id " +
+            "WHERE a.listaEspera = true " +
+            "AND t.nome = :turno")
+    int quantidadeAlunosPorTurno(String turno);
 
     @Query("FROM tb_aluno a WHERE a.email = :email")
     Optional<Aluno> buscarPorEmail(String email);
