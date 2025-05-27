@@ -15,7 +15,7 @@ public interface HorarioRepository extends JpaRepository<Horario, UUID> {
     @Query("FROM tb_horario h WHERE h.horarioInicial = :start AND h.horarioFinal = :end")
     Optional<Horario> buscarHorario(LocalTime start, LocalTime end);
 
-    @Query("FROM tb_horario h LEFT JOIN FETCH h.turno t ON h.turno.id = t.id WHERE t.nome = :turno")
+    @Query("SELECT h FROM tb_horario h JOIN FETCH h.turno t WHERE t.nome = :turno")
     List<Horario> buscarHorariosPorTurno(String turno);
 
 }
