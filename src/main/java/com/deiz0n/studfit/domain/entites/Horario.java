@@ -26,7 +26,7 @@ public class Horario {
     @Column(name = "vagas_disponiveis")
     private Integer vagasDisponiveis;
 
-    @OneToMany(mappedBy = "horario", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "horario", fetch = FetchType.EAGER)
     private List<Aluno> alunos;
     @ManyToOne
     private Turno turno;
