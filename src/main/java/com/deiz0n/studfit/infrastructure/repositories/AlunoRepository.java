@@ -13,17 +13,6 @@ import java.util.UUID;
 
 public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
 
-    @Query("SELECT NEW " +
-            "com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO(a.id, a.nome, a.colocacao) " +
-            "FROM tb_aluno a " +
-            "JOIN FETCH tb_turnos_preferenciais tp " +
-            "ON a.id = tp.aluno.id " +
-            "JOIN FETCH tb_turno t " +
-            "ON tp.turno.id = t.id " +
-            "WHERE a.colocacao = 1 " +
-            "AND t.nome = :turno")
-    Optional<AlunoListaEsperaDTO> buscarPrimeiroColocado(String turno);
-
     @Query("SELECT COUNT(a.id) " +
             "FROM tb_aluno a " +
             "JOIN FETCH tb_turnos_preferenciais tp " +
@@ -40,12 +29,21 @@ public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
     @Query("FROM tb_aluno a WHERE a.telefone = :telefone")
     Optional<Aluno> buscarPorTelefone(String telefone);
 
+    @Query("FROM tb_aluno a " +
+            "LEFT JOIN FETCH a.turnosPreferenciais tp " +
+            "LEFT JOIN FETCH tp.turno t " +
+            "WHERE t.nome = :turno " +
+            "AND a.listaEspera = true")
+    List<Aluno> buscarAlunosPorTurno(String turno);
+
     @Query("SELECT a " +
             "FROM tb_aluno a " +
             "LEFT JOIN FETCH a.turnosPreferenciais tp " +
             "LEFT JOIN FETCH tp.turno t " +
             "LEFT JOIN FETCH a.horario h " +
-            "WHERE t.nome = :turno "  +
+            "WHERE t.nome = :turno " +
+            "AND " +
+            "a.listaEspera = true "  +
             "ORDER BY a.colocacao")
     List<Aluno> buscarAlunosListaEspera(String turno);
 
