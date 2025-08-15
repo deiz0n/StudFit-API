@@ -1,7 +1,7 @@
 package com.deiz0n.studfit.infrastructure.repositories;
 
+import com.deiz0n.studfit.domain.dtos.HorarioDTO;
 import com.deiz0n.studfit.domain.entites.Horario;
-import com.deiz0n.studfit.domain.enums.Turno;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -17,5 +17,14 @@ public interface HorarioRepository extends JpaRepository<Horario, UUID> {
 
     @Query("SELECT h FROM tb_horario h JOIN FETCH h.turno t WHERE t.nome = :turno")
     List<Horario> buscarHorariosPorTurno(String turno);
+
+    @Query("SELECT NEW com.deiz0n.studfit.domain.dtos.HorarioDTO(" +
+            "h.horarioInicial, " +
+            "h.horarioFinal, " +
+            "NEW com.deiz0n.studfit.domain.dtos.TurnoDTO(" +
+            "h.turno.id, " +
+            "h.turno.nome)) " +
+            "FROM tb_horario h")
+    List<HorarioDTO> buscarTodosHorarios();
 
 }
