@@ -1,18 +1,18 @@
 package com.deiz0n.studfit.services;
 
 import com.deiz0n.studfit.domain.dtos.*;
-import com.deiz0n.studfit.domain.entites.*;
+import com.deiz0n.studfit.domain.entites.Aluno;
+import com.deiz0n.studfit.domain.entites.Horario;
+import com.deiz0n.studfit.domain.entites.Presenca;
+import com.deiz0n.studfit.domain.entites.TurnosPreferenciais;
 import com.deiz0n.studfit.domain.enums.Status;
 import com.deiz0n.studfit.domain.events.*;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotFoundException;
-import com.deiz0n.studfit.domain.exceptions.horario.HorarioINotAvailableException;
-import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.horario.TurnoNotExistentException;
 import com.deiz0n.studfit.domain.exceptions.usuario.EmailAlreadyRegisteredException;
 import com.deiz0n.studfit.domain.exceptions.usuario.TelefoneAlreadyRegisteredException;
 import com.deiz0n.studfit.infrastructure.repositories.*;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
@@ -69,8 +69,7 @@ public class AlunoService {
         if (!alunoListaEspera.getTurnosPreferenciais().isEmpty()) {
             var turno = alunoListaEspera.getTurnosPreferenciais().get(0).toString();
             alunoListaEspera.setColocacao(alunoRepository.quantidadeAlunosPorTurno(turno) + 1);
-        }
-        else {
+        } else {
             var turno = turnoRepository.buscarTodos().get(0);
             alunoListaEspera.setColocacao(alunoRepository.quantidadeAlunosPorTurno(turno.getNome()) + 1);
         }
@@ -81,14 +80,11 @@ public class AlunoService {
         return alunoListaEspera;
     }
 
-    // Remove um aluno da lista de espera
-    public AlunoListaEsperaDTO excluirAlunoListaEspera(UUID id) {
+    public void excluirAlunoListaEspera(UUID id) {
         var aluno = buscarPorId(id);
         alunoRepository.delete(aluno);
 
         reordenarListaEspera(aluno.getId());
-
-        return mapper.map(aluno, AlunoListaEsperaDTO.class);
     }
 
     // Retorna todos os alunos já cadastrados na academia
@@ -99,10 +95,10 @@ public class AlunoService {
 
     private void atualizarListaEspera() {
         turnoRepository.findAll().forEach(turno -> {
-           Optional<Aluno> alunoListaEspera = alunoRepository
-                   .buscarAlunosPorTurno(turno.getNome())
-                   .stream()
-                   .findFirst();
+            Optional<Aluno> alunoListaEspera = alunoRepository
+                    .buscarAlunosPorTurno(turno.getNome())
+                    .stream()
+                    .findFirst();
 
             if (alunoListaEspera.isEmpty()) return;
 
@@ -154,8 +150,8 @@ public class AlunoService {
     public AlunoDTO atualizarEfetivado(UUID id, AlunoDTO alunoDTO) {
         eExistente(alunoDTO, id);
         var aluno = buscarPorId(id);
-        BeanUtils.copyProperties(alunoDTO, aluno, "id");
-        alunoRepository.save(aluno);
+        var alunoAtualizado = mapper.map(alunoDTO, Aluno.class);
+        alunoRepository.save(alunoAtualizado);
         return mapper.map(aluno, AlunoDTO.class);
     }
 
@@ -164,10 +160,6 @@ public class AlunoService {
                 .orElseThrow(
                         () -> new AlunoNotFoundException(String.format("Aluno com ID: %s não foi encontrado", id))
                 );
-    }
-
-    public AlunoDTO buscarAlunoPorId(UUID id) {
-        return mapper.map(buscarPorId(id), AlunoDTO.class);
     }
 
     // Verifica a existência de email ao cadastrar um aluno na lista de espera
@@ -207,17 +199,6 @@ public class AlunoService {
         alunoRepository.saveAll(listaAlunos);
     }
 
-    // Verifica se o horário informado está disponível
-    private void estaDisponivel(HorarioDTO horario) {
-        var buscarHorarioPorId = horarioRepository.findById(horario.getId())
-                .orElseThrow(
-                        () -> new HorarioNotFoundException(String.format("O horário com id: %s não foi encontrado", horario.getId().toString()))
-                );
-
-        if (buscarHorarioPorId.getVagasDisponiveis() == 0)
-            throw new HorarioINotAvailableException("O horário informado atingiu o número máximo de alunos");
-    }
-
     // Registra as ausências dos alunos
     @EventListener
     protected void atualizarAusencias(RegistrarAusenciasAlunoEvent registarAusencias) {
@@ -236,13 +217,19 @@ public class AlunoService {
         } else {
             for (int i = 0; i < ausenciasPorAluno.size() - 1; i++) {
                 if (!ausenciasPorAluno.get(i).getPresente()) {
-                    if (ausenciasPorAluno.get(i).getData().getDayOfWeek() == DayOfWeek.FRIDAY && ausenciasPorAluno.get(i + 1).getData().getDayOfWeek() == DayOfWeek.MONDAY)
+                    if (
+                            ausenciasPorAluno.get(i).getData().getDayOfWeek() == DayOfWeek.FRIDAY
+                                    && ausenciasPorAluno.get(i + 1).getData().getDayOfWeek() == DayOfWeek.MONDAY
+                    )
                         quantidadeAusencias++;
                         // Verifica se as ausências estão em sequência
                     else if (ausenciasPorAluno.get(i).getData().plusDays(1).equals(ausenciasPorAluno.get(i + 1).getData()))
                         quantidadeAusencias++;
                         // Verifica se é o último dia do mês
-                    else if (ausenciasPorAluno.get(i).getData().getDayOfMonth() == ausenciasPorAluno.get(i).getData().lengthOfMonth() && ausenciasPorAluno.get(i + 1).getData().getDayOfMonth() == 1)
+                    else if (
+                            ausenciasPorAluno.get(i).getData().getDayOfMonth() == ausenciasPorAluno.get(i).getData().lengthOfMonth()
+                                    && ausenciasPorAluno.get(i + 1).getData().getDayOfMonth() == 1
+                    )
                         quantidadeAusencias++;
                 } else {
                     quantidadeAusencias = 0;
