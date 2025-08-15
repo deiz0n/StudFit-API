@@ -27,7 +27,7 @@ public class AlunoControllerImpl implements AlunoController {
 
     @Override
     public ResponseEntity<Response<?>> buscarAluno(UUID id, ServletWebRequest path) {
-        var aluno = service.buscarAlunoPorId(id);
+        var aluno = service.buscarPorId(id);
         return ResponseEntity.ok()
                 .body(Response.builder()
                         .code(HttpStatus.OK.value())
