@@ -76,13 +76,13 @@ public class AlunoService {
 
         var aluno = mapper.map(alunoListaEspera, Aluno.class);
         alunoRepository.save(aluno);
-        atualizarListaEspera();
+        alocarAlunoListaEsperaEmHorario();
         return alunoListaEspera;
     }
 
     public void excluirAlunoListaEspera(UUID id) {
         var aluno = buscarPorId(id);
-        alunoRepository.delete(aluno);
+        alunoRepository.deleteById(aluno.getId());
 
         reordenarListaEspera(aluno.getId());
     }
@@ -93,7 +93,7 @@ public class AlunoService {
         return alunoRepository.buscarAlunosEfetivados(pageable);
     }
 
-    private void atualizarListaEspera() {
+    private void alocarAlunoListaEsperaEmHorario() {
         turnoRepository.findAll().forEach(turno -> {
             Optional<Aluno> alunoListaEspera = alunoRepository
                     .buscarAlunosPorTurno(turno.getNome())
@@ -143,7 +143,7 @@ public class AlunoService {
     // Remove aluno cadastrado
     public void excluirAlunoEfetivado(UUID id) {
         var aluno = buscarPorId(id);
-        alunoRepository.delete(aluno);
+        alunoRepository.deleteById(aluno.getId());
     }
 
     // Atualiza os dados do aluno cadastrado
@@ -155,8 +155,9 @@ public class AlunoService {
         return mapper.map(aluno, AlunoDTO.class);
     }
 
-    private Aluno buscarPorId(UUID id) {
+    public AlunoDTO buscarPorId(UUID id) {
         return alunoRepository.findById(id)
+                .map(aluno -> mapper.map(aluno, AlunoDTO.class))
                 .orElseThrow(
                         () -> new AlunoNotFoundException(String.format("Aluno com ID: %s não foi encontrado", id))
                 );
@@ -239,7 +240,7 @@ public class AlunoService {
         }
 
         aluno.setAusenciasConsecutivas(quantidadeAusencias);
-        alunoRepository.save(aluno);
+        alunoRepository.save(mapper.map(aluno, Aluno.class));
 
         var atualizarStatus = new AtualizarStatusAlunoEvent(aluno.getId());
         eventPublisher.publishEvent(atualizarStatus);
@@ -255,7 +256,7 @@ public class AlunoService {
             aluno.setStatus(Status.EM_ALERTA);
         else
             aluno.setStatus(Status.REGULAR);
-        alunoRepository.save(aluno);
+        alunoRepository.save(mapper.map(aluno, Aluno.class));
     }
 
     @EventListener
