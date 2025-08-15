@@ -9,7 +9,11 @@ public class ModelMapperConfig {
 
     @Bean
     public ModelMapper mapper() {
-        return new ModelMapper();
+        var modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setPropertyCondition(
+                context -> context.getSource() != null
+        );
+        return modelMapper;
     }
 
 }
