@@ -77,6 +77,7 @@ public class AlunoService {
 
         var aluno = mapper.map(alunoListaEspera, Aluno.class);
         alunoRepository.save(aluno);
+        atualizarListaEspera();
         return alunoListaEspera;
     }
 
@@ -96,10 +97,8 @@ public class AlunoService {
         return alunoRepository.buscarAlunosEfetivados(pageable);
     }
 
-    public void registrarAlunoEfetivado() {
+    private void atualizarListaEspera() {
         turnoRepository.findAll().forEach(turno -> {
-            System.out.println("Turno atual: " + turno.getNome());
-
            Optional<Aluno> alunoListaEspera = alunoRepository
                    .buscarAlunosPorTurno(turno.getNome())
                    .stream()
