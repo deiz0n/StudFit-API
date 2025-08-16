@@ -76,7 +76,7 @@ public class AlunoService {
 
         var aluno = mapper.map(alunoListaEspera, Aluno.class);
         alunoRepository.save(aluno);
-        alocarAlunoListaEsperaEmHorario();
+        alocarAlunoEmHorarioDisponivel(aluno);
         return alunoListaEspera;
     }
 
@@ -93,51 +93,100 @@ public class AlunoService {
         return alunoRepository.buscarAlunosEfetivados(pageable);
     }
 
-    private void alocarAlunoListaEsperaEmHorario() {
-        turnoRepository.findAll().forEach(turno -> {
-            Optional<Aluno> alunoListaEspera = alunoRepository
-                    .buscarAlunosPorTurno(turno.getNome())
-                    .stream()
-                    .findFirst();
+    private void alocarAlunoEmHorarioDisponivel(Aluno aluno) {
+        Optional<Horario> horarioEscolhido = Optional.empty();
 
-            if (alunoListaEspera.isEmpty()) return;
-
-            Aluno aluno = mapper.map(alunoListaEspera.get(), Aluno.class);
-
-            Optional<Horario> horarioEscolhido = Optional.empty();
-
-            if (aluno.getTurnosPreferenciais() != null && !aluno.getTurnosPreferenciais().isEmpty()) {
-                for (TurnosPreferenciais preferencia : aluno.getTurnosPreferenciais()) {
-                    horarioEscolhido = horarioRepository
-                            .buscarHorariosPorTurno(preferencia.getTurno().getNome())
-                            .stream()
-                            .filter((horario -> horario.getVagasDisponiveis() > 0))
-                            .findFirst();
-                    if (horarioEscolhido.isPresent()) break;
-                }
-            }
-
-            if (horarioEscolhido.isEmpty()) {
-                horarioEscolhido = horarioRepository.findAll()
+        if (aluno.getTurnosPreferenciais() != null && !aluno.getTurnosPreferenciais().isEmpty()) {
+            for (TurnosPreferenciais preferencia : aluno.getTurnosPreferenciais()) {
+                horarioEscolhido = horarioRepository
+                        .buscarHorariosPorTurno(preferencia.getTurno().getNome())
                         .stream()
-                        .filter(horario -> horario.getVagasDisponiveis() > 0)
+                        .filter((horario -> horario.getVagasDisponiveis() > 0))
                         .findFirst();
+                if (horarioEscolhido.isPresent()) break;
             }
+        }
 
-            if (horarioEscolhido.isPresent()) {
-                var horario = horarioEscolhido.get();
-                horario.setVagasDisponiveis(horario.getVagasDisponiveis() - 1);
-                horarioRepository.save(horario);
+        if (horarioEscolhido.isEmpty()) {
+            horarioEscolhido = horarioRepository.findAll()
+                    .stream()
+                    .filter(horario -> horario.getVagasDisponiveis() > 0)
+                    .findFirst();
+        }
 
-                aluno.setHorario(horario);
-                aluno.setListaEspera(false);
-                aluno.setColocacao(null);
-                aluno.setStatus(Status.CADASTRO_PENDENTE);
-                alunoRepository.save(aluno);
+        if (horarioEscolhido.isPresent()) {
+            var horario = horarioEscolhido.get();
+            horario.setVagasDisponiveis(horario.getVagasDisponiveis() - 1);
+            horarioRepository.save(horario);
 
-                reordenarListaEspera(aluno.getId());
-            }
-        });
+            aluno.setHorario(horario);
+            aluno.setListaEspera(false);
+            aluno.setColocacao(null);
+            aluno.setStatus(Status.CADASTRO_PENDENTE);
+            alunoRepository.save(aluno);
+
+            reordenarListaEspera(aluno.getId());
+        }
+    }
+
+    private void alocarAlunosEmHorarioDisponivel() {
+
+//        turnoRepository.findAll().forEach(turno -> {
+//            Optional<Aluno> alunoListaEspera = alunoRepository
+//                    .buscarAlunosPorTurno(turno.getNome())
+//                    .stream()
+//                    .findFirst();
+//
+//            if (alunoListaEspera.isEmpty()) return;
+//
+//            Aluno aluno = mapper.map(alunoListaEspera.get(), Aluno.class);
+//
+//            Optional<Horario> horarioEscolhido = Optional.empty();
+//
+//            if (aluno.getTurnosPreferenciais() != null && !aluno.getTurnosPreferenciais().isEmpty()) {
+//                for (TurnosPreferenciais preferencia : aluno.getTurnosPreferenciais()) {
+//                    horarioEscolhido = horarioRepository
+//                            .buscarHorariosPorTurno(preferencia.getTurno().getNome())
+//                            .stream()
+//                            .filter((horario -> horario.getVagasDisponiveis() > 0))
+//                            .findFirst();
+//                    if (horarioEscolhido.isPresent()) break;
+//                }
+//            }
+//
+//            if (horarioEscolhido.isEmpty()) {
+//                horarioEscolhido = horarioRepository.findAll()
+//                        .stream()
+//                        .filter(horario -> horario.getVagasDisponiveis() > 0)
+//                        .findFirst();
+//            }
+//
+//            if (horarioEscolhido.isPresent()) {
+//                var horario = horarioEscolhido.get();
+//                horario.setVagasDisponiveis(horario.getVagasDisponiveis() - 1);
+//                horarioRepository.save(horario);
+//
+//                aluno.setHorario(horario);
+//                aluno.setListaEspera(false);
+//                aluno.setColocacao(null);
+//                aluno.setStatus(Status.CADASTRO_PENDENTE);
+//                alunoRepository.save(aluno);
+//
+//                reordenarListaEspera(aluno.getId());
+//            }
+//        });
+    }
+
+    public void registarAlunoStatusPendente(UUID id, AlunoDTO alunoDTO) {
+        var aluno = alunoRepository.findById(id)
+                .orElseThrow(
+                        () -> new AlunoNotFoundException(
+                                String.format(
+                                        "Aluno com ID: %s não foi encontrado", id)
+                        ));
+        atualizarDados(aluno, alunoDTO);
+        aluno.setStatus(Status.REGULAR);
+        alunoRepository.save(aluno);
     }
 
     // Remove aluno cadastrado
@@ -278,5 +327,27 @@ public class AlunoService {
 
             alunoRepository.deleteById(buscarAluno.getId());
         }
+    }
+
+    private void atualizarDados(Aluno aluno, AlunoDTO alunoDTO) {
+        if (alunoDTO.getNome() != null) aluno.setNome(alunoDTO.getNome());
+        if (alunoDTO.getPeso() != null) aluno.setPeso(alunoDTO.getPeso());
+        if (alunoDTO.getAltura() != null) aluno.setAltura(alunoDTO.getAltura());
+        if (alunoDTO.getEmail() != null) aluno.setEmail(alunoDTO.getEmail());
+        if (alunoDTO.getTelefone() != null) aluno.setTelefone(alunoDTO.getTelefone());
+        if (alunoDTO.getCirurgias() != null) aluno.setCirurgias(alunoDTO.getCirurgias());
+        if (alunoDTO.getPatologias() != null) aluno.setPatologias(alunoDTO.getPatologias());
+        if (alunoDTO.getMesesExperienciaMusculacao() != null)
+            aluno.setMesesExperienciaMusculacao(alunoDTO.getMesesExperienciaMusculacao());
+        if (alunoDTO.getDiagnosticoLesaoJoelho() != null)
+            aluno.setDiagnosticoLesaoJoelho(alunoDTO.getDiagnosticoLesaoJoelho());
+        if (alunoDTO.getStatus() != null) aluno.setStatus(alunoDTO.getStatus());
+        if (alunoDTO.getAusenciasConsecutivas() != null)
+            aluno.setAusenciasConsecutivas(alunoDTO.getAusenciasConsecutivas());
+        if (alunoDTO.getListaEspera() != null) aluno.setListaEspera(alunoDTO.getListaEspera());
+        if (alunoDTO.getConsumoAlcool() != null) aluno.setConsumoAlcool(alunoDTO.getConsumoAlcool());
+        if (alunoDTO.getConsumoCigarro() != null) aluno.setConsumoCigarro(alunoDTO.getConsumoCigarro());
+        if (alunoDTO.getPraticaExercicioFisico() != null)
+            aluno.setPraticaExercicioFisico(alunoDTO.getPraticaExercicioFisico());
     }
 }
