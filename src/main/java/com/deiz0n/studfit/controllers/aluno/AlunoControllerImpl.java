@@ -2,6 +2,7 @@ package com.deiz0n.studfit.controllers.aluno;
 
 import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
+import com.deiz0n.studfit.domain.enums.Status;
 import com.deiz0n.studfit.domain.response.Response;
 import com.deiz0n.studfit.services.AlunoService;
 import org.springframework.http.CacheControl;
@@ -70,8 +71,14 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<Response<?>> buscarAlunosEfetivados(ServletWebRequest path, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "10") int quantidade) {
-        var alunos = service.buscarAlunosEfetivados(numeroPagina, quantidade);
+    public ResponseEntity<Response<?>> buscarAlunosEfetivados(
+            ServletWebRequest path,
+            @RequestParam(defaultValue = "0", required = false) int numeroPagina,
+            @RequestParam(defaultValue = "10", required = false) int quantidade,
+            @RequestParam(required = false) String turno,
+            @RequestParam(required = false) Status status
+    ) {
+        var alunos = service.buscarAlunosEfetivados(numeroPagina, quantidade, turno, status);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
                 .body(Response.builder()

@@ -2,6 +2,7 @@ package com.deiz0n.studfit.controllers.aluno;
 
 import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
+import com.deiz0n.studfit.domain.enums.Status;
 import com.deiz0n.studfit.domain.response.Response;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -19,7 +20,12 @@ public interface AlunoController {
     ResponseEntity<Response<?>> buscarAluno(@PathVariable UUID id, ServletWebRequest path);
 
     @GetMapping("lista-espera")
-    ResponseEntity<Response<?>> buscarAlunosListaEspera(ServletWebRequest path, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "10") int quantidade, @RequestParam String turno);
+    ResponseEntity<Response<?>> buscarAlunosListaEspera(
+            ServletWebRequest path,
+            @RequestParam(defaultValue = "0") int numeroPagina,
+            @RequestParam(defaultValue = "10") int quantidade,
+            @RequestParam String turno
+    );
 
     @Transactional
     @PostMapping("/lista-espera/registrar")
@@ -30,7 +36,13 @@ public interface AlunoController {
     ResponseEntity excluirAlunoListaEspera(@PathVariable UUID id, ServletWebRequest path);
 
     @GetMapping("efetivados")
-    ResponseEntity<Response<?>> buscarAlunosEfetivados(ServletWebRequest path, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "100") int quantidade);
+    ResponseEntity<Response<?>> buscarAlunosEfetivados(
+            ServletWebRequest path,
+            @RequestParam(defaultValue = "0", required = false) int numeroPagina,
+            @RequestParam(defaultValue = "100", required = false) int quantidade,
+            @RequestParam(required = false) String turno,
+            @RequestParam(required = false) Status status
+    );
 
     @Deprecated
     @Transactional

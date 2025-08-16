@@ -1,8 +1,8 @@
 package com.deiz0n.studfit.infrastructure.repositories;
 
 import com.deiz0n.studfit.domain.dtos.AlunoEfetivadoDTO;
-import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.domain.entites.Aluno;
+import com.deiz0n.studfit.domain.enums.Status;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -43,7 +43,7 @@ public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
             "LEFT JOIN FETCH a.horario h " +
             "WHERE t.nome = :turno " +
             "AND " +
-            "a.listaEspera = true "  +
+            "a.listaEspera = true " +
             "ORDER BY a.colocacao")
     List<Aluno> buscarAlunosListaEspera(String turno);
 
@@ -54,6 +54,7 @@ public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
             "JOIN tb_horario h " +
             "ON a.horario.id = h.id " +
             "JOIN tb_turno t " +
-            "ON h.turno.id = t.id")
-    List<AlunoEfetivadoDTO> buscarAlunosEfetivados(Pageable pageable);
+            "ON h.turno.id = t.id " +
+            "WHERE (:status IS NULL OR a.status = :status) AND (:turno IS NULL OR t.nome = :turno)")
+    List<AlunoEfetivadoDTO> buscarAlunosEfetivados(Pageable pageable, String turno, Status status);
 }

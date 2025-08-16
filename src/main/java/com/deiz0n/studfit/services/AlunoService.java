@@ -90,9 +90,9 @@ public class AlunoService {
     }
 
     // Retorna todos os alunos já cadastrados na academia
-    public List<AlunoEfetivadoDTO> buscarAlunosEfetivados(int numeroPagina, int quantidade) {
+    public List<AlunoEfetivadoDTO> buscarAlunosEfetivados(int numeroPagina, int quantidade, String turno, Status status) {
         var pageable = PageRequest.of(numeroPagina, quantidade);
-        return alunoRepository.buscarAlunosEfetivados(pageable);
+        return alunoRepository.buscarAlunosEfetivados(pageable, turno.toUpperCase(), status);
     }
 
     private void alocarAlunoEmHorarioDisponivel(Aluno aluno) {
