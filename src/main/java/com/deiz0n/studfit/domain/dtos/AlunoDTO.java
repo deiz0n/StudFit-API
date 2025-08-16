@@ -44,6 +44,7 @@ public class AlunoDTO {
     private Boolean consumoCigarro = false;
     @JsonProperty("pratica_exercicio_fisico")
     private Boolean praticaExercicioFisico;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String[] turnosPreferenciais;
 
     private HorarioDTO horario;
