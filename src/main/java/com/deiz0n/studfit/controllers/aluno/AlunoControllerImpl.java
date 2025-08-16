@@ -82,18 +82,11 @@ public class AlunoControllerImpl implements AlunoController {
                         .build());
     }
 
-//    @Override
-//    public ResponseEntity<Response<?>> registrarAlunoEfetivado(AlunoDTO request, ServletWebRequest path) {
-//        var aluno = service.registrarAlunoEfetivado(request);
-//        return ResponseEntity.ok()
-//                .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
-//                .body(Response.builder()
-//                        .code(HttpStatus.OK.value())
-//                        .status(HttpStatus.OK)
-//                        .path(path.getRequest().getRequestURI())
-//                        .data(aluno)
-//                        .build());
-//    }
+    @Override
+    public ResponseEntity<?> registrarAlunoEfetivado(AlunoDTO request, UUID id, ServletWebRequest path) {
+        service.registarAlunoStatusPendente(id, request);
+        return ResponseEntity.noContent().build();
+    }
 
     @Override
     public ResponseEntity<?> excluirAlunoEfetivado(UUID id) {

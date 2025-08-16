@@ -32,10 +32,10 @@ public interface AlunoController {
     @GetMapping("efetivados")
     ResponseEntity<Response<?>> buscarAlunosEfetivados(ServletWebRequest path, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "100") int quantidade);
 
-//    @Deprecated
-//    @Transactional
-//    @PatchMapping("efetivados/efetivar")
-//    ResponseEntity<Response<?>> registrarAlunoEfetivado(@RequestBody @Valid AlunoDTO request, ServletWebRequest path);
+    @Deprecated
+    @Transactional
+    @PatchMapping("efetivados/efetivar/{id}")
+    ResponseEntity<?> registrarAlunoEfetivado(@RequestBody @Valid AlunoDTO request, @PathVariable UUID id, ServletWebRequest path);
 
     @Transactional
     @DeleteMapping("efetivados/excluir/{id}")
