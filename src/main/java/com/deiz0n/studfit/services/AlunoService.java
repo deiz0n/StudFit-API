@@ -16,7 +16,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.util.*;
@@ -129,52 +131,54 @@ public class AlunoService {
         }
     }
 
-    private void alocarAlunosEmHorarioDisponivel() {
+    // Verifica a existência de alunos na lista de espera a cada 1 hora
+    @Scheduled(fixedDelay = 100000)
+    @Transactional
+    void alocarAlunosEmHorariosDisponivel() {
+        turnoRepository.findAll().forEach(turno -> {
+            Optional<Aluno> alunoListaEspera = alunoRepository
+                    .buscarAlunosPorTurno(turno.getNome())
+                    .stream()
+                    .findFirst();
 
-//        turnoRepository.findAll().forEach(turno -> {
-//            Optional<Aluno> alunoListaEspera = alunoRepository
-//                    .buscarAlunosPorTurno(turno.getNome())
-//                    .stream()
-//                    .findFirst();
-//
-//            if (alunoListaEspera.isEmpty()) return;
-//
-//            Aluno aluno = mapper.map(alunoListaEspera.get(), Aluno.class);
-//
-//            Optional<Horario> horarioEscolhido = Optional.empty();
-//
-//            if (aluno.getTurnosPreferenciais() != null && !aluno.getTurnosPreferenciais().isEmpty()) {
-//                for (TurnosPreferenciais preferencia : aluno.getTurnosPreferenciais()) {
-//                    horarioEscolhido = horarioRepository
-//                            .buscarHorariosPorTurno(preferencia.getTurno().getNome())
-//                            .stream()
-//                            .filter((horario -> horario.getVagasDisponiveis() > 0))
-//                            .findFirst();
-//                    if (horarioEscolhido.isPresent()) break;
-//                }
-//            }
-//
-//            if (horarioEscolhido.isEmpty()) {
-//                horarioEscolhido = horarioRepository.findAll()
-//                        .stream()
-//                        .filter(horario -> horario.getVagasDisponiveis() > 0)
-//                        .findFirst();
-//            }
-//
-//            if (horarioEscolhido.isPresent()) {
-//                var horario = horarioEscolhido.get();
-//                horario.setVagasDisponiveis(horario.getVagasDisponiveis() - 1);
-//                horarioRepository.save(horario);
-//
-//                aluno.setHorario(horario);
-//                aluno.setListaEspera(false);
-//                aluno.setColocacao(null);
-//                aluno.setStatus(Status.CADASTRO_PENDENTE);
-//                alunoRepository.save(aluno);
-//
-//                reordenarListaEspera(aluno.getId());
-//            }
-//        });
+            if (alunoListaEspera.isEmpty()) return;
+
+            Aluno aluno = mapper.map(alunoListaEspera.get(), Aluno.class);
+
+            Optional<Horario> horarioEscolhido = Optional.empty();
+
+            if (aluno.getTurnosPreferenciais() != null && !aluno.getTurnosPreferenciais().isEmpty()) {
+                for (TurnosPreferenciais preferencia : aluno.getTurnosPreferenciais()) {
+                    horarioEscolhido = horarioRepository
+                            .buscarHorariosPorTurno(preferencia.getTurno().getNome())
+                            .stream()
+                            .filter((horario -> horario.getVagasDisponiveis() > 0))
+                            .findFirst();
+                    if (horarioEscolhido.isPresent()) break;
+                }
+            }
+
+            if (horarioEscolhido.isEmpty()) {
+                horarioEscolhido = horarioRepository.findAll()
+                        .stream()
+                        .filter(horario -> horario.getVagasDisponiveis() > 0)
+                        .findFirst();
+            }
+
+            if (horarioEscolhido.isPresent()) {
+                var horario = horarioEscolhido.get();
+                horario.setVagasDisponiveis(horario.getVagasDisponiveis() - 1);
+                horarioRepository.save(horario);
+
+                aluno.setHorario(horario);
+                aluno.setListaEspera(false);
+                aluno.setColocacao(null);
+                aluno.setStatus(Status.CADASTRO_PENDENTE);
+                alunoRepository.save(aluno);
+
+                reordenarListaEspera(aluno.getId());
+            }
+        });
     }
 
     public void registarAlunoStatusPendente(UUID id, AlunoDTO alunoDTO) {
@@ -204,6 +208,7 @@ public class AlunoService {
         return mapper.map(aluno, AlunoDTO.class);
     }
 
+    @Transactional
     public AlunoDTO buscarPorId(UUID id) {
         return alunoRepository.findById(id)
                 .map(aluno -> mapper.map(aluno, AlunoDTO.class))
