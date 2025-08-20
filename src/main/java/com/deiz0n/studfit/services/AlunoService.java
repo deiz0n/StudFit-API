@@ -5,6 +5,7 @@ import com.deiz0n.studfit.domain.entites.Aluno;
 import com.deiz0n.studfit.domain.entites.Horario;
 import com.deiz0n.studfit.domain.entites.Presenca;
 import com.deiz0n.studfit.domain.entites.TurnosPreferenciais;
+import com.deiz0n.studfit.domain.enums.Cargo;
 import com.deiz0n.studfit.domain.enums.Status;
 import com.deiz0n.studfit.domain.events.*;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotFoundException;
@@ -89,7 +90,6 @@ public class AlunoService {
     public void excluirAlunoListaEspera(UUID id) {
         var aluno = buscarPorId(id);
         alunoRepository.deleteById(aluno.getId());
-
         reordenarListaEspera(aluno.getId());
     }
 
@@ -122,8 +122,8 @@ public class AlunoService {
 
         if (horarioEscolhido.isPresent()) {
             var horario = horarioEscolhido.get();
-            horario.setVagasDisponiveis(horario.getVagasDisponiveis() - 1);
-            horarioRepository.save(horario);
+            var atualizarVagasDisponiveis = new AtualizarVagasDisponiveisHorarioEvent(horario.getId(), false);
+            eventPublisher.publishEvent(atualizarVagasDisponiveis);
 
             aluno.setHorario(horario);
             aluno.setListaEspera(false);
@@ -200,6 +200,9 @@ public class AlunoService {
     // Remove aluno cadastrado
     public void excluirAlunoEfetivado(UUID id) {
         var aluno = buscarPorId(id);
+        var horarioId = aluno.getHorario().getId();
+        var atualizarVagasDisponiveis = new AtualizarVagasDisponiveisHorarioEvent(horarioId, true);
+        eventPublisher.publishEvent(atualizarVagasDisponiveis);
         alunoRepository.deleteById(aluno.getId());
     }
 
@@ -330,33 +333,69 @@ public class AlunoService {
             var listaDeUsuarios = usuarioRepository.findAll()
                     .stream()
                     .map(usuario -> mapper.map(usuario, UsuarioDTO.class))
+                    .filter(usuario -> {
+                        var cargo = Cargo.valueOf(usuario.getCargo());
+                        return cargo == Cargo.INSTRUTOR || cargo == Cargo.ESTAGIARIO;
+                    })
                     .toList();
 
             var notificarUsuarioCadastroExcluido = new NotificarUsuarioCadastroExcluidoEvent(listaDeUsuarios, aluno.getNome());
             eventPublisher.publishEvent(notificarUsuarioCadastroExcluido);
+
+            var horario = buscarAluno.getHorario();
+            eventPublisher.publishEvent(new AtualizarVagasDisponiveisHorarioEvent(horario.getId(), true));
 
             alunoRepository.deleteById(buscarAluno.getId());
         }
     }
 
     private void atualizarDados(Aluno aluno, AlunoDTO alunoDTO) {
-        if (alunoDTO.getNome() != null) aluno.setNome(alunoDTO.getNome());
-        if (alunoDTO.getPeso() != null) aluno.setPeso(alunoDTO.getPeso());
-        if (alunoDTO.getAltura() != null) aluno.setAltura(alunoDTO.getAltura());
-        if (alunoDTO.getEmail() != null) aluno.setEmail(alunoDTO.getEmail());
-        if (alunoDTO.getTelefone() != null) aluno.setTelefone(alunoDTO.getTelefone());
-        if (alunoDTO.getCirurgias() != null) aluno.setCirurgias(alunoDTO.getCirurgias());
-        if (alunoDTO.getPatologias() != null) aluno.setPatologias(alunoDTO.getPatologias());
+        if (alunoDTO.getNome() != null)
+            aluno.setNome(alunoDTO.getNome());
+        if (alunoDTO.getPeso() != null)
+            aluno.setPeso(alunoDTO.getPeso());
+        if (alunoDTO.getAltura() != null)
+            aluno.setAltura(alunoDTO.getAltura());
+        if (alunoDTO.getEmail() != null)
+            aluno.setEmail(alunoDTO.getEmail());
+        if (alunoDTO.getHorario() != null) {
+            var horarioNovo = mapper.map(alunoDTO.getHorario(), Horario.class);
+            if (!horarioNovo.equals(aluno.getHorario())) {
+                var horarioAntigo = aluno.getHorario();
+                eventPublisher.publishEvent(
+                        new AtualizarVagasDisponiveisHorarioEvent(
+                                horarioAntigo.getId(),
+                                true
+                        )
+                );
+                eventPublisher.publishEvent(
+                        new AtualizarVagasDisponiveisHorarioEvent(
+                                horarioNovo.getId(),
+                                false
+                        )
+                );
+            }
+        }
+        if (alunoDTO.getTelefone() != null)
+            aluno.setTelefone(alunoDTO.getTelefone());
+        if (alunoDTO.getCirurgias() != null)
+            aluno.setCirurgias(alunoDTO.getCirurgias());
+        if (alunoDTO.getPatologias() != null)
+            aluno.setPatologias(alunoDTO.getPatologias());
         if (alunoDTO.getMesesExperienciaMusculacao() != null)
             aluno.setMesesExperienciaMusculacao(alunoDTO.getMesesExperienciaMusculacao());
         if (alunoDTO.getDiagnosticoLesaoJoelho() != null)
             aluno.setDiagnosticoLesaoJoelho(alunoDTO.getDiagnosticoLesaoJoelho());
-        if (alunoDTO.getStatus() != null) aluno.setStatus(alunoDTO.getStatus());
+        if (alunoDTO.getStatus() != null)
+            aluno.setStatus(alunoDTO.getStatus());
         if (alunoDTO.getAusenciasConsecutivas() != null)
             aluno.setAusenciasConsecutivas(alunoDTO.getAusenciasConsecutivas());
-        if (alunoDTO.getListaEspera() != null) aluno.setListaEspera(alunoDTO.getListaEspera());
-        if (alunoDTO.getConsumoAlcool() != null) aluno.setConsumoAlcool(alunoDTO.getConsumoAlcool());
-        if (alunoDTO.getConsumoCigarro() != null) aluno.setConsumoCigarro(alunoDTO.getConsumoCigarro());
+        if (alunoDTO.getListaEspera() != null)
+            aluno.setListaEspera(alunoDTO.getListaEspera());
+        if (alunoDTO.getConsumoAlcool() != null)
+            aluno.setConsumoAlcool(alunoDTO.getConsumoAlcool());
+        if (alunoDTO.getConsumoCigarro() != null)
+            aluno.setConsumoCigarro(alunoDTO.getConsumoCigarro());
         if (alunoDTO.getPraticaExercicioFisico() != null)
             aluno.setPraticaExercicioFisico(alunoDTO.getPraticaExercicioFisico());
     }
