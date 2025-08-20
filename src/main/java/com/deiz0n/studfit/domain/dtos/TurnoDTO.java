@@ -24,4 +24,8 @@ public class TurnoDTO {
     @JsonProperty(value = "created_at", access = JsonProperty.Access.READ_ONLY)
     private Instant createdAt;
 
+    public TurnoDTO(UUID id, String nome) {
+        this.id = id;
+        this.nome = nome;
+    }
 }
