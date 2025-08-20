@@ -1,11 +1,11 @@
 package com.deiz0n.studfit.domain.entites;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +25,10 @@ public class Horario {
     private LocalTime horarioFinal;
     @Column(name = "vagas_disponiveis")
     private Integer vagasDisponiveis;
+    @Column(updatable = true, name = "updated_at")
+    private Instant updatedAt;
+    @Column(insertable = true, name = "created_at")
+    private Instant createdAt;
 
     @OneToMany(mappedBy = "horario", fetch = FetchType.EAGER)
     private List<Aluno> alunos;

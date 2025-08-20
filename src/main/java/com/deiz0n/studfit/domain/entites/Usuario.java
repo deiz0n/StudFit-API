@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +33,10 @@ public class Usuario implements UserDetails {
     private String codigoRecuperacao;
     @Enumerated(EnumType.STRING)
     private Cargo cargo;
+    @Column(updatable = true, name = "updated_at")
+    private Instant updatedAt;
+    @Column(insertable = true, name = "created_at")
+    private Instant createdAt;
 
     @OneToMany(mappedBy = "usuario")
     private List<Presenca> presenca;

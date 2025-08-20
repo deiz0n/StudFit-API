@@ -3,8 +3,12 @@ package com.deiz0n.studfit.domain.entites;
 import com.deiz0n.studfit.domain.enums.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +49,10 @@ public class Aluno {
     private Boolean consumoCigarro;
     @Column(name = "pratica_exercicio_fisico")
     private Boolean praticaExercicioFisico;
+    @Column(updatable = true, name = "updated_at")
+    private Instant updatedAt;
+    @Column(insertable = true, name = "created_at")
+    private Instant createdAt;
 
     @JsonIgnore
     @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL)

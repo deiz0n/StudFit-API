@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +23,10 @@ public class Turno {
     private UUID id;
     @Column(name = "nome", unique = true)
     private String nome;
+    @Column(updatable = true, name = "updated_at")
+    private Instant updatedAt;
+    @Column(insertable = true, name = "created_at")
+    private Instant createdAt;
 
     @JsonIgnore
     @OneToMany(mappedBy = "turno")
