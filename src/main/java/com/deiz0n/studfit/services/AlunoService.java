@@ -68,7 +68,11 @@ public class AlunoService {
     public AlunoListaEsperaDTO registrarAlunosListaEspera(AlunoListaEsperaDTO alunoListaEspera) {
         eExistente(alunoListaEspera.getEmail(), alunoListaEspera.getTelefone());
 
-        if (!alunoListaEspera.getTurnosPreferenciais().isEmpty()) {
+        if (
+                alunoListaEspera.getListaEspera() != null
+                        && alunoListaEspera.getTurnosPreferenciais() != null
+                        && !alunoListaEspera.getTurnosPreferenciais().isEmpty()
+        ) {
             var turno = alunoListaEspera.getTurnosPreferenciais().get(0).toString();
             alunoListaEspera.setColocacao(alunoRepository.quantidadeAlunosPorTurno(turno) + 1);
         } else {
