@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -24,6 +25,10 @@ public class PresencaDTO {
     private AlunoEfetivadoDTO aluno;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private UsuarioDTO usuario;
+    @JsonProperty(value = "updated_at", access = JsonProperty.Access.READ_ONLY)
+    private Instant updatedAt;
+    @JsonProperty(value = "created_at", access = JsonProperty.Access.READ_ONLY)
+    private Instant createdAt;
 
     public PresencaDTO(UUID id, LocalDate data, Boolean presente, AlunoEfetivadoDTO aluno) {
         this.id = id;

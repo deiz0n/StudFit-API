@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -46,6 +47,10 @@ public class AlunoDTO {
     private Boolean praticaExercicioFisico;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String[] turnosPreferenciais;
+    @JsonProperty(value = "updated_at", access = JsonProperty.Access.READ_ONLY)
+    private Instant updatedAt;
+    @JsonProperty(value = "created_at", access = JsonProperty.Access.READ_ONLY)
+    private Instant createdAt;
 
     private HorarioDTO horario;
 
