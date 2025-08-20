@@ -2,6 +2,7 @@ package com.deiz0n.studfit.controllers.aluno;
 
 import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
+import com.deiz0n.studfit.domain.dtos.AtualizarAlunoDTO;
 import com.deiz0n.studfit.domain.enums.Status;
 import com.deiz0n.studfit.domain.response.Response;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -55,5 +56,10 @@ public interface AlunoController {
 
     @Transactional
     @PatchMapping("efetivado/atualizar/{id}")
-    ResponseEntity<Response<?>> atualizarAlunoEfetivado(@PathVariable UUID id, @RequestBody @Valid AlunoDTO request, ServletWebRequest path);
+    ResponseEntity<Response<?>> atualizarAlunoEfetivado(
+            @PathVariable UUID id,
+            @RequestBody
+            @Valid AtualizarAlunoDTO request,
+            ServletWebRequest path
+    );
 }

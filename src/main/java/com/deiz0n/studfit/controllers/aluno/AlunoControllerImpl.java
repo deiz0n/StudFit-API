@@ -2,6 +2,7 @@ package com.deiz0n.studfit.controllers.aluno;
 
 import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
+import com.deiz0n.studfit.domain.dtos.AtualizarAlunoDTO;
 import com.deiz0n.studfit.domain.enums.Status;
 import com.deiz0n.studfit.domain.response.Response;
 import com.deiz0n.studfit.services.AlunoService;
@@ -102,7 +103,7 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<Response<?>> atualizarAlunoEfetivado(UUID id, AlunoDTO request, ServletWebRequest path) {
+    public ResponseEntity<Response<?>> atualizarAlunoEfetivado(UUID id, AtualizarAlunoDTO request, ServletWebRequest path) {
         var aluno = service.atualizarEfetivado(id, request);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
