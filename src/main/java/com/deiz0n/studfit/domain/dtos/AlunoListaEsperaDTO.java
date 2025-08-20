@@ -1,12 +1,11 @@
 package com.deiz0n.studfit.domain.dtos;
 
-import com.deiz0n.studfit.domain.entites.TurnosPreferenciais;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,19 +35,7 @@ public class AlunoListaEsperaDTO {
     private Integer colocacao;
     @JsonIgnore
     private Boolean listaEspera = true;
+    @Size(max = 2, message = "É possível selecionar até 2 turnos preferenciais")
     private List<TurnosPreferenciaisDTO> turnosPreferenciais;
-
-    public AlunoListaEsperaDTO(UUID id, String nome, Integer colocacao) {
-        this.id = id;
-        this.nome = nome;
-        this.colocacao = colocacao;
-    }
-
-    public AlunoListaEsperaDTO(UUID id, String nome, Integer colocacao, List<TurnosPreferenciaisDTO> turnosPreferenciais) {
-        this.id = id;
-        this.nome = nome;
-        this.colocacao = colocacao;
-        this.turnosPreferenciais = turnosPreferenciais;
-    }
-
+    
 }
