@@ -92,7 +92,7 @@ public class AlunoService {
     // Retorna todos os alunos já cadastrados na academia
     public List<AlunoEfetivadoDTO> buscarAlunosEfetivados(int numeroPagina, int quantidade, String turno, Status status) {
         var pageable = PageRequest.of(numeroPagina, quantidade);
-        return alunoRepository.buscarAlunosEfetivados(pageable, turno.toUpperCase(), status);
+        return alunoRepository.buscarAlunosEfetivados(pageable, turno, status);
     }
 
     private void alocarAlunoEmHorarioDisponivel(Aluno aluno) {
@@ -200,11 +200,12 @@ public class AlunoService {
     }
 
     // Atualiza os dados do aluno cadastrado
-    public AlunoDTO atualizarEfetivado(UUID id, AlunoDTO alunoDTO) {
-        eExistente(alunoDTO, id);
-        var aluno = buscarPorId(id);
-        var alunoAtualizado = mapper.map(alunoDTO, Aluno.class);
-        alunoRepository.save(alunoAtualizado);
+    public AlunoDTO atualizarEfetivado(UUID id, AtualizarAlunoDTO alunoDTO) {
+        var dto = mapper.map(alunoDTO, AlunoDTO.class);
+        eExistente(dto, id);
+        var aluno = mapper.map(buscarPorId(id), Aluno.class);
+        atualizarDados(aluno, dto);
+        alunoRepository.save(aluno);
         return mapper.map(aluno, AlunoDTO.class);
     }
 
