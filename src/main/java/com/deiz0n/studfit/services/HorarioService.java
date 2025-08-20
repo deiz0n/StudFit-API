@@ -3,18 +3,16 @@ package com.deiz0n.studfit.services;
 import com.deiz0n.studfit.domain.dtos.HorarioDTO;
 import com.deiz0n.studfit.domain.dtos.TurnoDTO;
 import com.deiz0n.studfit.domain.entites.Horario;
-import com.deiz0n.studfit.domain.enums.Turno;
-import com.deiz0n.studfit.domain.events.RegitrarVagasDisponiveisEvent;
+import com.deiz0n.studfit.domain.events.AtualizarVagasDisponiveisHorarioEvent;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioAlreadyRegistered;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotValidException;
-import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotExistingException;
+import com.deiz0n.studfit.infrastructure.repositories.AlunoRepository;
 import com.deiz0n.studfit.infrastructure.repositories.HorarioRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -24,10 +22,12 @@ public class HorarioService {
 
     private final HorarioRepository repository;
     private final ModelMapper mapper;
+    private final AlunoRepository alunoRepository;
 
-    public HorarioService(HorarioRepository repository, ModelMapper mapper) {
+    public HorarioService(HorarioRepository repository, ModelMapper mapper, AlunoRepository alunoRepository) {
         this.repository = repository;
         this.mapper = mapper;
+        this.alunoRepository = alunoRepository;
     }
 
     public List<HorarioDTO> buscarHorarios() {
@@ -67,12 +67,13 @@ public class HorarioService {
     }
 
     @EventListener
-    private void atualizarVagasDisponiveis(RegitrarVagasDisponiveisEvent vagasDisponiveisEvent) {
+    private void atualizarVagasDisponiveis(AtualizarVagasDisponiveisHorarioEvent vagasDisponiveisEvent) {
         Horario horario = repository.findById(vagasDisponiveisEvent.id()).get();
-        var vagasDisponiveis = horario.getVagasDisponiveis();
-        var quantidadeAlunos = horario.getAlunos().size();
+        if (vagasDisponiveisEvent.adicionarVaga())
+            horario.setVagasDisponiveis(horario.getVagasDisponiveis() + 1);
+        else
+            horario.setVagasDisponiveis(horario.getVagasDisponiveis() - 1);
 
-        horario.setVagasDisponiveis(vagasDisponiveis - quantidadeAlunos);
         repository.save(horario);
     }
 
@@ -88,7 +89,7 @@ public class HorarioService {
         try {
             if (repository.buscarHorario(horario.getHorarioInicial(), horario.getHorarioFinal()).isPresent())
                 throw new HorarioAlreadyRegistered("Horário já cadastrado");
-            if ( horario.getHorarioFinal().getHour() - horario.getHorarioInicial().getHour() < 1)
+            if (horario.getHorarioFinal().getHour() - horario.getHorarioInicial().getHour() < 1)
                 throw new HorarioNotValidException("A diferença mínima entre o horário final e inicial é de 1 hora");
             if (horario.getHorarioInicial().isAfter(horario.getHorarioFinal()))
                 throw new HorarioNotValidException("O horário final não pode ser posterior ao inicial");
