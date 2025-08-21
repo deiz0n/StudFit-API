@@ -49,6 +49,8 @@ public class Aluno {
     private Boolean consumoCigarro;
     @Column(name = "pratica_exercicio_fisico")
     private Boolean praticaExercicioFisico;
+    @Column(name = "atestado", columnDefinition = "BLOB")
+    private byte[] atestado;
     @Column(updatable = true, name = "updated_at")
     private Instant updatedAt;
     @Column(insertable = true, name = "created_at")
