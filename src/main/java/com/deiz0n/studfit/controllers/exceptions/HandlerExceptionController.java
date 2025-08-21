@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.exc.PropertyBindingException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -43,6 +45,9 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class HandlerExceptionController extends ResponseEntityExceptionHandler {
+
+    @Value("${spring.servlet.multipart.max-file-size}")
+    private String tamanhoMaximoAtestado;
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -338,5 +343,21 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
             response.setTitle("Erro ao salvar atestado");
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(
+                        ResponseError.builder()
+                                .code(HttpStatus.PAYLOAD_TOO_LARGE.value())
+                                .title("Arquivo muito grande")
+                                .status(HttpStatus.PAYLOAD_TOO_LARGE)
+                                .description(
+                                        String.format("O tamanho máximo para um arquivo é %s", tamanhoMaximoAtestado)
+                                )
+                                .build()
+                );
     }
 }
