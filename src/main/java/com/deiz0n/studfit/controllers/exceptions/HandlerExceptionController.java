@@ -3,6 +3,7 @@ package com.deiz0n.studfit.controllers.exceptions;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotEfetivadoException;
+import com.deiz0n.studfit.domain.exceptions.aluno.AtestadoNotValidException;
 import com.deiz0n.studfit.domain.exceptions.horario.HorarioNotValidException;
 import com.deiz0n.studfit.domain.exceptions.resource.ResourceAlreadyException;
 import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotExistingException;
@@ -11,10 +12,15 @@ import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotValidException;
 import com.deiz0n.studfit.domain.exceptions.usuario.CargoNotExistentException;
 import com.deiz0n.studfit.domain.exceptions.usuario.SendEmailException;
 import com.deiz0n.studfit.domain.exceptions.usuario.SenhaNotCoincideException;
+import com.deiz0n.studfit.domain.exceptions.utils.CreationDirectoryException;
+import com.deiz0n.studfit.domain.exceptions.utils.InternalServerErrorException;
 import com.deiz0n.studfit.domain.response.ResponseError;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.exc.*;
+import com.fasterxml.jackson.databind.exc.IgnoredPropertyException;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.fasterxml.jackson.databind.exc.PropertyBindingException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -131,7 +137,7 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
         var detail = String.format("O campo '%s' não existe", fieldName);
 
         return ResponseEntity
-        .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.BAD_REQUEST)
                 .body(
                         ResponseError.builder()
                                 .code(HttpStatus.BAD_REQUEST.value())
@@ -172,7 +178,7 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ResourceNotExistingException.class)
     public ResponseEntity<ResponseError> handleCargoNotExistException(ResourceNotExistingException exception) {
-        var response =  ResponseError.builder()
+        var response = ResponseError.builder()
                 .code(HttpStatus.BAD_REQUEST.value())
                 .status(HttpStatus.BAD_REQUEST)
                 .description(exception.getMessage())
@@ -196,9 +202,12 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
                 .description(exception.getMessage())
                 .build();
 
-        if (exception instanceof HorarioNotValidException) {
+        if (exception instanceof HorarioNotValidException)
             response.setTitle("Horário inválido");
-        } else {
+
+        if (exception instanceof AtestadoNotValidException)
+            response.setTitle("Atestado inválido");
+        else {
             response.setTitle("Presença invália");
         }
         return ResponseEntity
@@ -312,5 +321,22 @@ public class HandlerExceptionController extends ResponseEntityExceptionHandler {
                                 .description(exception.getMessage())
                                 .build()
                 );
+    }
+
+    @ExceptionHandler(InternalServerErrorException.class)
+    public ResponseEntity<ResponseError> handleInternalServerError(InternalServerErrorException exception) {
+        var response = ResponseError.builder()
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .description(exception.getMessage())
+                .build();
+
+
+        if (exception instanceof CreationDirectoryException)
+            response.setTitle("Erro ao criar diretório");
+        else
+            response.setTitle("Erro ao salvar atestado");
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }
