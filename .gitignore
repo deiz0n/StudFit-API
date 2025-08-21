@@ -37,3 +37,5 @@ build/
 
 ### Variáveis de Ambiente ###
 .env
+
+/media
