@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -113,6 +114,12 @@ public class AlunoControllerImpl implements AlunoController {
                         .path(path.getRequest().getRequestURI())
                         .data(aluno)
                         .build());
+    }
+
+    @Override
+    public ResponseEntity<Void> adicionarAtestado(UUID id, MultipartFile atestado) {
+        service.adicionarAtestado(atestado, id);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -62,4 +63,8 @@ public interface AlunoController {
             @Valid AtualizarAlunoDTO request,
             ServletWebRequest path
     );
+
+    @Transactional
+    @PostMapping("efetivados/adicionar-atestado/{id}")
+    ResponseEntity<Void> adicionarAtestado(@PathVariable UUID id, @RequestParam("atestado") MultipartFile atestado);
 }

@@ -8,19 +8,31 @@ import com.deiz0n.studfit.domain.entites.TurnosPreferenciais;
 import com.deiz0n.studfit.domain.enums.Cargo;
 import com.deiz0n.studfit.domain.enums.Status;
 import com.deiz0n.studfit.domain.events.*;
+import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotEfetivadoException;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotFoundException;
+import com.deiz0n.studfit.domain.exceptions.aluno.AtestadoNotSavedException;
+import com.deiz0n.studfit.domain.exceptions.aluno.AtestadoNotValidException;
 import com.deiz0n.studfit.domain.exceptions.horario.TurnoNotExistentException;
 import com.deiz0n.studfit.domain.exceptions.usuario.EmailAlreadyRegisteredException;
 import com.deiz0n.studfit.domain.exceptions.usuario.TelefoneAlreadyRegisteredException;
+import com.deiz0n.studfit.domain.exceptions.utils.CreationDirectoryException;
 import com.deiz0n.studfit.infrastructure.repositories.*;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.DayOfWeek;
 import java.util.*;
 
@@ -34,8 +46,18 @@ public class AlunoService {
     private final HorarioRepository horarioRepository;
     private final UsuarioRepository usuarioRepository;
     private final TurnoRepository turnoRepository;
+    private final Path localArmazenamentoAtestado;
 
-    public AlunoService(AlunoRepository alunoRepository, PresencaRepository presencaRepository, ModelMapper mapper, ApplicationEventPublisher eventPublisher, HorarioRepository horarioRepository, UsuarioRepository usuarioRepository, TurnoRepository turnoRepository) {
+    public AlunoService(
+            AlunoRepository alunoRepository,
+            PresencaRepository presencaRepository,
+            ModelMapper mapper,
+            ApplicationEventPublisher eventPublisher,
+            HorarioRepository horarioRepository,
+            UsuarioRepository usuarioRepository,
+            TurnoRepository turnoRepository,
+            @Value("${file.upload.dir}") String caminhoAtestado
+    ) {
         this.alunoRepository = alunoRepository;
         this.presencaRepository = presencaRepository;
         this.mapper = mapper;
@@ -43,6 +65,13 @@ public class AlunoService {
         this.horarioRepository = horarioRepository;
         this.usuarioRepository = usuarioRepository;
         this.turnoRepository = turnoRepository;
+        this.localArmazenamentoAtestado = Paths.get(caminhoAtestado).toAbsolutePath().normalize();
+
+        try {
+            Files.createDirectories(this.localArmazenamentoAtestado);
+        } catch (IOException e) {
+            throw new CreationDirectoryException("Erro ao criar diretório para armazenamento do atestado");
+        }
     }
 
     public List<AlunoListaEsperaDTO> buscarAlunosListaEspera(int numeroPagina, int quantidade, String turno) {
@@ -223,6 +252,32 @@ public class AlunoService {
                 .orElseThrow(
                         () -> new AlunoNotFoundException(String.format("Aluno com ID: %s não foi encontrado", id))
                 );
+    }
+
+    public void adicionarAtestado(MultipartFile atestado, UUID id) {
+        var aluno = mapper.map(buscarPorId(id), Aluno.class);
+        var nomeArquivo = StringUtils.cleanPath(Objects.requireNonNull(atestado.getOriginalFilename()));
+
+        if (aluno.getStatus() == null)
+            throw new AlunoNotEfetivadoException(
+                    String.format("O aluno de id: %s ainda não foi efetivado", id.toString())
+            );
+
+        if (!Objects.equals(atestado.getContentType(), "application/pdf"))
+            throw new AtestadoNotValidException("O arquivo informado possui formato inválido. Apenas arquivos 'PDF' são aceitos");
+
+        try {
+            if (nomeArquivo.contains(".."))
+                throw new AtestadoNotValidException("O arquivo informado possui nome inválido");
+
+            Path caminhoOrigem = this.localArmazenamentoAtestado.resolve(nomeArquivo);
+            Files.copy(atestado.getInputStream(), caminhoOrigem, StandardCopyOption.REPLACE_EXISTING);
+
+            aluno.setAtestado(atestado.getBytes());
+            alunoRepository.save(aluno);
+        } catch (IOException e) {
+            throw new AtestadoNotSavedException("Erro ao salvar atestado");
+        }
     }
 
     // Verifica a existência de email ao cadastrar um aluno na lista de espera
