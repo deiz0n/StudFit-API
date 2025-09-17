@@ -12,6 +12,7 @@ import com.deiz0n.studfit.infrastructure.repositories.AlunoRepository;
 import com.deiz0n.studfit.infrastructure.repositories.PresencaRepository;
 import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class PresencaService {
         this.eventPublisher = eventPublisher;
     }
 
+    @Cacheable("presencas")
     public List<PresencaDTO> buscarPresencas(int numeroPagina, int quantidade) {
         var pageable = PageRequest.of(numeroPagina, quantidade);
         return presencaRepository.buscarPresencas(pageable);
