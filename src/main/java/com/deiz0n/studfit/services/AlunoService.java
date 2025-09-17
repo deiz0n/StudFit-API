@@ -19,6 +19,7 @@ import com.deiz0n.studfit.domain.exceptions.utils.CreationDirectoryException;
 import com.deiz0n.studfit.infrastructure.repositories.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
@@ -74,6 +75,7 @@ public class AlunoService {
         }
     }
 
+    @Cacheable("alunoListaEspera")
     public List<AlunoListaEsperaDTO> buscarAlunosListaEspera(int numeroPagina, int quantidade, String turno) {
         TurnoDTO turnoDTO = turnoRepository
                 .buscarPorNome(turno)
@@ -123,6 +125,7 @@ public class AlunoService {
     }
 
     // Retorna todos os alunos já cadastrados na academia
+    @Cacheable("alunosEfetivados")
     public List<AlunoEfetivadoDTO> buscarAlunosEfetivados(int numeroPagina, int quantidade, String turno, Status status) {
         var pageable = PageRequest.of(numeroPagina, quantidade);
         return alunoRepository.buscarAlunosEfetivados(pageable, turno, status);
@@ -165,7 +168,7 @@ public class AlunoService {
     }
 
     // Verifica a existência de alunos na lista de espera a cada 1 hora
-    @Scheduled(fixedDelay = 100000)
+    @Scheduled(fixedDelay = 3000)
     @Transactional
     void alocarAlunosEmHorariosDisponivel() {
         turnoRepository.findAll().forEach(turno -> {
