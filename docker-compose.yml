@@ -6,6 +6,7 @@ networks:
 
 services:
   stud-fit-db:
+    container_name: stud-fit-db
     image: postgres
     env_file:
       - .env
@@ -14,9 +15,18 @@ services:
     networks:
       - stud-fit-network
 
+  stud-fit-cache:
+    container_name: stud-fit-cache
+    image: redis:7.2
+    ports:
+      - "6379:6379"
+    networks:
+      - stud-fit-network
+
   stud-fit-api:
+    container_name: stud-fit-api
     image: deiz0n/stud-fit-api
-    command: ["/wait-for-it.sh", "-t", "10", "stud-fit-db:5435", "--", "java", "-jar", "studfit-api.jar"]
+    command: [ "/wait-for-it.sh", "-t", "10", "stud-fit-db:5435", "--", "java", "-jar", "studfit-api.jar" ]
     ports:
       - "8080:8080"
     environment:
@@ -27,3 +37,4 @@ services:
       - stud-fit-network
     depends_on:
       - stud-fit-db
+      - stud-fit-cache
