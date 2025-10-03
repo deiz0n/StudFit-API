@@ -93,7 +93,7 @@ public class UsuarioService {
     }
 
     @EventListener
-    private void geraCodigoRecuperacao(SolicitarRecuperacaoSenhaEvent recoveryPassswordEvent) {
+    public void geraCodigoRecuperacao(SolicitarRecuperacaoSenhaEvent recoveryPassswordEvent) {
         Usuario usuario = repository.buscarPorEmail(recoveryPassswordEvent.email())
                 .orElseThrow(
                         () -> new UsuarioNotFoundException("Usuário não encontrado")
@@ -108,7 +108,7 @@ public class UsuarioService {
     }
 
     @EventListener
-    private void atualizaSenha(AtualizarSenhaUsuarioEvent resetPasswordEvent) {
+    public void atualizaSenha(AtualizarSenhaUsuarioEvent resetPasswordEvent) {
         ResetPasswordDTO newSenha = resetPasswordEvent.resetPassword();
         Usuario usuario = repository.buscarPorCodigoRecuperacao(resetPasswordEvent.codigo())
                 .orElseThrow(
