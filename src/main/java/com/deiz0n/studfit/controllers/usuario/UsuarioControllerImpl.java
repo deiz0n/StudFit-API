@@ -24,7 +24,7 @@ public class UsuarioControllerImpl implements UsuarioController {
 
     @Override
     public ResponseEntity<Response<?>> buscarUsuarios(ServletWebRequest path) {
-        var usuarios = service.buscarHorarios();
+        var usuarios = service.buscarUsuarios();
         return ResponseEntity.ok()
                 .body(Response.builder()
                         .code(HttpStatus.OK.value())

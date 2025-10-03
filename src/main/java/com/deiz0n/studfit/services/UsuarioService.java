@@ -4,13 +4,13 @@ import com.deiz0n.studfit.domain.dtos.ResetPasswordDTO;
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
 import com.deiz0n.studfit.domain.entites.Usuario;
 import com.deiz0n.studfit.domain.enums.Cargo;
-import com.deiz0n.studfit.domain.events.EnviarEmailRecuperacaoSenhaEvent;
-import com.deiz0n.studfit.domain.events.EnviarEmailAlteracaoSenhaEvent;
-import com.deiz0n.studfit.domain.events.SolicitarRecuperacaoSenhaEvent;
 import com.deiz0n.studfit.domain.events.AtualizarSenhaUsuarioEvent;
+import com.deiz0n.studfit.domain.events.EnviarEmailAlteracaoSenhaEvent;
+import com.deiz0n.studfit.domain.events.EnviarEmailRecuperacaoSenhaEvent;
+import com.deiz0n.studfit.domain.events.SolicitarRecuperacaoSenhaEvent;
+import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotExistingException;
 import com.deiz0n.studfit.domain.exceptions.usuario.CodigoDeRecuperacaoNotFoundException;
 import com.deiz0n.studfit.domain.exceptions.usuario.EmailAlreadyRegisteredException;
-import com.deiz0n.studfit.domain.exceptions.resource.ResourceNotExistingException;
 import com.deiz0n.studfit.domain.exceptions.usuario.SenhaNotCoincideException;
 import com.deiz0n.studfit.domain.exceptions.usuario.UsuarioNotFoundException;
 import com.deiz0n.studfit.infrastructure.config.AlgorithmGenerateNumber;
@@ -41,7 +41,7 @@ public class UsuarioService {
         this.eventPublisher = eventPublisher;
     }
 
-    public List<UsuarioDTO> buscarHorarios() {
+    public List<UsuarioDTO> buscarUsuarios() {
         return repository.findAll()
                 .stream()
                 .map(usuario -> mapper.map(usuario, UsuarioDTO.class))
