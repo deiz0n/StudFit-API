@@ -10,6 +10,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.StorageClass;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -44,6 +45,7 @@ public class S3Service {
         var putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(nomeAtestado)
+                .storageClass(StorageClass.GLACIER_IR)
                 .contentType(atestado.getContentType())
                 .build();
 
