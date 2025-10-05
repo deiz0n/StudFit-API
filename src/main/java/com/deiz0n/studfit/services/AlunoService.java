@@ -15,10 +15,9 @@ import com.deiz0n.studfit.domain.exceptions.aluno.AtestadoNotValidException;
 import com.deiz0n.studfit.domain.exceptions.horario.TurnoNotExistentException;
 import com.deiz0n.studfit.domain.exceptions.usuario.EmailAlreadyRegisteredException;
 import com.deiz0n.studfit.domain.exceptions.usuario.TelefoneAlreadyRegisteredException;
-import com.deiz0n.studfit.domain.exceptions.utils.CreationDirectoryException;
+import com.deiz0n.studfit.infrastructure.aws.S3Service;
 import com.deiz0n.studfit.infrastructure.repositories.*;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -30,10 +29,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.DayOfWeek;
 import java.util.*;
 
@@ -47,7 +42,7 @@ public class AlunoService {
     private final HorarioRepository horarioRepository;
     private final UsuarioRepository usuarioRepository;
     private final TurnoRepository turnoRepository;
-    private final Path localArmazenamentoAtestado;
+    private final S3Service s3Service;
 
     public AlunoService(
             AlunoRepository alunoRepository,
@@ -57,7 +52,7 @@ public class AlunoService {
             HorarioRepository horarioRepository,
             UsuarioRepository usuarioRepository,
             TurnoRepository turnoRepository,
-            @Value("${file.upload.dir}") String caminhoAtestado
+            S3Service s3Service
     ) {
         this.alunoRepository = alunoRepository;
         this.presencaRepository = presencaRepository;
@@ -66,13 +61,7 @@ public class AlunoService {
         this.horarioRepository = horarioRepository;
         this.usuarioRepository = usuarioRepository;
         this.turnoRepository = turnoRepository;
-        this.localArmazenamentoAtestado = Paths.get(caminhoAtestado).toAbsolutePath().normalize();
-
-        try {
-            Files.createDirectories(this.localArmazenamentoAtestado);
-        } catch (IOException e) {
-            throw new CreationDirectoryException("Erro ao criar diretório para armazenamento do atestado");
-        }
+        this.s3Service = s3Service;
     }
 
     @Cacheable("alunoListaEspera")
@@ -257,7 +246,7 @@ public class AlunoService {
                 );
     }
 
-    public void adicionarAtestado(MultipartFile atestado, UUID id) {
+    public String adicionarAtestado(MultipartFile atestado, UUID id) {
         var aluno = mapper.map(buscarPorId(id), Aluno.class);
         var nomeArquivo = StringUtils.cleanPath(Objects.requireNonNull(atestado.getOriginalFilename()));
 
@@ -269,15 +258,11 @@ public class AlunoService {
         if (!Objects.equals(atestado.getContentType(), "application/pdf"))
             throw new AtestadoNotValidException("O arquivo informado possui formato inválido. Apenas arquivos 'PDF' são aceitos");
 
+        if (nomeArquivo.contains(".."))
+            throw new AtestadoNotValidException("O arquivo informado possui nome inválido");
+
         try {
-            if (nomeArquivo.contains(".."))
-                throw new AtestadoNotValidException("O arquivo informado possui nome inválido");
-
-            Path caminhoOrigem = this.localArmazenamentoAtestado.resolve(nomeArquivo);
-            Files.copy(atestado.getInputStream(), caminhoOrigem, StandardCopyOption.REPLACE_EXISTING);
-
-            aluno.setAtestado(atestado.getBytes());
-            alunoRepository.save(aluno);
+            return s3Service.uploadAtestado(atestado, id);
         } catch (IOException e) {
             throw new AtestadoNotSavedException("Erro ao salvar atestado");
         }
