@@ -26,11 +26,12 @@ services:
   stud-fit-api:
     container_name: stud-fit-api
     image: deiz0n/stud-fit-api
-    command: [ "/wait-for-it.sh", "-t", "10", "stud-fit-db:5435", "--", "java", "-jar", "studfit-api.jar" ]
+    command: [ "/app/wait-for-it.sh", "-t", "10", "stud-fit-db:5432", "--", "java", "-jar", "target/studfit-0.0.1-SNAPSHOT.jar" ]
     ports:
       - "8080:8080"
     environment:
       HOST: stud-fit-db
+      REDIS_HOST: stud-fit-cache
     env_file:
       - .env
     networks:
