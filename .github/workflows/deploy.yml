@@ -8,15 +8,64 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
+    services:
+      postgres-test:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis-test:
+        image: redis:6-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
+      - name: Wait for services
+        run: |
+          timeout 30 bash -c 'until pg_isready -h localhost -p 5432; do sleep 1; done'
+          timeout 30 bash -c 'until redis-cli -h localhost ping; do sleep 1; done'
+
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name:
+          Run tests
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
+          SPRING_DATASOURCE_USERNAME: testuser
+          SPRING_DATASOURCE_PASSWORD: testpassword
+          SPRING_REDIS_HOST: localhost
+          SPRING_REDIS_PORT: 6379
+        run: mvn test
+
       - name: Build with Maven
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
+          SPRING_DATASOURCE_USERNAME: testuser
+          SPRING_DATASOURCE_PASSWORD: testpassword
+          SPRING_REDIS_HOST: localhost
+          SPRING_REDIS_PORT: 6379
         run: mvn clean package
 
   deploy:
