@@ -49,17 +49,18 @@ jobs:
           timeout 30 bash -c 'until nc -z localhost 5432; do sleep 1; done'
           timeout 30 bash -c 'until nc -z localhost 6379; do sleep 1; done'
 
-      - name: Run tests
+      - name: Build and Run Tests
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/${{ secrets.POSTGRES_DB }}
           SPRING_DATASOURCE_USERNAME: ${{ secrets.POSTGRES_USER }}
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           SPRING_REDIS_HOST: localhost
           SPRING_REDIS_PORT: 6379
-        run: mvn clean test
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
 
-      - name: Build with Maven
-        run: mvn package -DskipTests
+        run: mvn clean packages
 
   deploy:
     needs: build-and-test
