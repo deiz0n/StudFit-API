@@ -60,7 +60,7 @@ jobs:
           AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
 
-        run: mvn clean packages
+        run: mvn clean package
 
   deploy:
     needs: build-and-test
