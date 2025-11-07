@@ -90,5 +90,5 @@ jobs:
           script: |
             cd ~/StudFit-API
             git pull origin prod-aws
-            docker compose build app
+            docker compose build stud-fit-api
             docker compose up -d
