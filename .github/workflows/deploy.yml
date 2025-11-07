@@ -13,9 +13,9 @@ jobs:
       postgres-test:
         image: postgres:14-alpine
         env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpassword
-          POSTGRES_DB: testdb
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         ports:
           - 5432:5432
         options: >-
@@ -35,11 +35,6 @@ jobs:
           --health-retries 5
 
     steps:
-      - name: Wait for services
-        run: |
-          timeout 30 bash -c 'until nc -z localhost 5432; do sleep 1; done'
-          timeout 30 bash -c 'until nc -z localhost 6379; do sleep 1; done'
-
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -49,33 +44,28 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name:
-          Run tests
+      - name: Wait for services
+        run: |
+          timeout 30 bash -c 'until nc -z localhost 5432; do sleep 1; done'
+          timeout 30 bash -c 'until nc -z localhost 6379; do sleep 1; done'
+
+      - name: Run tests
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
-          SPRING_DATASOURCE_USERNAME: testuser
-          SPRING_DATASOURCE_PASSWORD: testpassword
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/${{ secrets.POSTGRES_DB }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.POSTGRES_USER }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           SPRING_REDIS_HOST: localhost
           SPRING_REDIS_PORT: 6379
-        run: mvn test
+        run: mvn clean test
 
       - name: Build with Maven
-        env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
-          SPRING_DATASOURCE_USERNAME: testuser
-          SPRING_DATASOURCE_PASSWORD: testpassword
-          SPRING_REDIS_HOST: localhost
-          SPRING_REDIS_PORT: 6379
-        run: mvn clean package
+        run: mvn package -DskipTests
 
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
