@@ -49,15 +49,23 @@ jobs:
           timeout 30 bash -c 'until nc -z localhost 5432; do sleep 1; done'
           timeout 30 bash -c 'until nc -z localhost 6379; do sleep 1; done'
 
+      - name: Cache Maven
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
+
       - name: Build and Run Tests
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POTSGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
           POSTGRES_HOST_AUTH_METHOD: ${{ secrets.POSTGRES_HOST_AUTH_METHOD }}
 
-          SPRING_REDIS_HOST: ${{ secrets.REDIS_HOST }}
-          SPRING_REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          SPRING_REDIS_HOST: localhost
+          SPRING_REDIS_PORT: 6379
 
           AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
