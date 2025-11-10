@@ -56,8 +56,8 @@ jobs:
           POTSGRES_DB: ${{ secrets.POSTGRES_DB }}
           POSTGRES_HOST_AUTH_METHOD: ${{ secrets.POSTGRES_HOST_AUTH_METHOD }}
 
-          SPRING_REDIS_HOST: localhost
-          SPRING_REDIS_PORT: 6379
+          SPRING_REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          SPRING_REDIS_PORT: ${{ secrets.REDIS_PORT }}
 
           AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
