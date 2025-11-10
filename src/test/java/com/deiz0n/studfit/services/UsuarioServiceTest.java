@@ -75,7 +75,7 @@ class UsuarioServiceTest {
 
         assertNotNull(result.get(0));
         assertEquals(1, result.size());
-        assertEquals(ID, result.get(0).getId());
+        assertEquals(ID.toString(), result.get(0).getId());
         assertEquals(EMAIL, result.get(0).getEmail());
         assertEquals(CARGO, result.get(0).getCargo());
     }
