@@ -1,4 +1,4 @@
-package com.deiz0n.studfit.services;
+package com.deiz0n.studfit.unit.services;
 
 import com.deiz0n.studfit.domain.dtos.ResetPasswordDTO;
 import com.deiz0n.studfit.domain.dtos.UsuarioDTO;
@@ -15,6 +15,7 @@ import com.deiz0n.studfit.domain.exceptions.usuario.SenhaNotCoincideException;
 import com.deiz0n.studfit.domain.exceptions.usuario.UsuarioNotFoundException;
 import com.deiz0n.studfit.infrastructure.config.AlgorithmGenerateNumber;
 import com.deiz0n.studfit.infrastructure.repositories.UsuarioRepository;
+import com.deiz0n.studfit.services.UsuarioService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
