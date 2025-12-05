@@ -67,7 +67,7 @@ public interface UsuarioController {
         ),
         @ApiResponse(
             responseCode = "400",
-            description = "Dados inválidos - E-mail já cadastrado, telefone já cadastrado, cargo informado não existe (valores válidos: ADMIN, FUNCIONARIO), ou dados de validação inválidos (campos obrigatórios, formato de e-mail, etc.)",
+            description = "Dados inválidos - E-mail já cadastrado, telefone já cadastrado, cargo informado não existe (valores válidos: [ADMINISTRADOR, ESTAGIARIO, INSTRUTOR]) ou dados de validação inválidos (campos obrigatórios, formato de e-mail, etc.)",
             content = @Content
         ),
         @ApiResponse(
