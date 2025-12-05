@@ -35,7 +35,7 @@ public class UsuarioDTO {
     @Schema(description = "Senha do usuário", example = "senha123", accessMode = Schema.AccessMode.WRITE_ONLY)
     private String senha;
 
-    @Schema(description = "Cargo do usuário no sistema", example = "ADMIN", allowableValues = {"ADMIN", "FUNCIONARIO"}, required = true)
+    @Schema(description = "Cargo do usuário no sistema", example = "ADMINISTRADTOR", allowableValues = {"ADMINISTRADTOR", "ESTAGIARIO", "INSTRUTOR"}, required = true)
     private String cargo;
 
     @JsonProperty(value = "updated_at", access = JsonProperty.Access.READ_ONLY)
