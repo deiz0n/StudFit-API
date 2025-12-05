@@ -62,7 +62,8 @@ public interface AlunoController {
 
     @Operation(
         summary = "Buscar alunos na lista de espera",
-        description = "Retorna uma lista paginada de alunos aguardando efetivação, filtrada por turno"
+        description = "Retorna uma lista paginada de alunos aguardando efetivação, filtrada por turno",
+        security = {}
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -97,7 +98,8 @@ public interface AlunoController {
 
     @Operation(
         summary = "Registrar aluno na lista de espera",
-        description = "Adiciona um novo aluno à lista de espera para efetivação posterior"
+        description = "Adiciona um novo aluno à lista de espera para efetivação posterior",
+        security = {}
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -163,7 +165,8 @@ public interface AlunoController {
 
     @Operation(
         summary = "Buscar alunos efetivados",
-        description = "Retorna uma lista paginada de alunos já efetivados no sistema, com filtros opcionais"
+        description = "Retorna uma lista paginada de alunos já efetivados no sistema, com filtros opcionais",
+        security = {}
     )
     @ApiResponses(value = {
         @ApiResponse(
