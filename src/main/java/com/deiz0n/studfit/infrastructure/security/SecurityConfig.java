@@ -37,9 +37,10 @@ public class SecurityConfig {
                                 "api/v1.0/alunos/lista-espera",
                                 "api/v1.0/alunos/lista-espera/registrar",
                                 "api/v1.0/auth/**",
-                                "swagger-ui/**",
-                                "/v3/**",
-                                "/actuator/**"
+                                "/actuator/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-studfit.html"
                         ).permitAll()
 
                         .requestMatchers("api/v1.0/usuarios/**").hasRole("ADMINISTRADOR")
