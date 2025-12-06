@@ -15,6 +15,9 @@ import com.deiz0n.studfit.domain.exceptions.aluno.AtestadoNotValidException;
 import com.deiz0n.studfit.domain.exceptions.horario.TurnoNotExistentException;
 import com.deiz0n.studfit.domain.exceptions.usuario.EmailAlreadyRegisteredException;
 import com.deiz0n.studfit.domain.exceptions.usuario.TelefoneAlreadyRegisteredException;
+import com.deiz0n.studfit.domain.utils.MapearPropriedades;
+import com.deiz0n.studfit.domain.utils.ProcessarAlocacaoAluno;
+import com.deiz0n.studfit.domain.utils.ReordenarListaEspera;
 import com.deiz0n.studfit.infrastructure.aws.S3Service;
 import com.deiz0n.studfit.infrastructure.repositories.*;
 import org.modelmapper.ModelMapper;
@@ -24,7 +27,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,6 +45,9 @@ public class AlunoService {
     private final UsuarioRepository usuarioRepository;
     private final TurnoRepository turnoRepository;
     private final S3Service s3Service;
+    private final MapearPropriedades mapearPropriedades;
+    private final ProcessarAlocacaoAluno processarAlocacaoAluno;
+    private final ReordenarListaEspera reordenarListaEspera;
 
     public AlunoService(
             AlunoRepository alunoRepository,
@@ -52,7 +57,10 @@ public class AlunoService {
             HorarioRepository horarioRepository,
             UsuarioRepository usuarioRepository,
             TurnoRepository turnoRepository,
-            S3Service s3Service
+            S3Service s3Service,
+            MapearPropriedades mapearPropriedades,
+            ProcessarAlocacaoAluno processarAlocacaoAluno,
+            ReordenarListaEspera reordenarListaEspera
     ) {
         this.alunoRepository = alunoRepository;
         this.presencaRepository = presencaRepository;
@@ -62,6 +70,9 @@ public class AlunoService {
         this.usuarioRepository = usuarioRepository;
         this.turnoRepository = turnoRepository;
         this.s3Service = s3Service;
+        this.mapearPropriedades = mapearPropriedades;
+        this.processarAlocacaoAluno = processarAlocacaoAluno;
+        this.reordenarListaEspera = reordenarListaEspera;
     }
 
     @Cacheable("alunoListaEspera")
@@ -110,7 +121,7 @@ public class AlunoService {
     public void excluirAlunoListaEspera(UUID id) {
         var aluno = buscarPorId(id);
         alunoRepository.deleteById(aluno.getId());
-        reordenarListaEspera(aluno.getId());
+        reordenarListaEspera.reordenar(aluno.getId());
     }
 
     // Retorna todos os alunos já cadastrados na academia
@@ -120,7 +131,7 @@ public class AlunoService {
         return alunoRepository.buscarAlunosEfetivados(pageable, turno, status);
     }
 
-    private void alocarAlunoEmHorarioDisponivel(Aluno aluno) {
+    private Optional<Horario> buscarHorarioDisponivel(Aluno aluno) {
         Optional<Horario> horarioEscolhido = Optional.empty();
 
         if (aluno.getTurnosPreferenciais() != null && !aluno.getTurnosPreferenciais().isEmpty()) {
@@ -128,7 +139,7 @@ public class AlunoService {
                 horarioEscolhido = horarioRepository
                         .buscarHorariosPorTurno(preferencia.getTurno().getNome())
                         .stream()
-                        .filter((horario -> horario.getVagasDisponiveis() > 0))
+                        .filter(horario -> horario.getVagasDisponiveis() > 0)
                         .findFirst();
                 if (horarioEscolhido.isPresent()) break;
             }
@@ -141,68 +152,27 @@ public class AlunoService {
                     .findFirst();
         }
 
-        if (horarioEscolhido.isPresent()) {
-            var horario = horarioEscolhido.get();
-            var atualizarVagasDisponiveis = new AtualizarVagasDisponiveisHorarioEvent(horario.getId(), false);
-            eventPublisher.publishEvent(atualizarVagasDisponiveis);
+        return horarioEscolhido;
+    }
 
-            aluno.setHorario(horario);
-            aluno.setListaEspera(false);
-            aluno.setColocacao(null);
-            aluno.setStatus(Status.CADASTRO_PENDENTE);
-            alunoRepository.save(aluno);
-
-            reordenarListaEspera(aluno.getId());
-        }
+    private void alocarAlunoEmHorarioDisponivel(Aluno aluno) {
+        Optional<Horario> horarioEscolhido = buscarHorarioDisponivel(aluno);
+       processarAlocacaoAluno.processar(horarioEscolhido, aluno);
     }
 
     // Verifica a existência de alunos na lista de espera a cada 1 hora
     @Scheduled(fixedDelay = 3000)
-    @Transactional
     void alocarAlunosEmHorariosDisponivel() {
         turnoRepository.findAll().forEach(turno -> {
-            Optional<Aluno> alunoListaEspera = alunoRepository
-                    .buscarAlunosPorTurno(turno.getNome())
+            alunoRepository.buscarAlunosPorTurno(turno.getNome())
                     .stream()
-                    .findFirst();
+                    .findFirst()
+                    .ifPresent(alunoEntity -> {
+                        var aluno = mapper.map(alunoEntity, Aluno.class);
+                        Optional<Horario> horarioEscolhido = buscarHorarioDisponivel(aluno);
 
-            if (alunoListaEspera.isEmpty()) return;
-
-            Aluno aluno = mapper.map(alunoListaEspera.get(), Aluno.class);
-
-            Optional<Horario> horarioEscolhido = Optional.empty();
-
-            if (aluno.getTurnosPreferenciais() != null && !aluno.getTurnosPreferenciais().isEmpty()) {
-                for (TurnosPreferenciais preferencia : aluno.getTurnosPreferenciais()) {
-                    horarioEscolhido = horarioRepository
-                            .buscarHorariosPorTurno(preferencia.getTurno().getNome())
-                            .stream()
-                            .filter((horario -> horario.getVagasDisponiveis() > 0))
-                            .findFirst();
-                    if (horarioEscolhido.isPresent()) break;
-                }
-            }
-
-            if (horarioEscolhido.isEmpty()) {
-                horarioEscolhido = horarioRepository.findAll()
-                        .stream()
-                        .filter(horario -> horario.getVagasDisponiveis() > 0)
-                        .findFirst();
-            }
-
-            if (horarioEscolhido.isPresent()) {
-                var horario = horarioEscolhido.get();
-                horario.setVagasDisponiveis(horario.getVagasDisponiveis() - 1);
-                horarioRepository.save(horario);
-
-                aluno.setHorario(horario);
-                aluno.setListaEspera(false);
-                aluno.setColocacao(null);
-                aluno.setStatus(Status.CADASTRO_PENDENTE);
-                alunoRepository.save(aluno);
-
-                reordenarListaEspera(aluno.getId());
-            }
+                        processarAlocacaoAluno.processar(horarioEscolhido, aluno);
+                    });
         });
     }
 
@@ -213,7 +183,7 @@ public class AlunoService {
                                 String.format(
                                         "Aluno com ID: %s não foi encontrado", id)
                         ));
-        atualizarDados(aluno, alunoDTO);
+        mapearPropriedades.mapearPropriedadesAluno(aluno, alunoDTO);
         aluno.setStatus(Status.REGULAR);
         alunoRepository.save(aluno);
     }
@@ -232,12 +202,12 @@ public class AlunoService {
         var dto = mapper.map(alunoDTO, AlunoDTO.class);
         eExistente(dto, id);
         var aluno = mapper.map(buscarPorId(id), Aluno.class);
-        atualizarDados(aluno, dto);
+        mapearPropriedades.mapearPropriedadesAluno(aluno, dto);
         alunoRepository.save(aluno);
         return mapper.map(aluno, AlunoDTO.class);
     }
 
-    @Transactional
+//    @Transactional
     public AlunoDTO buscarPorId(UUID id) {
         return alunoRepository.findById(id)
                 .map(aluno -> mapper.map(aluno, AlunoDTO.class))
@@ -246,7 +216,7 @@ public class AlunoService {
                 );
     }
 
-    public String adicionarAtestado(MultipartFile atestado, UUID id) {
+    public void adicionarAtestado(MultipartFile atestado, UUID id) {
         var aluno = mapper.map(buscarPorId(id), Aluno.class);
         var nomeArquivo = StringUtils.cleanPath(Objects.requireNonNull(atestado.getOriginalFilename()));
 
@@ -262,7 +232,7 @@ public class AlunoService {
             throw new AtestadoNotValidException("O arquivo informado possui nome inválido");
 
         try {
-            return s3Service.uploadAtestado(atestado, id);
+            s3Service.uploadAtestado(atestado, id);
         } catch (IOException e) {
             throw new AtestadoNotSavedException("Erro ao salvar atestado");
         }
@@ -286,23 +256,6 @@ public class AlunoService {
         var alunoPorTelefone = alunoRepository.buscarPorTelefone(aluno.getTelefone());
         if (alunoPorTelefone.isPresent() && !alunoPorTelefone.get().getId().equals(id))
             throw new TelefoneAlreadyRegisteredException("Telefone já cadastrado");
-    }
-
-    // Reorganiza a lista de espera
-    private void reordenarListaEspera(UUID id) {
-        var alunoEfetivado = this.buscarPorId(id);
-        var turno = alunoEfetivado.getHorario().getTurno().getNome();
-        var listaAlunos = alunoRepository.buscarAlunosPorTurno(turno);
-
-        if (listaAlunos.isEmpty()) return;
-
-        listaAlunos.sort(Comparator.comparingInt(Aluno::getColocacao));
-
-        int colocacao = 1;
-        for (Aluno aluno : listaAlunos) {
-            aluno.setColocacao(colocacao++);
-        }
-        alunoRepository.saveAll(listaAlunos);
     }
 
     // Registra as ausências dos alunos
@@ -390,56 +343,5 @@ public class AlunoService {
 
             alunoRepository.deleteById(buscarAluno.getId());
         }
-    }
-
-    private void atualizarDados(Aluno aluno, AlunoDTO alunoDTO) {
-        if (alunoDTO.getNome() != null)
-            aluno.setNome(alunoDTO.getNome());
-        if (alunoDTO.getPeso() != null)
-            aluno.setPeso(alunoDTO.getPeso());
-        if (alunoDTO.getAltura() != null)
-            aluno.setAltura(alunoDTO.getAltura());
-        if (alunoDTO.getEmail() != null)
-            aluno.setEmail(alunoDTO.getEmail());
-        if (alunoDTO.getHorario() != null) {
-            var horarioNovo = mapper.map(alunoDTO.getHorario(), Horario.class);
-            if (!horarioNovo.equals(aluno.getHorario())) {
-                var horarioAntigo = aluno.getHorario();
-                eventPublisher.publishEvent(
-                        new AtualizarVagasDisponiveisHorarioEvent(
-                                horarioAntigo.getId(),
-                                true
-                        )
-                );
-                eventPublisher.publishEvent(
-                        new AtualizarVagasDisponiveisHorarioEvent(
-                                horarioNovo.getId(),
-                                false
-                        )
-                );
-            }
-        }
-        if (alunoDTO.getTelefone() != null)
-            aluno.setTelefone(alunoDTO.getTelefone());
-        if (alunoDTO.getCirurgias() != null)
-            aluno.setCirurgias(alunoDTO.getCirurgias());
-        if (alunoDTO.getPatologias() != null)
-            aluno.setPatologias(alunoDTO.getPatologias());
-        if (alunoDTO.getMesesExperienciaMusculacao() != null)
-            aluno.setMesesExperienciaMusculacao(alunoDTO.getMesesExperienciaMusculacao());
-        if (alunoDTO.getDiagnosticoLesaoJoelho() != null)
-            aluno.setDiagnosticoLesaoJoelho(alunoDTO.getDiagnosticoLesaoJoelho());
-        if (alunoDTO.getStatus() != null)
-            aluno.setStatus(alunoDTO.getStatus());
-        if (alunoDTO.getAusenciasConsecutivas() != null)
-            aluno.setAusenciasConsecutivas(alunoDTO.getAusenciasConsecutivas());
-        if (alunoDTO.getListaEspera() != null)
-            aluno.setListaEspera(alunoDTO.getListaEspera());
-        if (alunoDTO.getConsumoAlcool() != null)
-            aluno.setConsumoAlcool(alunoDTO.getConsumoAlcool());
-        if (alunoDTO.getConsumoCigarro() != null)
-            aluno.setConsumoCigarro(alunoDTO.getConsumoCigarro());
-        if (alunoDTO.getPraticaExercicioFisico() != null)
-            aluno.setPraticaExercicioFisico(alunoDTO.getPraticaExercicioFisico());
     }
 }
