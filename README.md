@@ -12,22 +12,98 @@ API back-end para gerenciamento da academia do IFCE campus Cedro, contemplando c
 
 ## Tecnologias Utilizadas
 
-- **Java 17** - Linguagem de programação
-- **Spring Boot 3.3.3** - Framework para desenvolvimento da API
-- **Spring Data JPA** - Persistência de dados
-- **Spring Security** - Segurança e autenticação
-- **JWT (Java-JWT)** - Autenticação via tokens
-- **PostgreSQL** - Banco de dados relacional
-- **Redis** - Cache em memória
-- **Flyway** - Controle de versionamento do banco de dados
-- **AWS S3** - Armazenamento de arquivos (atestados)
-- **Docker** - Containerização da aplicação
-- **Maven** - Gerenciador de dependências
-- **Lombok** - Redução de código boilerplate
-- **ModelMapper** - Mapeamento de objetos
-- **SpringDoc OpenAPI** - Documentação automática da API
-- **Spring Mail** - Envio de e-mails
-- **Testcontainers** - Testes de integração
+<div>
+  <img
+    align="left"
+    alt="Java"
+    title="Java"
+    width="40px"
+    style="padding-right: 10px;"
+    src="https://github.com/devicons/devicon/blob/v2.16.0/icons/java/java-original.svg"
+/>
+<img
+    align="left"
+    alt="Spring"
+    title="Spring"
+    width="40px"
+    style="padding-right: 10px;"
+    src="https://github.com/devicons/devicon/blob/v2.16.0/icons/spring/spring-original.svg"
+/>
+<img
+    align="left"
+    alt="PostgreSQL"
+    title="PostgreSQL"
+    width="40px"
+    style="padding-right: 10px;"
+    src="https://github.com/devicons/devicon/blob/v2.16.0/icons/postgresql/postgresql-original.svg"
+/>
+    <img
+    align="left"
+    alt="Redis"
+    title="Redis"
+    width="40px"
+    style="padding-right: 10px;"
+    src="https://github.com/devicons/devicon/blob/v2.16.0/icons/redis/redis-original.svg"
+/>
+<img
+    align="left"
+    alt="Docker"
+    title="Docker"
+    width="40px"
+    style="padding-right: 10px;"
+    src="https://github.com/devicons/devicon/blob/v2.16.0/icons/docker/docker-original.svg"
+/>
+<img
+    align="left"
+    alt="GitHub Actions"
+    title="GitHub Actions"
+    width="40px"
+    style="padding-right: 10px;"
+    src="https://github.com/devicons/devicon/blob/v2.16.0/icons/githubactions/githubactions-original.svg"
+/>
+<img
+    align="left"
+    alt="AWS"
+    title="AWS"
+    width="40px"
+    style="padding-right: 10px;"
+    src="https://github.com/devicons/devicon/blob/v2.16.0/icons/amazonwebservices/amazonwebservices-original-wordmark.svg"
+/>
+<img
+    align="left"
+    alt="Maven"
+    title="Maven"
+    width="40px"
+    style="padding-right: 10px;"
+    src="https://github.com/devicons/devicon/blob/v2.16.0/icons/maven/maven-original-wordmark.svg"
+/>
+<img
+    align="left"
+    alt="JUnit"
+    title="JUnit"
+    width="40px"
+    style="padding-right: 10px;"
+    src="https://github.com/devicons/devicon/blob/v2.16.0/icons/junit/junit-original-wordmark.svg"
+/>
+<img
+    align="left"
+    alt="Swagger"
+    title="Swagger"
+    width="40px"
+    style="padding-right: 10px;"
+    src="https://github.com/devicons/devicon/blob/v2.16.0/icons/swagger/swagger-original.svg"
+/>
+<img
+    align="left"
+    alt="Postman"
+    title="Postman"
+    width="40px"
+    style="padding-right: 10px;"
+    src="https://github.com/devicons/devicon/blob/v2.16.0/icons/postman/postman-original.svg"
+/>
+</div>
+
+<br></br>
 
 ## Pré-requisitos
 
