@@ -94,4 +94,6 @@ public class AlunoDTO {
     @Schema(description = "Horário atribuído ao aluno")
     private HorarioDTO horario;
 
+    @Schema(description = "URL no S3 do atestado", accessMode = Schema.AccessMode.READ_ONLY)
+    private String atestado;
 }
