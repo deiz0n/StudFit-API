@@ -10,7 +10,6 @@ import com.deiz0n.studfit.domain.enums.Status;
 import com.deiz0n.studfit.domain.events.*;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotEfetivadoException;
 import com.deiz0n.studfit.domain.exceptions.aluno.AlunoNotFoundException;
-import com.deiz0n.studfit.domain.exceptions.aluno.AtestadoNotSavedException;
 import com.deiz0n.studfit.domain.exceptions.aluno.AtestadoNotValidException;
 import com.deiz0n.studfit.domain.exceptions.horario.TurnoNotExistentException;
 import com.deiz0n.studfit.domain.exceptions.usuario.EmailAlreadyRegisteredException;
@@ -18,7 +17,6 @@ import com.deiz0n.studfit.domain.exceptions.usuario.TelefoneAlreadyRegisteredExc
 import com.deiz0n.studfit.domain.utils.MapearPropriedades;
 import com.deiz0n.studfit.domain.utils.ProcessarAlocacaoAluno;
 import com.deiz0n.studfit.domain.utils.ReordenarListaEspera;
-import com.deiz0n.studfit.infrastructure.aws.S3Service;
 import com.deiz0n.studfit.infrastructure.repositories.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -30,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.DayOfWeek;
 import java.util.*;
 
@@ -44,7 +41,6 @@ public class AlunoService {
     private final HorarioRepository horarioRepository;
     private final UsuarioRepository usuarioRepository;
     private final TurnoRepository turnoRepository;
-    private final S3Service s3Service;
     private final MapearPropriedades mapearPropriedades;
     private final ProcessarAlocacaoAluno processarAlocacaoAluno;
     private final ReordenarListaEspera reordenarListaEspera;
@@ -57,7 +53,6 @@ public class AlunoService {
             HorarioRepository horarioRepository,
             UsuarioRepository usuarioRepository,
             TurnoRepository turnoRepository,
-            S3Service s3Service,
             MapearPropriedades mapearPropriedades,
             ProcessarAlocacaoAluno processarAlocacaoAluno,
             ReordenarListaEspera reordenarListaEspera
@@ -69,7 +64,6 @@ public class AlunoService {
         this.horarioRepository = horarioRepository;
         this.usuarioRepository = usuarioRepository;
         this.turnoRepository = turnoRepository;
-        this.s3Service = s3Service;
         this.mapearPropriedades = mapearPropriedades;
         this.processarAlocacaoAluno = processarAlocacaoAluno;
         this.reordenarListaEspera = reordenarListaEspera;
@@ -191,9 +185,13 @@ public class AlunoService {
     // Remove aluno cadastrado
     public void excluirAlunoEfetivado(UUID id) {
         var aluno = buscarPorId(id);
+
+        var atestado = aluno.getAtestado();
+        var urlAtestado = atestado.substring(atestado.lastIndexOf("/") + 1);
+        eventPublisher.publishEvent(new ExcluirAtestadoS3Event(urlAtestado));
+
         var horarioId = aluno.getHorario().getId();
-        var atualizarVagasDisponiveis = new AtualizarVagasDisponiveisHorarioEvent(horarioId, true);
-        eventPublisher.publishEvent(atualizarVagasDisponiveis);
+        eventPublisher.publishEvent(new AtualizarVagasDisponiveisHorarioEvent(horarioId, true));
         alunoRepository.deleteById(aluno.getId());
     }
 
@@ -231,11 +229,7 @@ public class AlunoService {
         if (nomeArquivo.contains(".."))
             throw new AtestadoNotValidException("O arquivo informado possui nome inválido");
 
-        try {
-            s3Service.uploadAtestado(atestado, id);
-        } catch (IOException e) {
-            throw new AtestadoNotSavedException("Erro ao salvar atestado");
-        }
+        eventPublisher.publishEvent(new RealizarUploadAtestadoS3Event(atestado, id));
     }
 
     // Verifica a existência de email ao cadastrar um aluno na lista de espera
