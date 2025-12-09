@@ -5,10 +5,11 @@ API back-end para gerenciamento da academia do IFCE campus Cedro, contemplando c
 ## Índice
 
 1. [Tecnologias Utilizadas](#tecnologias-utilizadas)
-2. [Pré-requisitos](#pré-requisitos)
-3. [Configurações Iniciais](#configurações-iniciais)
-4. [Executando a API](#executando-a-api)
-5. [Documentação](#documentação)
+2. [Funcionalidades](#funcionalidades)
+3. [Pré-requisitos](#pré-requisitos)
+4. [Configurações Iniciais](#configurações-iniciais)
+5. [Executando a API](#executando-a-api)
+6. [Documentação](#documentação)
 
 ## Tecnologias Utilizadas
 
@@ -105,6 +106,43 @@ API back-end para gerenciamento da academia do IFCE campus Cedro, contemplando c
 
 <br></br>
 
+## Funcionalidades
+
+### 🔐 Autenticação e Segurança
+- **Login com JWT** - Autenticação segura com geração de token de acesso
+- **Recuperação de senha** - Envio de código de recuperação de 6 dígitos por e-mail
+- **Redefinição de senha** - Atualização de senha através do código de recuperação
+- **Validação de token** - Verificação de validade e assinatura do token JWT
+
+### 👤 Gestão de Usuários
+- **Cadastro de usuários** - Registro de administradores, estagiários e instrutores
+- **Listagem de usuários** - Visualização de todos os usuários cadastrados
+- **Exclusão de usuários** - Remoção de usuários do sistema (com controle de permissões)
+
+### 🎓 Gestão de Alunos
+- **Lista de espera** - Registro e gerenciamento de alunos aguardando efetivação
+- **Efetivação de alunos** - Processo de efetivação de alunos da lista de espera
+- **Consulta de alunos** - Busca por ID, turno e status (efetivados e lista de espera)
+- **Atualização de dados** - Edição de informações cadastrais dos alunos
+- **Exclusão de alunos** - Remoção de alunos da lista de espera ou efetivados
+- **Upload de atestados** - Anexação de atestados médicos em PDF (integração com AWS S3)
+
+### 📅 Gestão de Horários
+- **Cadastro de horários** - Criação de horários por turno (Manhã, Tarde, Noite)
+- **Listagem de horários** - Visualização de todos os horários ou filtrados por turno
+- **Exclusão de horários** - Remoção de horários (com validação de alunos vinculados)
+
+### ✅ Controle de Presenças
+- **Registro de presenças** - Marcação de presença de múltiplos alunos por data
+- **Consulta de presenças** - Listagem paginada de todas as presenças
+- **Filtro por data** - Busca de presenças por data específica
+
+### 📧 Notificações por E-mail
+- **Confirmação de efetivação** - E-mail automático ao efetivar aluno
+- **Recuperação de senha** - E-mail com código de recuperação
+- **Notificação de remoção** - E-mail informando remoção do sistema
+- **Alerta de faltas** - Notificação automática por excesso de faltas
+
 ## Pré-requisitos
 
 Para executar este projeto, você precisará ter instalado:
@@ -195,7 +233,21 @@ docker run --env-file .env -p 8080:8080 studfit-api
 ```
 
 ## Documentação
+### 1. Diagrama lógico do banco de dados
+![Diagrama do banco de dados](./docs/diagrama_db.svg)
 
+### 2. Diagrama atual na AWS
+![Arquitetura AWS](./docs/arquitetura_aws.svg)
+
+### 3. Arquitetura atual da API
+![Arquitetura API](./docs/fluxo_dados.svg)
+
+### 4. Possível arquitetura futura
+![Arquitetura API](./docs/arquitetura_futura.svg)
+
+#### Para melhor visualização dos diagramas, acesse: [clique aqui](https://lucid.app/lucidchart/0281c846-fe4d-4cef-9b04-f33ce6e95f39/edit?view_items=Cnecs9N_uCZz%2CCnec.JTd9IZA&page=Jhecf8WXMu7B&invitationId=inv_6ea02e59-667b-4d9b-8d9e-84ba3e9ffb45)
+
+### 5. Rotas da aplicação
 A API possui documentação interativa gerada automaticamente com Swagger/OpenAPI.
 
 Após iniciar a aplicação, acesse:
