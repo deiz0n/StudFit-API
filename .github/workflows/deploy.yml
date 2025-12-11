@@ -75,6 +75,7 @@ jobs:
 
           API_MAIL: ${{ secrets.API_EMAIL }}
           API_PASSWORD: ${{ secrets.API_PASSWORD }}
+          API_PORT: ${{ secrets.API_PORT }}
 
           KEY: ${{ secrets.KEY }}
 
