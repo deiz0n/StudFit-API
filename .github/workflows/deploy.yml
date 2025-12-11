@@ -57,6 +57,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2-
 
+      - name: Run Tests
+        run: mvn clean package -Dspring.profiles.active=test
+
       - name: Build and Run Tests
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
