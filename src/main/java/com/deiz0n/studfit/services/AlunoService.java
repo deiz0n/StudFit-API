@@ -90,7 +90,6 @@ public class AlunoService {
         return alunos.subList(inicio, fim);
     }
 
-    // Registra um aluno na lista de espera
     public AlunoListaEsperaDTO registrarAlunosListaEspera(AlunoListaEsperaDTO alunoListaEspera) {
         eExistente(alunoListaEspera.getEmail(), alunoListaEspera.getTelefone());
 
@@ -118,7 +117,6 @@ public class AlunoService {
         reordenarListaEspera.reordenar(aluno.getId());
     }
 
-    // Retorna todos os alunos já cadastrados na academia
     @Cacheable("alunosEfetivados")
     public List<AlunoEfetivadoDTO> buscarAlunosEfetivados(int numeroPagina, int quantidade, String turno, Status status) {
         var pageable = PageRequest.of(numeroPagina, quantidade);
@@ -182,7 +180,6 @@ public class AlunoService {
         alunoRepository.save(aluno);
     }
 
-    // Remove aluno cadastrado
     public void excluirAlunoEfetivado(UUID id) {
         var aluno = buscarPorId(id);
 
@@ -195,7 +192,6 @@ public class AlunoService {
         alunoRepository.deleteById(aluno.getId());
     }
 
-    // Atualiza os dados do aluno cadastrado
     public AlunoDTO atualizarEfetivado(UUID id, AtualizarAlunoDTO alunoDTO) {
         var dto = mapper.map(alunoDTO, AlunoDTO.class);
         eExistente(dto, id);
@@ -205,7 +201,6 @@ public class AlunoService {
         return mapper.map(aluno, AlunoDTO.class);
     }
 
-//    @Transactional
     public AlunoDTO buscarPorId(UUID id) {
         return alunoRepository.findById(id)
                 .map(aluno -> mapper.map(aluno, AlunoDTO.class))
@@ -232,7 +227,6 @@ public class AlunoService {
         eventPublisher.publishEvent(new RealizarUploadAtestadoS3Event(atestado, id));
     }
 
-    // Verifica a existência de email ao cadastrar um aluno na lista de espera
     private void eExistente(String email, String telefone) {
         if (alunoRepository.buscarPorEmail(email).isPresent())
             throw new EmailAlreadyRegisteredException("Email já cadastrado");
