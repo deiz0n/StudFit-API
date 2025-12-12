@@ -15,7 +15,7 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenApi() {
-        final String securitySchemeName = "bearerAuth";
+        String securitySchemeName = "bearerAuth";
 
         return new OpenAPI()
                 .addSecurityItem(new SecurityRequirement()
@@ -32,7 +32,8 @@ public class OpenApiConfig {
                         .version("1.0")
                         .description("A API do Sistema de Academia foi desenvolvida para apoiar instituições públicas na gestão de alunos e atividades físicas, " +
                                 "promovendo maior eficiência e transparência. O sistema automatiza processos como registro de alunos, acompanhamento de frequência e " +
-                                "administração de listas de espera, oferecendo uma experiência organizada e confiável para administradores e alunos")
+                                "administração de listas de espera, oferecendo uma experiência organizada e confiável para administradores e alunos. " +
+                                "OBS: A implementação da documentação ainda está sendo concluída")
                         .contact(new Contact()
                                 .name("Carlos Eduardo Silva")
                                 .email("doardo.ns@gmail.com")
