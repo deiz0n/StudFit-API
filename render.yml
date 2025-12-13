@@ -1,5 +1,4 @@
 services:
-  # A API Java (Ambiente Docker)
   - type: web
     name: stud-fit-api
     env: docker
@@ -36,43 +35,6 @@ services:
           property: host
 
       - key: REDIS_PORT
-        fromService:
-          type: redis
-          name: stud-fit-cache
-          property: port
-
-      - key: SPRING_DATASOURCE_URL
-        fromDatabase:
-          name: stud-fit-db
-          property: connectionString
-      - key: SPRING_DATASOURCE_USERNAME
-        fromDatabase:
-          name: stud-fit-db
-          property: user
-      - key: SPRING_DATASOURCE_PASSWORD
-        fromDatabase:
-          name: stud-fit-db
-          property: password
-
-      - key: SPRING_FLYWAY_URL
-        fromDatabase:
-          name: stud-fit-db
-          property: connectionString
-      - key: SPRING_FLYWAY_USER
-        fromDatabase:
-          name: stud-fit-db
-          property: user
-      - key: SPRING_FLYWAY_PASSWORD
-        fromDatabase:
-          name: stud-fit-db
-          property: password
-
-      - key: SPRING_DATA_REDIS_HOST
-        fromService:
-          type: redis
-          name: stud-fit-cache
-          property: host
-      - key: SPRING_DATA_REDIS_PORT
         fromService:
           type: redis
           name: stud-fit-cache
