@@ -1,6 +1,5 @@
 package com.deiz0n.studfit.controllers.aluno;
 
-import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.domain.dtos.AtualizarAlunoDTO;
 import com.deiz0n.studfit.domain.enums.Status;
@@ -11,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +53,7 @@ public interface AlunoController {
             content = @Content
         )
     })
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/{id}")
     ResponseEntity<Response<?>> buscarAluno(
         @Parameter(description = "ID único do aluno", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
@@ -62,8 +63,7 @@ public interface AlunoController {
 
     @Operation(
         summary = "Buscar alunos na lista de espera",
-        description = "Retorna uma lista paginada de alunos aguardando efetivação, filtrada por turno",
-        security = {}
+        description = "Retorna uma lista paginada de alunos aguardando efetivação, filtrada por turno"
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -98,8 +98,7 @@ public interface AlunoController {
 
     @Operation(
         summary = "Registrar aluno na lista de espera",
-        description = "Adiciona um novo aluno à lista de espera para efetivação posterior",
-        security = {}
+        description = "Adiciona um novo aluno à lista de espera para efetivação posterior"
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -157,6 +156,7 @@ public interface AlunoController {
     })
     @Transactional
     @DeleteMapping("/lista-espera/excluir/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     ResponseEntity<?> excluirAlunoListaEspera(
         @Parameter(description = "ID único do aluno", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
         @PathVariable UUID id,
@@ -165,8 +165,7 @@ public interface AlunoController {
 
     @Operation(
         summary = "Buscar alunos efetivados",
-        description = "Retorna uma lista paginada de alunos já efetivados no sistema, com filtros opcionais",
-        security = {}
+        description = "Retorna uma lista paginada de alunos já efetivados no sistema, com filtros opcionais"
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -202,46 +201,6 @@ public interface AlunoController {
     );
 
     @Operation(
-        summary = "Efetivar aluno (Descontinuado)",
-        description = "Efetiva um aluno da lista de espera. Este endpoint está marcado como descontinuado."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Aluno efetivado com sucesso",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = Response.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Dados inválidos - E-mail já cadastrado por outro aluno, telefone já cadastrado, ou dados de validação inválidos",
-            content = @Content
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Aluno não encontrado - O aluno com o ID especificado não existe na lista de espera",
-            content = @Content
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "Erro interno do servidor - Falha no envio de e-mail de confirmação ou erro na persistência dos dados",
-            content = @Content
-        )
-    })
-    @Deprecated
-    @Transactional
-    @PatchMapping("efetivados/efetivar/{id}")
-    ResponseEntity<?> registrarAlunoEfetivado(
-        @Parameter(description = "Dados do aluno para efetivação", required = true)
-        @RequestBody @Valid AlunoDTO request,
-        @Parameter(description = "ID único do aluno", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-        @PathVariable UUID id,
-        ServletWebRequest path
-    );
-
-    @Operation(
         summary = "Excluir aluno efetivado",
         description = "Remove permanentemente um aluno efetivado do sistema"
     )
@@ -269,6 +228,7 @@ public interface AlunoController {
     })
     @Transactional
     @DeleteMapping("efetivados/excluir/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     ResponseEntity<?> excluirAlunoEfetivado(
         @Parameter(description = "ID único do aluno", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
         @PathVariable UUID id
@@ -305,6 +265,7 @@ public interface AlunoController {
     })
     @Transactional
     @PatchMapping("efetivado/atualizar/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     ResponseEntity<Response<?>> atualizarAlunoEfetivado(
         @Parameter(description = "ID único do aluno", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
         @PathVariable UUID id,
@@ -346,6 +307,7 @@ public interface AlunoController {
     })
     @Transactional
     @PostMapping("efetivados/adicionar-atestado/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     ResponseEntity<Void> adicionarAtestado(
         @Parameter(description = "ID único do aluno", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
         @PathVariable UUID id,

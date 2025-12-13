@@ -1,6 +1,5 @@
 package com.deiz0n.studfit.controllers.aluno;
 
-import com.deiz0n.studfit.domain.dtos.AlunoDTO;
 import com.deiz0n.studfit.domain.dtos.AlunoListaEsperaDTO;
 import com.deiz0n.studfit.domain.dtos.AtualizarAlunoDTO;
 import com.deiz0n.studfit.domain.enums.Status;
@@ -41,7 +40,12 @@ public class AlunoControllerImpl implements AlunoController {
     }
 
     @Override
-    public ResponseEntity<Response<?>> buscarAlunosListaEspera(ServletWebRequest path, @RequestParam(defaultValue = "0") int numeroPagina, @RequestParam(defaultValue = "10") int quantidade, @RequestParam String turno) {
+    public ResponseEntity<Response<?>> buscarAlunosListaEspera(
+            ServletWebRequest path,
+            @RequestParam(defaultValue = "0") int numeroPagina,
+            @RequestParam(defaultValue = "10") int quantidade,
+            @RequestParam String turno
+    ) {
         var alunos = service.buscarAlunosListaEspera(numeroPagina, quantidade, turno);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(3, TimeUnit.MINUTES))
@@ -89,12 +93,6 @@ public class AlunoControllerImpl implements AlunoController {
                         .path(path.getRequest().getRequestURI())
                         .data(alunos)
                         .build());
-    }
-
-    @Override
-    public ResponseEntity<?> registrarAlunoEfetivado(AlunoDTO request, UUID id, ServletWebRequest path) {
-        service.registarAlunoStatusPendente(id, request);
-        return ResponseEntity.noContent().build();
     }
 
     @Override
