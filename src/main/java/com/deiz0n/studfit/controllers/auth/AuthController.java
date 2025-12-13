@@ -24,8 +24,7 @@ public interface AuthController {
 
     @Operation(
         summary = "Realizar login",
-        description = "Autentica um usuário no sistema e retorna um token de acesso JWT",
-        security = {}
+        description = "Autentica um usuário no sistema e retorna um token de acesso JWT"
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -66,8 +65,7 @@ public interface AuthController {
 
     @Operation(
         summary = "Recuperar senha",
-        description = "Envia um código de recuperação de 6 dígitos para o e-mail do usuário",
-        security = {}
+        description = "Envia um código de recuperação de 6 dígitos para o e-mail do usuário"
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -103,8 +101,7 @@ public interface AuthController {
 
     @Operation(
         summary = "Atualizar senha",
-        description = "Redefine a senha do usuário utilizando o código de recuperação de 6 dígitos recebido por e-mail",
-        security = {}
+        description = "Redefine a senha do usuário utilizando o código de recuperação de 6 dígitos recebido por e-mail"
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -142,8 +139,7 @@ public interface AuthController {
 
     @Operation(
         summary = "Validar token",
-        description = "Verifica se um token JWT está válido, não expirou e possui assinatura correta",
-        security = {}
+        description = "Verifica se um token JWT está válido, não expirou e possui assinatura correta"
     )
     @ApiResponses(value = {
         @ApiResponse(

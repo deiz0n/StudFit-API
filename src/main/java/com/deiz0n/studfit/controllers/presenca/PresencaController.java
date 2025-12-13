@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import java.time.LocalDate;
 import java.util.List;
 
+@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Presença", description = "API para gerenciamento de presenças dos alunos no sistema StudFit")
 public interface PresencaController {
 
