@@ -5,7 +5,7 @@ services:
     plan: free
     region: oregon
 
-    startCommand: java -jar app.jar
+    startCommand: java -Dspring.datasource.url=jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME} -Dspring.flyway.url=jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME} -jar app.jar
 
     envVars:
       - key: SPRING_PROFILES_ACTIVE
@@ -13,20 +13,31 @@ services:
       - key: API_PORT
         value: 8080
 
-      - key: HOST
+      - key: DB_HOST
         fromDatabase:
           name: stud-fit-db
           property: host
-
+      - key: DB_PORT
+        fromDatabase:
+          name: stud-fit-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: stud-fit-db
+          property: databaseName
       - key: DB_USER
         fromDatabase:
           name: stud-fit-db
           property: user
-
       - key: DB_PASSWORD
         fromDatabase:
           name: stud-fit-db
           property: password
+
+      - key: HOST
+        fromDatabase:
+          name: stud-fit-db
+          property: host
 
       - key: REDIS_HOST
         fromService:
@@ -35,6 +46,18 @@ services:
           property: host
 
       - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: stud-fit-cache
+          property: port
+
+      - key: SPRING_DATA_REDIS_HOST
+        fromService:
+          type: redis
+          name: stud-fit-cache
+          property: host
+
+      - key: SPRING_DATA_REDIS_PORT
         fromService:
           type: redis
           name: stud-fit-cache
