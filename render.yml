@@ -1,0 +1,99 @@
+services:
+  - type: web
+    name: stud-fit-api
+    env: docker
+    plan: free
+    region: oregon
+
+    startCommand: java -jar app.jar
+
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: stud-fit-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: stud-fit-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: stud-fit-db
+          property: password
+
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: stud-fit-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: stud-fit-db
+          property: password
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: stud-fit-db
+          property: databaseName
+
+      - key: SPRING_DATA_REDIS_HOST
+        fromService:
+          type: redis
+          name: stud-fit-cache
+          property: host
+      - key: SPRING_DATA_REDIS_PORT
+        fromService:
+          type: redis
+          name: stud-fit-cache
+          property: port
+
+      - key: SPRING_REDIS_HOST
+        fromService:
+          type: redis
+          name: stud-fit-cache
+          property: host
+      - key: SPRING_REDIS_PORT
+        fromService:
+          type: redis
+          name: stud-fit-cache
+          property: port
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: stud-fit-cache
+          property: host
+
+      - key: AWS_ACCESS_KEY
+        sync: false
+      - key: AWS_SECRET_KEY
+        sync: false
+      - key: AWS_REGION
+        sync: false
+      - key: AWS_SESSION_TOKEN
+        sync: false
+      - key: AWS_BUCKET_ATESTADO
+        sync: false
+
+      - key: API_MAIL
+        sync: false
+      - key: API_PASSWORD
+        sync: false
+      - key: API_PORT
+        sync: false
+
+      - key: KEY
+        sync: false
+
+databases:
+  - name: stud-fit-db
+    databaseName: studfitdb
+    user: studfituser
+    plan: free
+    region: oregon
+
+  - name: stud-fit-cache
+    type: redis
+    plan: free
+    region: oregon
+    ipAllowList: []
